@@ -7,7 +7,7 @@
 <h2>🎯 Objetivo</h2>
 <p>Facilitar la organización y el acceso a grandes volúmenes de información, haciendo repositorios de conocimiento más eficientes y navegables.</p>
 <br>
-<h2>🧠 Tecnologías utilizadas</h2>
+<h2>⚙️ Tecnologías utilizadas</h2>
 <h3>Back-end</h3>
 <p>-IntelliJ IDEA.</p>
 <p>-Java.</p>
