@@ -1,5 +1,5 @@
 # TechMind
-Plataforma para la clasificación y organización inteligente de contenidos.
+<p>Plataforma para la clasificación y organización inteligente de contenidos.</p>
 <br>
 <h2>📖 Descripción del proyecto</h2>
 <p>Crear una solución inteligente capaz de recibir contenidos técnicos en formato textual y procesarlos automáticamente, clasificándolos en categorías relevantes, extrayéndolos palabras clave y enriqueciendo la información con metadatos generados por el modelo.</p>
@@ -8,10 +8,17 @@ Plataforma para la clasificación y organización inteligente de contenidos.
 <p>Facilitar la organización y el acceso a grandes volúmenes de información, haciendo repositorios de conocimiento más eficientes y navegables.</p>
 <br>
 <h2>🧠 Tecnologías utilizadas</h2>
-<p>-Python.</p>
-<p>-Java.</p>
+<h3>Back-end</h3>
 <p>-IntelliJ IDEA.</p>
-<p>-Antigravity IDE.</p>
+<p>-Java.</p>
+<p>-API REST.</p>
+<h3>Ciencia de datos</h3>
+<p>-Google Colab.</p>
+<p>-Python.</p>
+<p>-Pandas.</p>
+<p>-TF-IDF.</p>
+<p>-Scikit-learn.</p>
+<h3>Infraestructura</h3>
 <p>-Oracle Cloud Infrastructure (OCI).</p>
 <br>
 <h2>🤝 Equipo</h2>
