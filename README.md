@@ -24,8 +24,8 @@
 <h2>🤝 Equipo</h2>
 <p>-Leandro Villamil.</p>
 <p>-Noelia Rementeria.</p>
-<p>-Sergio Pablo Vilte.</p>
+<p>-Sergio Vilte.</p>
 <p>-Ernesto Llampa.</p>
 <p>-Camila Fagina.</p>
-<p>-Romulo Garcia Maygua.</p>
-<p>-Federico Gabriel Gutierrez.</p>
+<p>-Romulo Garcia.</p>
+<p>-Federico Gutierrez.</p>
