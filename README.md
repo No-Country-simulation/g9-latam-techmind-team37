@@ -2,7 +2,7 @@
 <p>Plataforma para la clasificación y organización inteligente de contenidos.</p>
 <br>
 <h2>📖 Descripción del proyecto</h2>
-<p>Crear una solución inteligente capaz de recibir contenidos técnicos en formato textual y procesarlos automáticamente, clasificándolos en categorías relevantes, extrayéndolos palabras clave y enriqueciendo la información con metadatos generados por el modelo.</p>
+<p>Crear una solución inteligente capaz de recibir contenidos técnicos en formato textual y procesarlos automáticamente, clasificándolos en categorías relevantes, extrayéndo palabras clave y enriqueciendo la información con metadatos generados por el modelo.</p>
 <br>
 <h2>🎯 Objetivo</h2>
 <p>Facilitar la organización y el acceso a grandes volúmenes de información, haciendo repositorios de conocimiento más eficientes y navegables.</p>
@@ -29,3 +29,4 @@
 <p>-Camila Fagina.</p>
 <p>-Romulo Garcia.</p>
 <p>-Federico Gutierrez.</p>
+<p>-Andres Rojas.</p>
