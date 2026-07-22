@@ -217,7 +217,7 @@ uvicorn app.main:app --reload --port 8000
 
 | Rol | Tecnología | Integrante |
 |-----|-----------|-----------|
-| **Ciencia de Datos** | Python · Scikit-Learn · FastAPI · PostgreSQL | Ernesto |
+| **Ciencia de Datos** | Python · Scikit-Learn · FastAPI · PostgreSQL | Equipo Data Science |
 | **Back-End** | Java · Spring Boot | Equipo Backend |
 | **Cloud** | Oracle Cloud Infrastructure | Todo el equipo |
 
