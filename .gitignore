@@ -1,0 +1,115 @@
+# ==========================================
+# 1. Archivos Temporales del Proyecto / Trabajo
+# ==========================================
+temp_target_repo/
+tmp/
+temp/
+scratch/
+
+# ==========================================
+# 2. Variables de Entorno (NUNCA versionar secretos)
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# 3. Artefactos de Data Science y Modelos ML
+# ==========================================
+# Ignorar binarios de modelos generados por el notebook
+*.joblib
+*.pkl
+*.onnx
+*.h5
+*.pth
+*.pt
+
+# Asegurar que la carpeta data-science/models/ persista en git aunque esté vacía
+!data-science/models/.gitkeep
+
+# ==========================================
+# 4. Documentos Fuente Locales (PDF/DOCX/etc.)
+# ==========================================
+documentos/*
+!documentos/.gitkeep
+
+# ==========================================
+# 5. Python & Entornos Virtuales
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Caches de testing y linting
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Builds y empaquetado
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+
+# ==========================================
+# 6. Jupyter Notebooks
+# ==========================================
+.ipynb_checkpoints/
+
+# ==========================================
+# 7. IDEs & Editores de Código
+# ==========================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ==========================================
+# 8. Sistema Operativo & Logs
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs y DBs locales
+*.log
+*.sqlite
+*.db
