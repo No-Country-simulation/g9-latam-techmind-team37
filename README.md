@@ -13,7 +13,7 @@
 <p>-Java.</p>
 <p>-API REST.</p>
 <h3>Ciencia de datos</h3>
-<p>-Google Colab.</p>
+<p>-Jupyter Notebook.</p>
 <p>-Python.</p>
 <p>-Pandas.</p>
 <p>-TF-IDF.</p>
