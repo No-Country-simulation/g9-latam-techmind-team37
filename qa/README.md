@@ -33,13 +33,13 @@ Para ejecutar la suite completa de pruebas necesitás contar con los siguientes 
 La suite cubre 6 dimensiones clave de calidad sobre el microservicio:
 
 1. **Pruebas Funcionales / Flujo Feliz (7 Casos):**
-   * Validación de clasificación de texto (`CP-01`), extracción de palabras clave (`CP-02`), cálculo de probabilidad entre 0 y 1 (`CP-03`), contrato JSON (`CP-09`), carga del modelo `.joblib` (`CP-10`), latencia < 2000 ms (`CP-11`) y normalización de mayúsculas/tildes (`CP-20`).
+   * Validación de clasificación de texto (`CP-01`), extracción de palabras clave (`CP-02`), cálculo de probabilidad entre 0 y 1 (`CP-03`), contrato JSON (`CP-09`), carga del modelo `.joblib` (`CP-10`), latencia < 2000 ms (`CP-11`),  normalización de mayúsculas/tildes (`CP-20`) y evalúa la latencia y estabilidad ante 100 peticiones concurrentes (`CP-22`).
 
 2. **Casos Borde y Stress Leve (3 Casos):**
    * Evaluación de payloads extensos de +500k caracteres (`CP-12`), sanitización de caracteres especiales/emojis en UTF-8 (`CP-13`) y la evaluación de cómo reacciona la API ante entradas no técnicas o sin sentido (`CP-21`).
 
 3. **Validación de Esquema y Tipos (1 Caso):**
-   * Verificación de rechazo con HTTP 422 ante tipos de datos no válidos (`CP-14`).
+   * Verificación de rechazo con HTTP 422 ante tipos de datos no válidos (`CP-14`), también se valida que la API rechace payloads nulos (`CP-23`) y detecte errores de sintaxis JSON (`CP-24`).
 
 4. **Pruebas de Seguridad y Robustez (2 Casos):**
    * Inmunidad contra Inyección SQL en campos de entrada (`CP-15`) y rechazo de cabeceras no soportadas como XML (`CP-16`).
