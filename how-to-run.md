@@ -123,6 +123,9 @@ python data-science\src\migrate_to_postgres.py
 
 Esto crea las tablas necesarias en la base de datos y las carga con el dataset inicial.
 
+> 💬 **El script puede preguntarte:** *"¿Querés reemplazarlos? (s/N)"*
+> Escribí `N` y presioná Enter — eso conserva los datos existentes, que es lo correcto.
+
 ---
 
 ### Paso 7 — Iniciar el microservicio FastAPI
@@ -139,21 +142,24 @@ Si todo salió bien, vas a ver esto en la consola:
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
-> ⚠️ **Si ves un error sobre archivos `.joblib` no encontrados**, los modelos de ML no están generados todavía. Hablá con Ernesto para que te pase los archivos `modelo_clasificador.joblib` y `tfidf_vectorizer.joblib` y los pongas en la carpeta `data-science\models\`.
+> ✅ **Los modelos ya vienen incluidos en el repositorio** (`data-science\models\`) — no necesitás generarlos ni pedirlos.
 
 Para **detener** el servidor: presioná `CTRL + C` en la consola.
 
 ---
 
-## 🔁 Las veces siguientes (3 comandos)
+## 🔁 Las veces siguientes (4 comandos)
 
 Una vez instalado todo, cada vez que quieras levantar el servicio solo ejecutás esto:
 
 ```powershell
-# 1. Activar el entorno virtual (hacerlo siempre primero)
+# 0. Ir a la carpeta del proyecto (si abriste una terminal nueva)
+cd g9-latam-techmind-team37
+
+# 1. Activar el entorno virtual (hacerlo siempre antes que cualquier otra cosa)
 venv\Scripts\activate
 
-# 2. Levantar PostgreSQL (si Docker Desktop ya está abierto, seguramente ya corre)
+# 2. Levantar PostgreSQL (abrí Docker Desktop primero, luego ejecutá esto)
 docker-compose up -d
 
 # 3. Iniciar el microservicio
