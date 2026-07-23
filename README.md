@@ -72,27 +72,27 @@ Todo en formato JSON, listo para ser consumido por la API REST del equipo.
 ```
 g9-latam-techmind-team37/
 │
-├── app/                            # Microservicio FastAPI (Backend Python)
+├── app/                                   # Microservicio FastAPI (Backend Python)
 │   ├── __init__.py
-│   ├── main.py                     # API REST: /predecir, /health, /categorias
-│   └── database.py                 # Conexión PostgreSQL y registro de predicciones
+│   ├── main.py                            # API REST: /predecir, /health, /categorias
+│   └── database.py                        # Conexión PostgreSQL y registro de predicciones
 │
-├── documentos/                     # PDFs / DOCXs para ingesta masiva
+├── documentos/                            # PDFs / DOCXs para ingesta masiva
 │
-├── data-science/                   # Módulo de Ciencia de Datos y Machine Learning
+├── data-science/                          # Módulo de Ciencia de Datos y Machine Learning
 │   ├── data/
 │   │   ├── raw/
 │   │   │   └── contenidos_tecnicos.csv    # Dataset inicial de entrenamiento
-│   │   └── processed/              # Datos procesados / intermedios
+│   │   └── processed/                     # Datos procesados / intermedios
 │   ├── notebooks/
 │   │   └── TechMind_DataScience.ipynb     # Notebook Jupyter principal
 │   ├── src/
-│   │   ├── ingest_documents.py     # Script para ingestión de PDFs/DOCXs
-│   │   └── migrate_to_postgres.py  # Script de migración CSV -> PostgreSQL
+│   │   ├── ingest_documents.py            # Script para ingestión de PDFs/DOCXs
+│   │   └── migrate_to_postgres.py         # Script de migración CSV -> PostgreSQL
 │   ├── models/
 │   │   ├── modelo_clasificador.joblib     # Modelo binario serializado
 │   │   └── tfidf_vectorizer.joblib        # Vectorizador TF-IDF serializado
-│   ├── docs/                       # Documentación técnica de Data Science
+│   ├── docs/                              # Documentación técnica de Data Science
 │   │   ├── BACKEND_INTEGRATION.md
 │   │   ├── DIAGRAMA_PIPELINE.md
 │   │   ├── INGESTA_DOCUMENTOS.md
@@ -101,16 +101,28 @@ g9-latam-techmind-team37/
 │   │   ├── ROADMAP.md
 │   │   └── CHANGELOG.md
 │   ├── assets/
-│   │   └── pipeline_flowchart.png  # Diagrama de flujo del pipeline
-│   ├── requirements.txt            # Dependencias de Python
-│   └── README.md                   # Documentación específica del módulo DS
+│   │   └── pipeline_flowchart.png        # Diagrama de flujo del pipeline
+│   ├── requirements.txt                  # Dependencias de Python
+│   └── README.md                         # Documentación específica del módulo DS
 │
-├── docker-compose.yml              # Servidor PostgreSQL 16
-├── setup.py                        # Script automático de instalación y arranque
-├── how-to-run.md                   # Guía paso a paso para el equipo de Backend
-├── .env.example                    # Plantilla de variables de entorno
+├── qa/                                   # Módulo de Quality Assurance
+│   ├── casos-de-prueba/                  # Documentación de diseño de pruebas
+│   │   └── (v1.0) Matriz de Casos de Prueba – Sprint 1.xlsx          
+│   ├── evidencias/                       # Respaldos y ejecuciones de las pruebas
+│   │   ├── capturas/                     
+│   │   └── respuestas-json/
+│   ├── reportes/                         # Informes y resultados finales
+│   │   ├── informes/
+│   │   │   └── (v1.0) Matriz de Casos de Prueba – Sprint 1.xlsx
+│   │   └── resultados-sprint-1.md        # Resumen ejecutivo de métricas, bugs encontrados y estado de ejecución del Sprint 1
+│   └── README.md                         # Documentación específica del módulo QA
+│
+├── docker-compose.yml                    # Servidor PostgreSQL 16
+├── setup.py                              # Script automático de instalación y arranque
+├── how-to-run.md                         # Guía paso a paso para el equipo de Backend
+├── .env.example                          # Plantilla de variables de entorno
 ├── .gitignore
-└── README.md                       # Documentación principal del repositorio
+└── README.md                             # Documentación principal del repositorio
 ```
 
 ---
