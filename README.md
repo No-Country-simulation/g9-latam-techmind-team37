@@ -150,8 +150,15 @@ docker-compose up -d # PostgreSQL disponible en localhost:5432
 ### 4. Configurar variables de entorno y migrar datos
 
 ```bash
+cd ..
+```
+
+```bash
 cp .env.example .env
-python3 data-science/src/migrate_to_postgres.py
+```
+
+```bash
+py data-science/src/migrate_to_postgres.py
 ```
 
 ### 5. Iniciar la API FastAPI
