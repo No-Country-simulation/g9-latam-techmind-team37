@@ -107,13 +107,13 @@ g9-latam-techmind-team37/
 │
 ├── qa/                                   # Módulo de Quality Assurance
 │   ├── casos-de-prueba/                  # Documentación de diseño de pruebas
-│   │   └── (v1.1) Matriz de Casos de Prueba – Sprint 1.xlsx          
+│   │   └── (v1.2) Matriz de Casos de Prueba – Sprint 1.xlsx          
 │   ├── evidencias/                       # Respaldos y ejecuciones de las pruebas
 │   │   ├── capturas/                     
 │   │   └── respuestas-json/
 │   ├── reportes/                         # Informes y resultados finales
 │   │   ├── informes/
-│   │   │   └── (v1.1) Matriz de Casos de Prueba – Sprint 1.xlsx
+│   │   │   └── (v1.2) Matriz de Casos de Prueba – Sprint 1.xlsx
 │   │   └── resultados-sprint-1.md        # Resumen ejecutivo de métricas, bugs encontrados y estado de ejecución del Sprint 1
 │   └── README.md                         # Documentación específica del módulo QA
 │
@@ -226,7 +226,7 @@ uvicorn app.main:app --reload --port 8000
 
 ## 📚 Documentación Técnica
 
-- **Guía de arranque para Backend (Windows):** [`how-to-run.md`](how-to-run.md)
+- Guía de arranque para Backend (Windows): [`how-to-run.md`](how-to-run.md)
 - Guía de integración Java/Spring Boot: [`data-science/docs/BACKEND_INTEGRATION.md`](data-science/docs/BACKEND_INTEGRATION.md)
 - Guía de entrenamiento y ejecución del modelo: [`data-science/docs/ENTRENAMIENTO_Y_EJECUCION.md`](data-science/docs/ENTRENAMIENTO_Y_EJECUCION.md)
 - Ingesta de documentos PDF/DOCX: [`data-science/docs/INGESTA_DOCUMENTOS.md`](data-science/docs/INGESTA_DOCUMENTOS.md)
@@ -234,7 +234,7 @@ uvicorn app.main:app --reload --port 8000
 - Explicación conceptual para presentaciones: [`data-science/docs/EXPLICACION_PROYECTO.md`](data-science/docs/EXPLICACION_PROYECTO.md)
 - Requerimientos técnicos: [`data-science/docs/REQUIREMENTS.md`](data-science/docs/REQUIREMENTS.md)
 - Historial de cambios: [`data-science/docs/CHANGELOG.md`](data-science/docs/CHANGELOG.md)
-- **Documentación y Reportes de QA:** [`qa/README.md`](qa/README.md)
+- Documentación y Reportes de QA: [`qa/README.md`](qa/README.md)
 
 ---
 

@@ -12,9 +12,9 @@
 Durante el Sprint 1 se ejecutó la suite completa de pruebas sobre los endpoints de la API FastAPI y la integración con PostgreSQL. Se logró una cobertura total de escenarios funcionales, de límites, seguridad, resiliencia y validación de datos.
 
 ### 📊 Métricas Generales
-* **Casos Planificados:** 21
-* **Casos Ejecutados:** 21
-* **Casos Exitosos (PASÓ):** 21
+* **Casos Planificados:** 24
+* **Casos Ejecutados:** 24
+* **Casos Exitosos (PASÓ):** 24
 * **Casos Fallidos (FALLÓ):** 0
 * **Porcentaje de Éxito:** 100%
 
@@ -24,13 +24,13 @@ Durante el Sprint 1 se ejecutó la suite completa de pruebas sobre los endpoints
 
 | Categoria | Planificado | PASÓ | FALLÓ | % Éxito |
 |-----------|-----------|-----------|-----------|-----------|
-| Funcionales (Flujo Feliz) | 7 | 7 | 0 | 100 |
+| Funcionales (Flujo Feliz) | 8 | 8 | 0 | 100 |
 | Casos Borde / Encoding (UTF-8) | 3 | 3 | 0 | 100 |
-| Validación de Esquema / Tipos | 1 | 1 | 0 | 100 |
+| Validación de Esquema / Tipos | 3 | 3 | 0 | 100 |
 | Seguridad (Inyección SQL / Content-Type) | 2 | 2 | 0 | 100 |
 | Endpoints Complementarios | 2 | 2 | 0 | 100 |
 | Integridad de Datos |	6 | 6 | 0 | 100 |
-| **TOTAL** | **21** | **21** | **0** | **100** |
+| **TOTAL** | **24** | **24** | **0** | **100** |
 
 ---
 
