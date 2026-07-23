@@ -107,13 +107,13 @@ g9-latam-techmind-team37/
 │
 ├── qa/                                   # Módulo de Quality Assurance
 │   ├── casos-de-prueba/                  # Documentación de diseño de pruebas
-│   │   └── (v1.0) Matriz de Casos de Prueba – Sprint 1.xlsx          
+│   │   └── (v1.1) Matriz de Casos de Prueba – Sprint 1.xlsx          
 │   ├── evidencias/                       # Respaldos y ejecuciones de las pruebas
 │   │   ├── capturas/                     
 │   │   └── respuestas-json/
 │   ├── reportes/                         # Informes y resultados finales
 │   │   ├── informes/
-│   │   │   └── (v1.0) Matriz de Casos de Prueba – Sprint 1.xlsx
+│   │   │   └── (v1.1) Matriz de Casos de Prueba – Sprint 1.xlsx
 │   │   └── resultados-sprint-1.md        # Resumen ejecutivo de métricas, bugs encontrados y estado de ejecución del Sprint 1
 │   └── README.md                         # Documentación específica del módulo QA
 │
@@ -234,6 +234,7 @@ uvicorn app.main:app --reload --port 8000
 - Explicación conceptual para presentaciones: [`data-science/docs/EXPLICACION_PROYECTO.md`](data-science/docs/EXPLICACION_PROYECTO.md)
 - Requerimientos técnicos: [`data-science/docs/REQUIREMENTS.md`](data-science/docs/REQUIREMENTS.md)
 - Historial de cambios: [`data-science/docs/CHANGELOG.md`](data-science/docs/CHANGELOG.md)
+- **Documentación y Reportes de QA:** [`qa/README.md`](qa/README.md)
 
 ---
 
@@ -243,7 +244,7 @@ uvicorn app.main:app --reload --port 8000
 |-----|-----------|-----------|
 | **Ciencia de Datos** | Python · Scikit-Learn · FastAPI · PostgreSQL | Equipo Data Science |
 | **Back-End** | Java · Spring Boot | Equipo Backend |
-| **Cloud** | Oracle Cloud Infrastructure | Equipo QA |
+| **Quality Assurance** | Postman · Swagger · Manual Testing · Git | Federico Gutierrez |
 | **Cloud** | Oracle Cloud Infrastructure | Todo el equipo |
 
 ---
