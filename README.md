@@ -134,10 +134,14 @@ cd g9-latam-techmind-team37/data-science
 ### 2. Crear entorno virtual e instalar dependencias
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate          # macOS / Linux
-# venv\Scripts\activate           # Windows
+py -m venv venv
+```
 
+```bash
+# venv\Scripts\activate
+```
+
+```bash
 pip install -r requirements.txt
 ```
 
