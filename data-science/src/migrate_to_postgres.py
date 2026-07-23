@@ -48,13 +48,13 @@ CREATE TABLE IF NOT EXISTS contenidos (
 );
 
 CREATE TABLE IF NOT EXISTS predicciones (
-    id              SERIAL PRIMARY KEY,
-    titulo          TEXT        NOT NULL,
-    texto           TEXT        NOT NULL,
-    categoria       TEXT        NOT NULL,
-    probabilidad    FLOAT       NOT NULL,
-    keywords        TEXT[]      NOT NULL,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id                        SERIAL PRIMARY KEY,
+    titulo                    TEXT        NOT NULL,
+    texto                     TEXT        NOT NULL,
+    categoria                 TEXT        NOT NULL,
+    probabilidad              FLOAT       NOT NULL,
+    informaciones_adicionales TEXT[]      NOT NULL,
+    created_at                TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_contenidos_categoria   ON contenidos  (categoria);

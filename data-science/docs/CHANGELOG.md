@@ -10,7 +10,7 @@
 ### Corregido
 - **Bug crítico en `app/main.py` — endpoint `POST /predecir`:** la variable `probabilidad` nunca se calculaba antes de ser usada en `log_prediccion()`, lo que causaba un `NameError` en runtime. Se agregó el cálculo correcto usando `modelo.predict_proba(vector)[0].max()` antes de la llamada a la función de logging.
 - **Rutas de serialización en `TechMind_DataScience.ipynb`:** las celdas de `joblib.dump()` y `joblib.load()` usaban rutas relativas simples (`"tfidf_vectorizer.joblib"`, `"modelo_clasificador.joblib"`) que guardaban los artefactos en el directorio de trabajo del kernel (`data-science/notebooks/`), no en `data-science/models/` donde FastAPI los busca. Se corrigieron las rutas a `"../models/tfidf_vectorizer.joblib"` y `"../models/modelo_clasificador.joblib"`.
-- **Esquema PostgreSQL — tabla `predicciones`:** la columna fue creada por el script de migración con el nombre `keywords` en lugar de `informaciones_adicionales`, lo que causaba un error silencioso al intentar persistir cada predicción. Se renombró la columna con `ALTER TABLE predicciones RENAME COLUMN keywords TO informaciones_adicionales;`.
+- **Esquema PostgreSQL — tabla `predicciones`:** la columna fue creada por el script de migración (`migrate_to_postgres.py`) con el nombre `keywords` en lugar de `informaciones_adicionales`, lo que causaba un error silencioso al intentar persistir cada predicción. Corregido en dos pasos: (1) `ALTER TABLE` sobre la DB existente y (2) corrección del nombre en el `SCHEMA_SQL` del script de migración para que instalaciones nuevas también queden correctas.
 
 ### Verificado
 - Pipeline completo probado end-to-end: `POST /predecir` → clasificación → persistencia en PostgreSQL sin errores.
