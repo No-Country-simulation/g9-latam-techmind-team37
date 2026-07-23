@@ -231,6 +231,7 @@ uvicorn app.main:app --reload --port 8000
 |-----|-----------|-----------|
 | **Ciencia de Datos** | Python · Scikit-Learn · FastAPI · PostgreSQL | Equipo Data Science |
 | **Back-End** | Java · Spring Boot | Equipo Backend |
+| **Cloud** | Oracle Cloud Infrastructure | Equipo QA |
 | **Cloud** | Oracle Cloud Infrastructure | Todo el equipo |
 
 ---
