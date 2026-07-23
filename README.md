@@ -134,11 +134,7 @@ cd g9-latam-techmind-team37/data-science
 ### 2. Crear entorno virtual e instalar dependencias
 
 ```bash
-py -m venv venv
-```
-
-```bash
-# venv\Scripts\activate
+py -m venv venv # venv\Scripts\activate
 ```
 
 ```bash
@@ -148,8 +144,7 @@ pip install -r requirements.txt
 ### 3. Levantar PostgreSQL con Docker
 
 ```bash
-docker-compose up -d
-# PostgreSQL disponible en localhost:5432
+docker-compose up -d # PostgreSQL disponible en localhost:5432
 ```
 
 ### 4. Configurar variables de entorno y migrar datos
