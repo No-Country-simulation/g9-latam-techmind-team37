@@ -70,7 +70,7 @@ Todo en formato JSON, listo para ser consumido por la API REST del equipo.
 ## 📁 Estructura del Repositorio
 
 ```
-tech-mind/
+g9-latam-techmind-team37/
 │
 ├── app/                            # Microservicio FastAPI (Backend Python)
 │   ├── __init__.py
@@ -84,18 +84,14 @@ tech-mind/
 │   │   ├── raw/
 │   │   │   └── contenidos_tecnicos.csv    # Dataset inicial de entrenamiento
 │   │   └── processed/              # Datos procesados / intermedios
-│   │
 │   ├── notebooks/
 │   │   └── TechMind_DataScience.ipynb     # Notebook Jupyter principal
-│   │
 │   ├── src/
 │   │   ├── ingest_documents.py     # Script para ingestión de PDFs/DOCXs
 │   │   └── migrate_to_postgres.py  # Script de migración CSV -> PostgreSQL
-│   │
 │   ├── models/
 │   │   ├── modelo_clasificador.joblib     # Modelo binario serializado
 │   │   └── tfidf_vectorizer.joblib        # Vectorizador TF-IDF serializado
-│   │
 │   ├── docs/                       # Documentación técnica de Data Science
 │   │   ├── BACKEND_INTEGRATION.md
 │   │   ├── DIAGRAMA_PIPELINE.md
@@ -104,14 +100,14 @@ tech-mind/
 │   │   ├── REQUIREMENTS.md
 │   │   ├── ROADMAP.md
 │   │   └── CHANGELOG.md
-│   │
 │   ├── assets/
 │   │   └── pipeline_flowchart.png  # Diagrama de flujo del pipeline
-│   │
 │   ├── requirements.txt            # Dependencias de Python
 │   └── README.md                   # Documentación específica del módulo DS
 │
 ├── docker-compose.yml              # Servidor PostgreSQL 16
+├── setup.py                        # Script automático de instalación y arranque
+├── how-to-run.md                   # Guía paso a paso para el equipo de Backend
 ├── .env.example                    # Plantilla de variables de entorno
 ├── .gitignore
 └── README.md                       # Documentación principal del repositorio
@@ -121,47 +117,52 @@ tech-mind/
 
 ## 🚀 Cómo ejecutar el proyecto
 
-### 1. Clonar el repositorio
+### Opción rápida — Script automático (recomendado)
+
+```bash
+# Primera vez — instala todo y arranca
+python setup.py
+
+# Las veces siguientes
+python setup.py --start
+```
+
+> Ver la guía completa paso a paso en [`how-to-run.md`](how-to-run.md) (especialmente útil para el equipo de Backend en Windows).
+
+### Pasos manuales
+
+#### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/No-Country-simulation/g9-latam-techmind-team37.git
+cd g9-latam-techmind-team37
 ```
+
+#### 2. Crear entorno virtual e instalar dependencias
 
 ```bash
-cd g9-latam-techmind-team37/data-science
+python3 -m venv venv
+source venv/bin/activate          # macOS / Linux
+# venv\Scripts\activate           # Windows
+
+pip install -r data-science/requirements.txt
 ```
 
-### 2. Crear entorno virtual e instalar dependencias
+#### 3. Levantar PostgreSQL con Docker
 
 ```bash
-py -m venv venv # venv\Scripts\activate
+docker-compose up -d
+# PostgreSQL disponible en localhost:5432
 ```
 
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Levantar PostgreSQL con Docker
-
-```bash
-docker-compose up -d # PostgreSQL disponible en localhost:5432
-```
-
-### 4. Configurar variables de entorno y migrar datos
-
-```bash
-cd ..
-```
+#### 4. Configurar variables de entorno y migrar datos
 
 ```bash
 cp .env.example .env
+python3 data-science/src/migrate_to_postgres.py
 ```
 
-```bash
-py data-science/src/migrate_to_postgres.py
-```
-
-### 5. Iniciar la API FastAPI
+#### 5. Iniciar la API FastAPI
 
 ```bash
 uvicorn app.main:app --reload --port 8000
@@ -213,12 +214,14 @@ uvicorn app.main:app --reload --port 8000
 
 ## 📚 Documentación Técnica
 
+- **Guía de arranque para Backend (Windows):** [`how-to-run.md`](how-to-run.md)
 - Guía de integración Java/Spring Boot: [`data-science/docs/BACKEND_INTEGRATION.md`](data-science/docs/BACKEND_INTEGRATION.md)
 - Guía de entrenamiento y ejecución del modelo: [`data-science/docs/ENTRENAMIENTO_Y_EJECUCION.md`](data-science/docs/ENTRENAMIENTO_Y_EJECUCION.md)
 - Ingesta de documentos PDF/DOCX: [`data-science/docs/INGESTA_DOCUMENTOS.md`](data-science/docs/INGESTA_DOCUMENTOS.md)
 - Diagrama interactivo del pipeline: [`data-science/docs/DIAGRAMA_PIPELINE.md`](data-science/docs/DIAGRAMA_PIPELINE.md)
 - Explicación conceptual para presentaciones: [`data-science/docs/EXPLICACION_PROYECTO.md`](data-science/docs/EXPLICACION_PROYECTO.md)
 - Requerimientos técnicos: [`data-science/docs/REQUIREMENTS.md`](data-science/docs/REQUIREMENTS.md)
+- Historial de cambios: [`data-science/docs/CHANGELOG.md`](data-science/docs/CHANGELOG.md)
 
 ---
 

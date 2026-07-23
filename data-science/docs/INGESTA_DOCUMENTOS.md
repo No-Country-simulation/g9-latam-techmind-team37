@@ -50,10 +50,12 @@ python3 data-science/src/ingest_documents.py --archivo documentos/docker_intro.p
 
 ## Re-entrenamiento del Modelo
 
-Una vez ingeridos los nuevos documentos, puedes re-entrenar el modelo ejecutando:
+Una vez ingeridos los nuevos documentos, podés re-entrenar el modelo ejecutando:
 
 ```bash
-jupyter nbconvert --to notebook --execute data-science/notebooks/TechMind_DataScience.ipynb
+cd data-science/notebooks
+jupyter nbconvert --to notebook --execute --inplace TechMind_DataScience.ipynb
+cd ../..
 ```
 
 Los artefactos `.joblib` en `data-science/models/` se actualizarán automáticamente.
