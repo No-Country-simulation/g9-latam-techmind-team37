@@ -132,6 +132,8 @@ def predecir(req: ContenidoRequest):
 
     vector       = vectorizer.transform([texto_limpio])
     categoria    = modelo.predict(vector)[0]
+    proba_arr    = modelo.predict_proba(vector)[0]
+    probabilidad = float(proba_arr.max())
     informaciones_adicionales = extraer_keywords(texto_limpio)
 
     log_prediccion(req.titulo, req.texto, categoria, probabilidad, informaciones_adicionales)

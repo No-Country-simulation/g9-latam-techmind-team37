@@ -106,3 +106,18 @@ Al finalizar el entrenamiento, se generan dos archivos esenciales para que FastA
 - `data-science/models/modelo_clasificador.joblib`: Realiza la predicción de la categoría y probabilidades.
 
 Ambos modelos son cargados automáticamente por FastAPI (`app/main.py`) al iniciar el servidor.
+
+> ✅ **Nota (v0.6.0):** Las rutas de serialización en el notebook fueron corregidas a `"../models/tfidf_vectorizer.joblib"` y `"../models/modelo_clasificador.joblib"`, lo que garantiza que los `.joblib` se generen siempre en `data-science/models/` independientemente del directorio desde donde se ejecute el notebook.
+
+---
+
+## 7. Nota sobre el cálculo de probabilidad
+
+En `app/main.py`, el endpoint `POST /predecir` calcula la probabilidad de la siguiente forma:
+
+```python
+proba_arr    = modelo.predict_proba(vector)[0]   # distribución de probabilidad por clase
+probabilidad = float(proba_arr.max())            # toma la probabilidad de la clase ganadora
+```
+
+Esto garantiza que el campo `probabilidad` en la respuesta JSON siempre refleja la confianza del modelo en la categoría predicha (un valor entre 0.0 y 1.0).

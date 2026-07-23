@@ -24,6 +24,10 @@ scratch/
 *.pth
 *.pt
 
+# EXCEPCIÓN: los modelos entrenados de la carpeta oficial sí se versionan
+# para que el equipo de Backend pueda consumirlos directamente desde el repo.
+!data-science/models/*.joblib
+
 # Asegurar que la carpeta data-science/models/ persista en git aunque esté vacía
 !data-science/models/.gitkeep
 

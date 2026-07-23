@@ -17,11 +17,6 @@ cd g9-latam-techmind-team37/data-science
 ```
 data-science/
 │
-├── app/                            # Microservicio FastAPI (Python)
-│   ├── __init__.py
-│   ├── main.py                     # API REST: /predecir, /health, /categorias
-│   └── database.py                 # Conexión PostgreSQL y registro de predicciones
-│
 ├── data/
 │   ├── raw/
 │   │   └── contenidos_tecnicos.csv    # Dataset inicial de entrenamiento (~61 registros)
@@ -51,14 +46,11 @@ data-science/
 ├── assets/
 │   └── pipeline_flowchart.png     # Diagrama visual del flujo de datos
 │
-├── documentos/
-│   └── .gitkeep                    # Carpeta para colocar nuevos PDFs/DOCXs
-│
-├── docker-compose.yml              # PostgreSQL 16 para entorno local de DS
-├── .env.example                    # Plantilla de variables de entorno
 ├── requirements.txt               # Dependencias de Python
 └── README.md                       # Este archivo
 ```
+
+> ⚠️ **Nota:** el microservicio FastAPI (`app/`) se encuentra en la **raíz del repositorio**, no dentro de `data-science/`.
 
 ---
 

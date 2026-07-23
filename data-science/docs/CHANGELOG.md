@@ -5,7 +5,20 @@
 
 ---
 
-## [0.5.0] — 2026-07-21 · Ingesta de Documentos + Re-entrenamiento Automático (actual)
+## [0.6.0] — 2026-07-22 · Bug Fixes + Corrección de rutas del modelo (actual)
+
+### Corregido
+- **Bug crítico en `app/main.py` — endpoint `POST /predecir`:** la variable `probabilidad` nunca se calculaba antes de ser usada en `log_prediccion()`, lo que causaba un `NameError` en runtime. Se agregó el cálculo correcto usando `modelo.predict_proba(vector)[0].max()` antes de la llamada a la función de logging.
+- **Rutas de serialización en `TechMind_DataScience.ipynb`:** las celdas de `joblib.dump()` y `joblib.load()` usaban rutas relativas simples (`"tfidf_vectorizer.joblib"`, `"modelo_clasificador.joblib"`) que guardaban los artefactos en el directorio de trabajo del kernel (`data-science/notebooks/`), no en `data-science/models/` donde FastAPI los busca. Se corrigieron las rutas a `"../models/tfidf_vectorizer.joblib"` y `"../models/modelo_clasificador.joblib"`.
+- **Esquema PostgreSQL — tabla `predicciones`:** la columna fue creada por el script de migración con el nombre `keywords` en lugar de `informaciones_adicionales`, lo que causaba un error silencioso al intentar persistir cada predicción. Se renombró la columna con `ALTER TABLE predicciones RENAME COLUMN keywords TO informaciones_adicionales;`.
+
+### Verificado
+- Pipeline completo probado end-to-end: `POST /predecir` → clasificación → persistencia en PostgreSQL sin errores.
+- Los modelos `.joblib` ahora se generan directamente en `data-science/models/` al ejecutar el notebook.
+
+---
+
+## [0.5.0] — 2026-07-21 · Ingesta de Documentos + Re-entrenamiento Automático
 
 ### Añadido
 - **Script de ingesta interactiva** (`ingest_documents.py`) que permite importar archivos PDF (`pdfplumber`) y DOCX (`python-docx`) a PostgreSQL.
@@ -118,4 +131,4 @@ Postman → Spring Boot (8080) → FastAPI (8000) → PostgreSQL (5432)
 
 ---
 
-*Mantenido por el equipo de Ciencia de Datos — TechMind G9 LATAM Team 37. Última actualización: 2026-07-21.*
+*Mantenido por el equipo de Ciencia de Datos — TechMind G9 LATAM Team 37. Última actualización: 2026-07-22.*
