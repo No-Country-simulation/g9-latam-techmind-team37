@@ -125,6 +125,9 @@ tech-mind/
 
 ```bash
 git clone https://github.com/No-Country-simulation/g9-latam-techmind-team37.git
+```
+
+```bash
 cd g9-latam-techmind-team37/data-science
 ```
 
@@ -135,7 +138,7 @@ python3 -m venv venv
 source venv/bin/activate          # macOS / Linux
 # venv\Scripts\activate           # Windows
 
-pip install -r data-science/requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 3. Levantar PostgreSQL con Docker
