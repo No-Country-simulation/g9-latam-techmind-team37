@@ -17,6 +17,32 @@ Spring Boot lo llama internamente cada vez que recibe un contenido para clasific
 
 ---
 
+## ⚡ Opción rápida — Script automático (recomendado)
+
+Si no querés hacer los pasos manualmente, el repositorio incluye un script que **hace todo por vos**:
+
+### Primera vez
+```powershell
+python setup.py
+```
+
+### Las veces siguientes
+```powershell
+python setup.py --start
+```
+
+El script verifica Python, crea el entorno virtual, instala dependencias, levanta Docker, migra la base de datos e inicia la API. Si algo falla, te dice exactamente qué está mal.
+
+> ⚠️ Requiere tener **Python** y **Docker Desktop** instalados (ver requisitos abajo).
+
+---
+
+## 📋 Pasos manuales (alternativa)
+
+Si preferís ejecutar cada paso vos mismo, seguí esta guía:
+
+---
+
 ## ✅ Requisitos previos
 
 Antes de empezar, verificá que tenés instalado:
