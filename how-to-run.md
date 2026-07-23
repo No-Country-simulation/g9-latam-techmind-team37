@@ -267,11 +267,6 @@ python3 data-science/src/migrate_to_postgres.py
 
 Los demás comandos (`docker-compose`, `uvicorn`) son idénticos.
 
----
-
-## 📞 Contacto
-
-Si algo no funciona, hablá con **Ernesto** (Ciencia de Datos).
 
 ---
 
