@@ -242,8 +242,8 @@ uvicorn app.main:app --reload --port 8000
 
 | Rol | Tecnología | Integrante |
 |-----|-----------|-----------|
-| **Ciencia de Datos** | Python · Scikit-Learn · FastAPI · PostgreSQL | Equipo Data Science |
-| **Back-End** | Java · Spring Boot | Equipo Backend |
+| **Ciencia de Datos** | Python · Scikit-Learn · FastAPI · PostgreSQL | Leandro Villamil | Ernesto Llampa | Romulo Garcia Maygua |
+| **Back-End** | Java · Spring Boot | Sergio Pablo Vilte | Andres Felipe Rojas | Noelia Rementeria | Camila Fagina |
 | **Quality Assurance** | Postman · Swagger · Manual Testing · Git | Federico Gutierrez |
 | **Cloud** | Oracle Cloud Infrastructure | Todo el equipo |
 
