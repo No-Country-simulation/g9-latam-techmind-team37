@@ -61,8 +61,9 @@ Todo en formato JSON, listo para ser consumido por la API REST del equipo.
 
 | Componente | Tecnología | Responsable |
 |-----------|-----------|-------------|
-| **Ciencia de Datos** | Python · Scikit-Learn · FastAPI | Ernesto |
-| **Back-End** | Java · Spring Boot | Equipo Backend |
+| **Ciencia de Datos** | Python · Scikit-Learn · FastAPI | Leandro Villamil · Ernesto Llampa · Romulo Garcia Maygua |
+| **Back-End** | Java · Spring Boot | Sergio Pablo Vilte · Andres Felipe Rojas · Noelia Rementeria · Camila Fagina |
+| **Quality Assurance** | Postman · Swagger · Manual Testing · Git | Federico Gutierrez |
 | **Nube** | Oracle Cloud Infrastructure (OCI) | Todo el equipo |
 
 ---
@@ -235,17 +236,6 @@ uvicorn app.main:app --reload --port 8000
 - Requerimientos técnicos: [`data-science/docs/REQUIREMENTS.md`](data-science/docs/REQUIREMENTS.md)
 - Historial de cambios: [`data-science/docs/CHANGELOG.md`](data-science/docs/CHANGELOG.md)
 - Documentación y Reportes de QA: [`qa/README.md`](qa/README.md)
-
----
-
-## 👥 Equipo
-
-| Rol | Tecnología | Integrante |
-|-----|-----------|-----------|
-| **Ciencia de Datos** | Python · Scikit-Learn · FastAPI · PostgreSQL | Leandro Villamil | Ernesto Llampa | Romulo Garcia Maygua |
-| **Back-End** | Java · Spring Boot | Sergio Pablo Vilte | Andres Felipe Rojas | Noelia Rementeria | Camila Fagina |
-| **Quality Assurance** | Postman · Swagger · Manual Testing · Git | Federico Gutierrez |
-| **Cloud** | Oracle Cloud Infrastructure | Todo el equipo |
 
 ---
 
