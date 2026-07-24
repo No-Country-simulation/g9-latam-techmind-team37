@@ -234,11 +234,35 @@ def quick_start():
                  capture_output=True, text=True)
     if "Up" not in result.stdout:
         info("PostgreSQL no está corriendo — levantándolo...")
-        run("docker-compose up -d")
-        time.sleep(5)
-    ok("PostgreSQL activo")
+        result = run("docker-compose up -d")
+        if result.returncode != 0:
+            # Intentar iniciar el contenedor si ya existe pero con otro proyecto
+            info("Intentando iniciar contenedor existente 'techmind-postgres'...")
+            result = run("docker start techmind-postgres", capture_output=True)
+            if result.returncode != 0:
+                fail("No se pudo levantar PostgreSQL con Docker.")
+
+        # Esperar a que PostgreSQL esté realmente listo
+        print("  ⏳ Esperando que PostgreSQL esté listo", end="", flush=True)
+        for _ in range(30):
+            time.sleep(1)
+            ready = run(
+                "docker exec techmind-postgres pg_isready -U techmind_user -d techmind",
+                capture_output=True
+            )
+            if ready.returncode == 0:
+                print(" ✅")
+                ok("PostgreSQL listo en localhost:5432")
+                break
+            print(".", end="", flush=True)
+        else:
+            print()
+            fail("PostgreSQL no respondió a tiempo. Revisá los logs con: docker logs techmind-postgres")
+    else:
+        ok("PostgreSQL activo")
 
     start_api()
+
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
