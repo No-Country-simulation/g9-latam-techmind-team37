@@ -108,14 +108,20 @@ g9-latam-techmind-team37/
 │
 ├── qa/                                   # Módulo de Quality Assurance
 │   ├── casos-de-prueba/                  # Documentación de diseño de pruebas
-│   │   └── (v1.2) Matriz de Casos de Prueba – Sprint 1.xlsx          
+│   │   └── (v2.0) Matriz de Casos de Prueba – Sprint 1.xlsx          
 │   ├── evidencias/                       # Respaldos y ejecuciones de las pruebas
-│   │   ├── capturas/                     
+│   │   ├── capturas/  
+│   │   │   ├── FastAPI 
+│   │   │   └── DataBase         
 │   │   └── respuestas-json/
+│   │       └── FastAPI  
 │   ├── reportes/                         # Informes y resultados finales
 │   │   ├── informes/
-│   │   │   └── (v1.2) Matriz de Casos de Prueba – Sprint 1.xlsx
-│   │   └── resultados-sprint-1.md        # Resumen ejecutivo de métricas, bugs encontrados y estado de ejecución del Sprint 1
+│   │   │   └── (v2.0) Matriz de Casos de Prueba – Sprint 1.xlsx
+│   │   ├── Reporte de BUGS/
+│   │   │   └── FIX-columna-informaciones_adicionales.md
+│   │   ├── resultados-FastAPI.md         # Resumen ejecutivo de métricas, bugs encontrados y estado de FastAPI
+│   │   └── resultados-DataBase.md        # Resumen ejecutivo de métricas, bugs encontrados y estado en la DB.
 │   └── README.md                         # Documentación específica del módulo QA
 │
 ├── docker-compose.yml                    # Servidor PostgreSQL 16

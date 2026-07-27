@@ -8,7 +8,6 @@
 ---
 
 ## 📈 Resumen Ejecutivo
-
 Durante el Sprint 1 se ejecutó la suite completa de pruebas sobre los endpoints de la API FastAPI y la integración con PostgreSQL. Se logró una cobertura total de escenarios funcionales, de límites, seguridad, resiliencia y validación de datos.
 
 ### 📊 Métricas Generales

@@ -1,20 +1,25 @@
 # 🧪 Guía de Ejecución de QA y Testing — TechMind
 
-Este documento describe la estrategia, las herramientas, la configuración del entorno y el procedimiento paso a paso para la ejecución de la suite de pruebas del proyecto **TechMind**.
+Este documento describe la estrategia, las herramientas, la configuración del entorno y el procedimiento paso a paso para la ejecución de la suite de pruebas del proyecto TechMind, cubriendo tanto la API REST (FastAPI) como la capa de persistencia e integridad de datos en PostgreSQL.
 
 ---
-
 ## 🛠️ 1. Requisitos Previos y Herramientas
 
-Para ejecutar la suite completa de pruebas necesitás contar con los siguientes elementos configurados:
+Para ejecutar la suite completa de pruebas de FastAPI necesitás contar con los siguientes elementos configurados:
 
 * **Postman** (Desktop Client o Web).
 * **Servidor de FastAPI** iniciado y escuchando en `http://localhost:8000`.
 * **Base de datos PostgreSQL** operativa y conectada al microservicio.
 * **Navegador Web** para el acceso a la documentación interactiva Swagger UI (`http://localhost:8000/docs`).
 
----
+Para ejecutar la suite completa de pruebas de Base de Datos necesitás contar con los siguientes elementos configurados:
 
+* **Docker Desktop** (o motor Docker activo).
+* **Contenedor Docker techmind-postgres** activo y escuchando en el puerto correspondiente.
+* **Cliente Interactivo de PostgreSQL (psql)** accesible vía la consola de Docker.
+* **Base de datos PostgreSQL techmind** poblada con la tabla de origen contenidos y predicciones.
+
+---
 ## ⚙️ 2. Configuración del Entorno de Pruebas
 
 ### Pasos para importar la Colección en Postman:
@@ -26,9 +31,14 @@ Para ejecutar la suite completa de pruebas necesitás contar con los siguientes 
 4. Seleccioná el entorno **TechMind - Local** en el desplegable superior derecho.
 5. Verificá que la variable `base_url` apunte a `http://localhost:8000`.
 
----
+### Pasos para conectar a PostgreSQL vía Docker:
+1. Abrí tu consola o terminal (PowerShell, CMD o Bash).
+2. Ejecutá el comando para acceder al shell interactivo del motor de base de datos:
+   * `docker start techmind-postgres`
+   * `docker exec -it techmind-postgres psql -U techmind_user -d techmind`
 
-## 📐 3. Cobertura de Pruebas (Matriz CP-01 a CP-20)
+---
+## 📐 3a. Cobertura de Pruebas (Matriz Casos de Pruebas FastAPI)
 
 La suite cubre 6 dimensiones clave de calidad sobre el microservicio:
 
@@ -50,8 +60,24 @@ La suite cubre 6 dimensiones clave de calidad sobre el microservicio:
 6. **Integridad de Datos y Validaciones (6 Casos):**
    * Control de errores HTTP 422/405 ante campos vacíos (`CP-04`, `CP-05`, `CP-06`), JSON mal formado (`CP-07`), método HTTP no permitido (`CP-08`) y omisión de claves requeridas (`CP-19`).
 
----
+## 📐 3b. Cobertura de Pruebas (Matriz Casos de Prueba BD)
 
+La suite de Data QA cubre 6 dimensiones clave sobre la tabla de origen `contenidos`:
+
+1. Completitud y Control de Nulos (`CP-DB-09`):
+   * Verificación del volumen total de registros y confirmación de la ausencia de valores NULL en columnas críticas (id, titulo, texto, created_at).
+2. Integridad de Clave Primaria (`CP-DB-10`):
+   * Validación del principio de unicidad en la columna id mediante agrupamiento para garantizar que no existan IDs duplicados ni colisiones.
+3. Inspección Muestral y Sanitización (`CP-DB-11`):
+   * Revisión cualitativa de los datos almacenados, verificando la integridad de codificación de caracteres especiales (tildes, caracteres UTF-8) y la coherencia temporal de las marcas de agua (created_at).
+4. Detección de Datos Vacíos / Cero Caracteres (`CP-DB-12`):
+   * Búsqueda de registros con cadenas de longitud 0 o compuestas exclusivamente por espacios en blanco aislados (TRIM).
+5. Análisis de Límite Inferior (`CP-DB-13`):
+   * Inspección de los 5 registros con menor cantidad de caracteres para asegurar que mantengan una estructura coherente y suficiente para el procesamiento del modelo NLP.
+6. Análisis de Límite Superior / Longitud No Acotada (`CP-DB-14`):
+   * Comprobación de almacenamiento de payloads extensos (textos de 5.000 palabras / +28.000 caracteres) en el tipo de dato TEXT sin truncamiento silencioso ni pérdida de datos.
+
+---
 ## 🚀 4. Guía de Ejecución Paso a Paso
 
 ### Opción A: Ejecución Manual vía Swagger UI
@@ -66,20 +92,32 @@ La suite cubre 6 dimensiones clave de calidad sobre el microservicio:
    }
 
 ### Opción B: Ejecución Automatizada con Postman
-1. Navegá a `http://localhost:8000/docs`.
-2. Ubicá el endpoint `POST /predecir`.
-3. Hacé clic en **Try it out**.
-4. Ingresá un payload de prueba en el cuerpo de la petición. Por ejemplo:
-   ```json
+1. Navegá a `http://postman.com`.
+2. Crear una peticion HTTP `POST`.
+3. Ingresar la URL `http://localhost:8000/predecir`.
+4. Hacé clic en `body` y luego selecciona `raw` y en el menu desplegable seleccionar `JSON`.
+5. Ingresá un payload de prueba en el cuerpo de la petición. Por ejemplo:
+   ```
    {
      "titulo": "Introducción a Spring Boot",
      "texto": "En este contenido se presentan los conceptos básicos para la creación de APIs REST utilizando Java y Spring Boot."
    }
+   ```
+6. Hacé clic en **Send**.
 
+### Ejecución de Queries de Prueba en PostgreSQL (techmind=#)
+1. Dentro de la consola interactiva (`techmind=#`), escribes tu instrucción SQL terminando siempre con punto y coma (;) y presionas Enter:
+   ```
+   SELECT 
+      COUNT(*) AS total_contenidos, 
+      COUNT(id) AS ids_no_nulos, 
+      COUNT(titulo) AS titulos_presentes, 
+      COUNT(texto) AS textos_presentes, 
+      COUNT(created_at) AS fechas_presentes 
+   FROM contenidos;
+   ```
 ---
-
-## 🔍 5. Assertions Implementadas en Postman (Scripts de Prueba)
-
+## 🔍 5a. Assertions Implementadas en Postman (Scripts de Prueba)
 Todas las peticiones principales incluyen scripts automáticos de validación escritos en JavaScript dentro de la pestaña Tests:
 
 ```
@@ -108,14 +146,29 @@ pm.test("La probabilidad es un número válido entre 0 y 1", function () {
     pm.expect(responseJson.probabilidad).to.be.within(0, 1);
 });
 ```
+
+## 🔍 5b. Validaciones e Indicadores de Integridad de Datos
+Durante la ejecución de las consultas SQL se deben validar los siguientes aspectos clave:
+* Ausencia de Nulos: Ninguna fila cargada en contenidos puede prescindir de su identificador o contenido textual.
+* Integridad de Tipos de Datos: La columna texto debe estar definida como TEXT para permitir extensiones sin acotamiento.
+* Codificación UTF-8: Verificación de que caracteres en español (vocales con tilde, 'ñ', signos de puntuación) se persistan correctamente sin alteración de bytes.
+* Consistencia Relacional: Ausencia de registros huérfanos o con IDs desordenados en el motor de persistencia.
+
 ---
 
 ## 6. Registro y Reporte de Evidencias
 
-### Cada ejecución de pruebas se documenta siguiendo esta estructura:
-- Capturas de pantalla: Guardadas en evidencias/capturas/ asociadas al ID del caso (ej. CP-01_Swagger_POST_predecir_HTTP200.png).
-- Respuestas JSON: Almacenadas en evidencias/respuestas-json/.
+### Cada ejecución de pruebas de FastAPI se documenta siguiendo esta estructura:
+- Capturas de pantalla: Guardadas en evidencias/capturas/FastAPI asociadas al ID del caso (ej. CP-FASTAPI-01_Swagger_POST_predecir_HTTP200.png).
+- Respuestas JSON: Almacenadas en evidencias/respuestas-json/FastAPI.
+- Matriz de Casos en Excel: Documentada con las entradas utilizadas, precondiciones, resultados esperados y obtenidos en casos-de-prueba/.
 - Reporte: Documentado en reportes/informes.
-- Reporte Ejecutivo: Documentado en reportes/resultados-sprint-1.md.
+- Reporte Ejecutivo: Documentado en reportes/resultados-FastAPI.md.
+
+### Cada ejecución de pruebas de base de datos se documenta siguiendo esta estructura:
+- Capturas de pantalla de terminal: Guardadas en evidencias/capturas/DataBase asociadas al ID del caso (ej. CP-DB-09_Verificacion_Nulos_Contenidos.png).
+- Matriz de Casos en Excel: Documentada con las queries utilizadas, precondiciones, resultados esperados y obtenidos en casos-de-prueba/.
+- Reporte: Documentado en reportes/informes.
+- Reporte Ejecutivo: Documentado en reportes/resultados-DataBase.md.
 
 _QA Testing Guide — TechMind Project v1.0 — Sprint 1_
