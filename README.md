@@ -233,7 +233,7 @@ El script creará el entorno virtual de Python, instalará requerimientos, levan
 - 📄 **Changelog de Bugs Corregidos**: [`data-science/docs/BUGFIX_CHANGELOG.md`](data-science/docs/BUGFIX_CHANGELOG.md)
 - 📄 **Integración Backend / ML**: [`data-science/docs/BACKEND_INTEGRATION.md`](data-science/docs/BACKEND_INTEGRATION.md)
 - 📄 **Ingesta de Documentos PDF/DOCX**: [`data-science/docs/INGESTA_DOCUMENTOS.md`](data-science/docs/INGESTA_DOCUMENTOS.md)
-- 📄 **Reporte Ejecutivo de QA**: [`qa/reportes/resultados-sprint-1.md`](qa/reportes/resultados-sprint-1.md)
+- 📄 **Reporte Ejecutivo de QA**: [`qa/reportes/Informes/(v3.0) Reporte de Resultados.pdf`](/qa/reportes/Informes/(v3.0)%20Reporte%20de%20Resultados.pdf)
 
 ---
 
