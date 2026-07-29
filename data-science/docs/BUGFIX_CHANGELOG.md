@@ -324,6 +324,27 @@ data-science/models/
 
 ---
 
+### BUG-14 — Incompatibilidad de imagen Docker `eclipse-temurin:17-jdk-alpine` en macOS Apple Silicon (ARM64)
+
+| Campo | Valor |
+|---|---|
+| **Severidad** | 🔴 Crítica (en macOS M1/M2/M3/M4) |
+| **Archivo afectado** | `backend/Dockerfile` |
+| **Estado** | ✅ Resuelto |
+| **Fecha** | 2026-07-29 |
+
+**Descripción:** Al ejecutar `python3 setup.py --docker` en sistemas macOS con procesador Apple Silicon (ARM64), la compilación del contenedor de Spring Boot fallaba con el error: `no match for platform in manifest: not found` para la imagen base `eclipse-temurin:17-jdk-alpine`. La variante Alpine oficial de Eclipse Temurin en Docker Hub no publicaba manifiestos para la plataforma `linux/arm64`.
+
+**Síntoma:** `target springboot: failed to solve: eclipse-temurin:17-jdk-alpine: failed to resolve source metadata for docker.io/library/eclipse-temurin:17-jdk-alpine: no match for platform in manifest: not found`.
+
+**Solución aplicada:** Se actualizaron las imágenes base en `backend/Dockerfile` a las etiquetas estándar multi-arquitectura:
+- Etapa de build: `eclipse-temurin:17-jdk`
+- Etapa de ejecución: `eclipse-temurin:17-jre`
+
+Estas etiquetas oficiales cuentan con soporte nativo tanto para `linux/amd64` (Windows/Linux x86_64) como para `linux/arm64` (macOS Apple Silicon y servidores ARM64 en OCI).
+
+---
+
 ## 📊 Resumen de Impacto
 
 | Bug | Riesgo en demo | Componente |
@@ -341,8 +362,10 @@ data-science/models/
 | BUG-11 (gitignore .joblib) | FastAPI caía por modelos faltantes | Git · FastAPI |
 | BUG-12 (auto-healing setup.py) | Aborto en instalaciones frescas | setup.py · Data Science |
 | BUG-13 (FastAPI null contenido_id) | Error de log en PostgreSQL por inserción redundante | FastAPI · app/main.py |
+| BUG-14 (Docker manifest ARM64) | Fallo al compilar contenedor Spring Boot en macOS | backend/Dockerfile |
 
 ---
 
-*TechMind G9 LATAM Team 37 — Changelog actualizado el 2026-07-28*
+*TechMind G9 LATAM Team 37 — Changelog actualizado el 2026-07-29*
+
 
