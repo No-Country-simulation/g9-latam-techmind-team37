@@ -8,7 +8,7 @@
 ---
 
 ## 📈 Resumen Ejecutivo
-Durante la fase de Data QA del Sprint 1 se ejecutó la suite de auditoría e integridad sobre la base de datos PostgreSQL (`techmind`), evaluando la persistencia y calidad de datos en las tablas contenidos y predicciones. Se logró una cobertura total de escenarios de integridad referencial, consistencia de esquemas, límites superiores e inferiores, unicidad de claves primarias y resiliencia ante inyecciones de datos.
+Durante la fase de Data QA del Sprint 2 se ejecutó la suite de auditoría e integridad sobre la base de datos PostgreSQL (`techmind`), evaluando la persistencia y calidad de datos en las tablas contenidos y predicciones. Se logró una cobertura total de escenarios de integridad referencial, consistencia de esquemas, límites superiores e inferiores, unicidad de claves primarias y resiliencia ante inyecciones de datos.
 
 ### 📊 Métricas Generales
 * **Casos Planificados:** 17
