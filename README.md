@@ -102,7 +102,7 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 | **Andrés Felipe Rojas** | Backend Java | Configuración Spring Boot, entidades JPA y DTOs |
 | **Noelia Rementería** | Backend Java | Configuración de base de datos y soporte backend |
 | **Camila Fagina** | Backend Java | Soporte backend y lógica transaccional |
-| **Federico Gutiérrez** | Quality Assurance (QA) | Matriz de pruebas, testing manual de endpoints, Swagger y validación |
+| **Federico Gutierrez** | Quality Assurance (QA) | Matriz de pruebas, testing manual de endpoints, Swagger y validación |
 
 ---
 
@@ -136,6 +136,29 @@ g9-latam-techmind-team37/
 │       ├── generate_models.py             # Entrenador offline ultrarrápido para auto-healing
 │       ├── ingest_documents.py            # Ingesta masiva de documentos PDF / DOCX
 │       └── migrate_to_postgres.py         # Carga inicial de datos a PostgreSQL
+│
+├── qa/                                   # Módulo de Quality Assurance
+│   ├── casos-de-prueba/                  # Documentación de diseño de pruebas         
+│   │   └── (v3.0) Matriz de Casos de Prueba.xlsx          
+│   ├── evidencias/                       # Respaldos y ejecuciones de las pruebas                   
+│   │   ├── Capturas de Pantalla/  
+│   │   │   ├── Backend (Spring Boot) 
+│   │   │   ├── Base de Datos (PostgreSQL 16) 
+│   │   │   └── Data Science (FastAPI)          
+│   │   └── JSON/
+│   │       ├── Backend (Spring Boot) 
+│   │       └── Data Science (FastAPI)  
+│   ├── reportes/                         # Informes y resultados finales
+│   │   ├── informes/
+│   │   │   └── (v2.0) Reporte de Resultados.xlsx
+│   │   ├── Reporte de BUGS/
+│   │   │   └── FIX-columna-informaciones_adicionales.md
+│   │   │   └── FIX-docker-multiarch-spring-boot.md
+│   │   ├── resultados-sprint-1.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 1
+│   │   ├── resultados-sprint-2.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 2
+│   │   └── resultados-sprint-3.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 3
+│   └── README.md                         # Documentación específica del módulo QA
+│
 │
 ├── docker-compose.yml                    # Configuración de los 4 servicios en Docker
 ├── setup.py                              # Installer y orquestador multiplataforma (Windows/Mac/Linux)

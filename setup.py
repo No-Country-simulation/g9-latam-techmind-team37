@@ -216,9 +216,9 @@ def start_services():
     print(" ║                  🚀 PROYECTO TECHMIND LISTO Y EN EJECUCIÓN          ║")
     print(" ╠═════════════════════════════════════════════════════════════════════╣")
     print(" ║  🎨 Frontend Web UI (Stitch UI):   http://localhost:5173            ║")
-    print(" ║  🤖 Microservicio FastAPI ML:   http://localhost:8000            ║")
-    print(" ║  ☕ API Spring Boot (Backend):  http://localhost:8080            ║")
-    print(" ║  📖 Documentación Swagger:      http://localhost:8000/docs       ║")
+    print(" ║  🤖 Microservicio FastAPI ML:   http://localhost:8000               ║")
+    print(" ║  ☕ API Spring Boot (Backend):  http://localhost:8080               ║")
+    print(" ║  📖 Documentación Swagger:      http://localhost:8000/docs          ║")
     print(" ╚═════════════════════════════════════════════════════════════════════╝")
     print()
     info("Para conectar el backend Java de Spring Boot:")
@@ -373,7 +373,7 @@ def main():
 
     print()
     print("╔═════════════════════════════════════════════════════════════════╗")
-    print("║   🧠 TechMind — Asistente de Instalación y Arranque              ║")
+    print("║   🧠 TechMind — Asistente de Instalación y Arranque             ║")
     print("║   Hackathon G9 LATAM · Equipo 37                                ║")
     print("╚═════════════════════════════════════════════════════════════════╝")
 
