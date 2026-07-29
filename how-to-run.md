@@ -26,12 +26,34 @@ Si no querés hacer los pasos manualmente, el repositorio incluye un script que 
 python setup.py
 ```
 
-### Las veces siguientes
+El script verifica Python, crea el entorno virtual, instala dependencias, levanta Docker, migra la base de datos e inicia la API. Si algo falla, te dice exactamente qué está mal.
+
+---
+
+## 🐳 Opción 100% Dockerizada (Producción / Demo)
+
+Si querés levantar los **4 componentes del sistema** (PostgreSQL + FastAPI + Spring Boot + Frontend Web UI) totalmente dentro de contenedores Docker con un solo comando (sin necesidad de tener Java ni Python instalados en la PC):
+
+### Vía Script Automático:
 ```powershell
-python setup.py --start
+python setup.py --docker
 ```
 
-El script verifica Python, crea el entorno virtual, instala dependencias, levanta Docker, migra la base de datos e inicia la API. Si algo falla, te dice exactamente qué está mal.
+### Vía Docker Compose directamente:
+```powershell
+docker-compose --profile full up -d --build
+```
+
+Esto compilará las imágenes y dejará todo el stack activo en:
+* 🎨 **Frontend Web UI:** **[http://localhost:5173](http://localhost:5173)**
+* ☕ **Spring Boot API:** `http://localhost:8080`
+* 🤖 **FastAPI ML Service:** `http://localhost:8000`
+* 📖 **Documentación Swagger:** `http://localhost:8000/docs`
+
+Para detener todos los contenedores:
+```powershell
+docker-compose --profile full down
+```
 
 > ⚠️ Requiere tener **Python** y **Docker Desktop** instalados (ver requisitos abajo).
 
@@ -141,20 +163,35 @@ Deberías ver `techmind-postgres` en la lista con el puerto `5432`.
 
 ---
 
-### Paso 6 — Cargar los datos iniciales en la base de datos
+### Paso 6 — Iniciar Spring Boot para crear las tablas (Flyway)
+
+> ⚠️ **Orden estricto de arranque:** Spring Boot debe iniciarse antes de migrar los datos para que Flyway cree las tablas con los tipos de datos correctos (`BIGINT` / `BIGSERIAL`).
+
+En una terminal separada:
+```powershell
+cd backend\api\api
+.\mvnw spring-boot:run
+```
+
+Una vez que veas `Started ApiApplication`, la base de datos tendrá el esquema oficial listo.
+
+---
+
+### Paso 7 — Cargar el dataset ampliado de entrenamiento en PostgreSQL
+
+En tu terminal principal con el entorno `(venv)` activo:
 
 ```powershell
 python data-science\src\migrate_to_postgres.py
 ```
 
-Esto crea las tablas necesarias en la base de datos y las carga con el dataset inicial.
-
-> 💬 **El script puede preguntarte:** *"¿Querés reemplazarlos? (s/N)"*
-> Escribí `N` y presioná Enter — eso conserva los datos existentes, que es lo correcto.
+Esto inserta los **221 registros de entrenamiento** en la tabla `contenidos`.
 
 ---
 
-### Paso 7 — Iniciar el microservicio FastAPI
+### Paso 8 — Iniciar el microservicio FastAPI
+
+En la terminal principal:
 
 ```powershell
 uvicorn app.main:app --reload --port 8000
@@ -164,32 +201,45 @@ Si todo salió bien, vas a ver esto en la consola:
 
 ```
 ✅  Modelos cargados correctamente
-✅  Tabla 'predicciones' lista en PostgreSQL
+✅  Conexión a PostgreSQL verificada correctamente
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
-> ✅ **Los modelos ya vienen incluidos en el repositorio** (`data-science\models\`) — no necesitás generarlos ni pedirlos.
-
-Para **detener** el servidor: presioná `CTRL + C` en la consola.
+> ✅ **Los modelos se auto-generan automáticamente** si no existen al ejecutar `setup.py` o `setup.py --docker`, y también están almacenados en `data-science\models\`.
 
 ---
 
-## 🔁 Las veces siguientes (4 comandos)
+### Paso 9 — Iniciar el Frontend Web UI
 
-Una vez instalado todo, cada vez que quieras levantar el servicio solo ejecutás esto:
+En una tercera terminal:
 
 ```powershell
-# 0. Ir a la carpeta del proyecto (si abriste una terminal nueva)
-cd g9-latam-techmind-team37
+python -m http.server 5173 --directory frontend
+```
 
-# 1. Activar el entorno virtual (hacerlo siempre antes que cualquier otra cosa)
-venv\Scripts\activate
+Abrí en tu navegador:
+👉 **[http://localhost:5173](http://localhost:5173)**
 
-# 2. Levantar PostgreSQL (abrí Docker Desktop primero, luego ejecutá esto)
+---
+
+## 🔁 Las veces siguientes (Cómo levantar el stack completo)
+
+Una vez instalado todo, para levantar los 4 componentes del sistema:
+
+```powershell
+# 1. Base de Datos (Docker)
 docker-compose up -d
 
-# 3. Iniciar el microservicio
+# 2. Backend Java / Spring Boot (Terminal 1)
+cd backend\api\api
+.\mvnw spring-boot:run
+
+# 3. Microservicio Python / FastAPI (Terminal 2 con venv activo)
+venv\Scripts\activate
 uvicorn app.main:app --reload --port 8000
+
+# 4. Frontend Web UI (Terminal 3)
+python -m http.server 5173 --directory frontend
 ```
 
 ---
@@ -281,23 +331,33 @@ Respuesta esperada:
 
 ## 📝 Nota para Ernesto (macOS)
 
-Los mismos pasos aplican, reemplazando los comandos de Windows por:
+Los mismos pasos aplican en macOS ejecutando:
 
 ```bash
-# Paso 2
+# Paso 2 — Crear entorno virtual
 python3 -m venv venv && source venv/bin/activate
 
-# Paso 3
+# Paso 3 — Instalar dependencias
 pip install -r data-science/requirements.txt
 
-# Paso 4
+# Paso 4 — Configurar variables de entorno
 cp .env.example .env
 
-# Paso 6
-python3 data-science/src/migrate_to_postgres.py
-```
+# Paso 5 — Levantar PostgreSQL
+docker-compose up -d
 
-Los demás comandos (`docker-compose`, `uvicorn`) son idénticos.
+# Paso 6 — Iniciar Spring Boot (Crea las tablas con Flyway)
+cd backend/api/api && ./mvnw spring-boot:run
+
+# Paso 7 — Cargar dataset de entrenamiento (221 registros)
+python3 data-science/src/migrate_to_postgres.py
+
+# Paso 8 — Iniciar FastAPI
+uvicorn app.main:app --reload --port 8000
+
+# Paso 9 — Iniciar Frontend Web UI (http://localhost:5173)
+python3 -m http.server 5173 --directory frontend
+```
 
 
 ---

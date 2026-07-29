@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, field_validator
 
-from app.database import init_db, log_prediccion
+from app.database import init_db, get_predicciones
 
 load_dotenv()
 
@@ -63,14 +63,32 @@ def extraer_keywords(texto_limpio: str, top_n: int = 5) -> list:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global vectorizer, modelo
-    model_path = os.getenv("MODEL_PATH", "./")
+    
+    # Búsqueda inteligente de rutas para los archivos .joblib
+    env_path = os.getenv("MODEL_PATH")
+    possible_paths = [
+        env_path,
+        os.path.join("data-science", "models"),
+        os.path.join("..", "data-science", "models"),
+        "./"
+    ]
+    
+    model_path = None
+    for p in possible_paths:
+        if p and os.path.exists(os.path.join(p, "tfidf_vectorizer.joblib")):
+            model_path = p
+            break
+            
+    if not model_path:
+        model_path = env_path or os.path.join("data-science", "models")
+
     try:
         vectorizer = joblib.load(os.path.join(model_path, "tfidf_vectorizer.joblib"))
         modelo     = joblib.load(os.path.join(model_path, "modelo_clasificador.joblib"))
-        print("✅  Modelos cargados correctamente")
+        print(f"✅  Modelos cargados correctamente desde '{model_path}'")
     except FileNotFoundError as e:
-        print(f"❌  No se encontraron los .joblib: {e}")
-        print("    Ejecutá el notebook TechMind_DataScience.ipynb para generarlos.")
+        print(f"❌  No se encontraron los .joblib en '{model_path}': {e}")
+        print("    Verificá que la carpeta data-science/models/ contenga los archivos .joblib.")
         raise
     init_db()
     yield
@@ -80,11 +98,21 @@ async def lifespan(app: FastAPI):
 
 # ── Aplicación FastAPI ────────────────────────────────────────────────────────
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="TechMind — API de Ciencia de Datos",
     description="Microservicio interno de clasificación de contenidos técnicos. Consumido por Spring Boot.",
     version="0.4.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -119,8 +147,6 @@ Recibe el **título** y **texto** de un contenido técnico y devuelve:
 - `categoria` — una de las 8 categorías del modelo
 - `probabilidad` — confianza del modelo (0 a 1)
 - `informaciones_adicionales` — top 5 palabras clave por peso TF-IDF
-
-Cada predicción se persiste automáticamente en la tabla `predicciones` de PostgreSQL.
 """,
 )
 def predecir(req: ContenidoRequest):
@@ -135,8 +161,6 @@ def predecir(req: ContenidoRequest):
     proba_arr    = modelo.predict_proba(vector)[0]
     probabilidad = float(proba_arr.max())
     informaciones_adicionales = extraer_keywords(texto_limpio)
-
-    log_prediccion(req.titulo, req.texto, categoria, probabilidad, informaciones_adicionales)
 
     return PrediccionResponse(
         categoria=categoria,
@@ -156,6 +180,15 @@ def health():
         "model_loaded": vectorizer is not None,
         "version":      "0.4.0",
     }
+
+
+@app.get(
+    "/predicciones",
+    summary="Historial de predicciones",
+    description="Devuelve el historial de predicciones registradas en la base de datos PostgreSQL.",
+)
+def listar_predicciones(limit: int = 50):
+    return get_predicciones(limit=limit)
 
 
 @app.get(
