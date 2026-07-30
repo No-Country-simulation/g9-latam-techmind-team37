@@ -19,6 +19,7 @@ const CATEGORY_CONFIG = {
 };
 
 let lastJsonResponse = null;
+let lastInput = null;
 let allHistoryData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,6 +37,8 @@ async function initHealthChecks() {
         const data = await res.json();
         if (data.status === 'ok') {
             setServiceStatus('status-fastapi', true, 'FastAPI ML :8000 (Listo)');
+        } else {
+            setServiceStatus('status-fastapi', false, 'FastAPI ML :8000 (Desconectado)');
         }
     } catch {
         setServiceStatus('status-fastapi', false, 'FastAPI ML :8000 (Desconectado)');
@@ -46,7 +49,7 @@ async function initHealthChecks() {
         await fetch(`${API_BASE_URL}/contenido`, { method: 'OPTIONS' });
         setServiceStatus('status-springboot', true, 'API Spring Boot :8080 (Listo)');
     } catch {
-        setServiceStatus('status-springboot', true, 'API Spring Boot :8080 (Listo)');
+        setServiceStatus('status-springboot', false, 'API Spring Boot :8080 (Desconectado)');
     }
 
     // PostgreSQL status
@@ -56,15 +59,15 @@ async function initHealthChecks() {
 function setServiceStatus(elementId, isOk, text) {
     const el = document.getElementById(elementId);
     if (!el) return;
-    const led = el.querySelector('.w-2');
+    const led = el.querySelector('.rounded-full');
     const label = el.querySelector('span');
-    
+
     if (isOk) {
-        led.className = 'w-2 h-2 rounded-full bg-tertiary-fixed led-pulse';
-        label.className = 'font-label-sm text-label-sm text-tertiary-fixed font-medium';
+        led.className = 'w-2.5 h-2.5 rounded-full bg-tertiary-fixed led-pulse';
+        label.className = 'font-label-sm text-xs text-tertiary-fixed font-medium truncate';
     } else {
-        led.className = 'w-2 h-2 rounded-full bg-rose-500';
-        label.className = 'font-label-sm text-label-sm text-rose-400 font-medium';
+        led.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+        label.className = 'font-label-sm text-xs text-rose-400 font-medium truncate';
     }
     label.textContent = text;
 }
@@ -75,9 +78,6 @@ function bindEvents() {
     const classifyBtn = document.getElementById('btn-classify');
     const jsonBtn = document.getElementById('btn-view-json');
     const jsonModalClose = document.getElementById('modal-close');
-    
-    const historyModalClose = document.getElementById('history-modal-close');
-    const viewAllHistoryBtn = document.getElementById('btn-view-all-history');
 
     if (classifyBtn) {
         classifyBtn.addEventListener('click', handleClassification);
@@ -88,24 +88,105 @@ function bindEvents() {
     if (jsonModalClose) {
         jsonModalClose.addEventListener('click', toggleJsonModal);
     }
-    if (historyModalClose) {
-        historyModalClose.addEventListener('click', toggleHistoryModal);
-    }
-    if (viewAllHistoryBtn) {
-        viewAllHistoryBtn.addEventListener('click', openFullHistoryModal);
+
+    // Sidebar selectors
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const mainContent = document.getElementById('main-content');
+
+    const closeSidebar = () => {
+        if (!sidebar) return;
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0', 'md:translate-x-0');
+        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+        if (mainContent && window.innerWidth >= 768) {
+            mainContent.classList.remove('md:ml-64');
+        }
+    };
+
+    // Toggle Sidebar Control
+    const sidebarToggle = document.getElementById('btn-sidebar-toggle');
+    const sidebarClose = document.getElementById('btn-sidebar-close');
+
+    if (sidebarToggle && sidebar && sidebarOverlay && mainContent) {
+        const toggleSidebar = () => {
+            const isOpen = (window.innerWidth >= 768 && sidebar.classList.contains('md:translate-x-0')) ||
+                           (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0'));
+
+            if (isOpen) {
+                closeSidebar();
+            } else {
+                // Open it
+                sidebar.classList.remove('-translate-x-full');
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.add('md:translate-x-0');
+                    mainContent.classList.add('md:ml-64');
+                } else {
+                    sidebar.classList.add('translate-x-0');
+                    sidebarOverlay.classList.remove('hidden');
+                }
+            }
+        };
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
     }
 
-    // Enlazar todos los enlaces de Historial (Sidebar, Nav, etc.)
-    document.querySelectorAll('.btn-history-trigger, a[href="#history-section"]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = document.getElementById('history-section');
-            if (section) {
-                section.scrollIntoView({ behavior: 'smooth' });
+    // View Switcher Control (SPA subpage logic)
+    const navClassifier = document.getElementById('nav-classifier');
+    const navHistory = document.getElementById('nav-history');
+    const classifierView = document.getElementById('classifier-view-section');
+    const historyView = document.getElementById('history-view-section');
+
+    if (navClassifier && navHistory && classifierView && historyView) {
+        const showClassifier = () => {
+            classifierView.classList.remove('hidden');
+            historyView.classList.add('hidden');
+            
+            navClassifier.className = "bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer";
+            navHistory.className = "text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer";
+
+            if (window.innerWidth < 768) {
+                closeSidebar();
             }
-            openFullHistoryModal();
+        };
+
+        const showHistory = () => {
+            classifierView.classList.add('hidden');
+            historyView.classList.remove('hidden');
+            
+            navHistory.className = "bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer";
+            navClassifier.className = "text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer";
+
+            loadDetailedHistory();
+
+            if (window.innerWidth < 768) {
+                closeSidebar();
+            }
+        };
+
+        navClassifier.addEventListener('click', showClassifier);
+        navHistory.addEventListener('click', showHistory);
+    }
+
+    // Filter Category and Search listeners
+    const filterCategory = document.getElementById('filter-category');
+    const searchHistory = document.getElementById('search-history');
+    
+    if (filterCategory) {
+        filterCategory.addEventListener('change', (e) => {
+            const searchQuery = searchHistory ? searchHistory.value.trim().toLowerCase() : '';
+            loadDetailedHistory(e.target.value, searchQuery);
         });
-    });
+    }
+
+    if (searchHistory) {
+        searchHistory.addEventListener('input', (e) => {
+            const category = filterCategory ? filterCategory.value : 'all';
+            loadDetailedHistory(category, e.target.value.trim().toLowerCase());
+        });
+    }
 }
 
 // ── 3. Clasificación via Spring Boot ────────────────────────────────────────
@@ -138,6 +219,7 @@ async function handleClassification() {
 
         const data = await response.json();
         lastJsonResponse = data;
+        lastInput = { titulo, texto };
 
         // Renderizar resultado
         renderResult(data);
@@ -163,7 +245,7 @@ function renderResult(data) {
     // 1. Categoría
     const badgeContainer = document.getElementById('category-badge-container');
     const config = CATEGORY_CONFIG[categoria] || { icon: 'auto_awesome', colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
-    
+
     badgeContainer.innerHTML = `
         <div class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full border text-xl font-bold shadow-[0_0_25px_rgba(139,92,246,0.25)] ${config.colorClass} transition-all duration-300 transform scale-105">
             <span class="material-symbols-outlined text-2xl">${config.icon}</span>
@@ -180,12 +262,15 @@ function renderResult(data) {
     // 3. Keywords
     const keywordsList = document.getElementById('keywords-list');
     if (informaciones_adicionales && informaciones_adicionales.length > 0) {
-        keywordsList.innerHTML = informaciones_adicionales.map(kw => `
-            <span class="px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary-fixed font-label-sm text-sm hover:scale-105 hover:bg-primary/20 transition-all cursor-default flex items-center gap-1.5 shadow-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-primary-fixed"></span>
-                ${escapeHtml(kw)}
-            </span>
-        `).join('');
+        keywordsList.innerHTML = informaciones_adicionales.map(kw => {
+            const capitalized = kw.charAt(0).toUpperCase() + kw.slice(1);
+            return `
+                <span class="px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary-fixed font-label-sm text-sm hover:scale-105 hover:bg-primary/20 transition-all cursor-default flex items-center gap-1.5 shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary-fixed"></span>
+                    ${escapeHtml(capitalized)}
+                </span>
+            `;
+        }).join('');
     } else {
         keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm italic">Sin términos clave destacados</span>`;
     }
@@ -207,12 +292,12 @@ async function loadHistory() {
     try {
         const res = await fetch(`${DS_API_URL}/predicciones?limit=50`);
         if (!res.ok) throw new Error('No se pudo consultar el historial');
-        
+
         allHistoryData = await res.json();
-        
+
         if (allHistoryData && allHistoryData.length > 0) {
-            // Mostrar los 6 más recientes en el grid de la página
-            const recent = allHistoryData.slice(0, 6);
+            // Mostrar los 3 más recientes en el grid de la página
+            const recent = allHistoryData.slice(0, 3);
             historyGrid.innerHTML = recent.map(entry => {
                 const config = CATEGORY_CONFIG[entry.categoria] || { colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
@@ -229,7 +314,7 @@ async function loadHistory() {
                         <div class="mt-3 flex items-center justify-between opacity-80 pt-2 border-t border-white/5">
                             <div class="flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-[15px] text-primary-fixed">auto_awesome</span>
-                                <span class="font-label-sm text-[11px] text-on-surface-variant">Confianza IA: ${probPct}%</span>
+                                <span class="font-label-sm text-[11px] text-on-surface-variant">Confianza: ${probPct}%</span>
                             </div>
                             <span class="text-[10px] font-mono text-outline opacity-60">ID #${entry.id}</span>
                         </div>
@@ -249,65 +334,104 @@ async function loadHistory() {
     }
 }
 
-// ── 6. Modal de Historial Completo ──────────────────────────────────────────
+// ── 6. Historial Detallado (Subpágina) ──────────────────────────────────────
 
-function openFullHistoryModal() {
-    loadHistory().then(() => {
-        const modal = document.getElementById('history-modal');
-        const container = document.getElementById('history-modal-list');
-        if (!modal || !container) return;
+async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
+    const listContainer = document.getElementById('detailed-history-list');
+    if (!listContainer) return;
 
-        if (allHistoryData && allHistoryData.length > 0) {
-            container.innerHTML = allHistoryData.map(entry => {
+    try {
+        listContainer.innerHTML = `
+            <div class="py-8 text-center glass-panel rounded-xl">
+                <span class="material-symbols-outlined text-4xl text-outline mb-2 animate-spin">refresh</span>
+                <p class="text-on-surface-variant text-sm font-label-sm">Cargando historial detallado desde PostgreSQL...</p>
+            </div>
+        `;
+
+        const res = await fetch(`${DS_API_URL}/predicciones?limit=100`);
+        if (!res.ok) throw new Error('No se pudo consultar el historial');
+        
+        allHistoryData = await res.json();
+        
+        let filteredData = allHistoryData;
+        if (categoryFilter !== 'all') {
+            filteredData = allHistoryData.filter(entry => entry.categoria === categoryFilter);
+        }
+
+        if (searchQuery) {
+            filteredData = filteredData.filter(entry => {
+                const matchTitle = entry.titulo && entry.titulo.toLowerCase().includes(searchQuery);
+                const matchKeywords = entry.keywords && entry.keywords.some(k => k.toLowerCase().includes(searchQuery));
+                return matchTitle || matchKeywords;
+            });
+        }
+
+        if (filteredData && filteredData.length > 0) {
+            listContainer.innerHTML = filteredData.map(entry => {
                 const config = CATEGORY_CONFIG[entry.categoria] || { icon: 'auto_awesome', colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
                 const probPct = (prob * 100).toFixed(1);
-                const dateStr = entry.created_at ? new Date(entry.created_at.replace(/(\.\d{3})\d+/, '$1')).toLocaleString() : 'Fecha no disponible';
-                const keywordsPills = (entry.keywords || []).map(k => `<span class="px-2 py-0.5 rounded bg-primary/10 text-primary-fixed text-[10px] font-mono">${escapeHtml(k)}</span>`).join(' ');
+                
+                let dateStr = 'Fecha no disponible';
+                if (entry.created_at) {
+                    const d = new Date(entry.created_at);
+                    if (!isNaN(d.getTime())) {
+                        dateStr = d.toLocaleString([], { dateStyle: 'short', timeStyle: 'medium' });
+                    }
+                }
+
+                const keywordsPills = (entry.keywords || []).map(k => {
+                    const capitalized = k.charAt(0).toUpperCase() + k.slice(1);
+                    return `
+                        <span class="px-2.5 py-1 rounded bg-primary/10 border border-primary/20 text-primary-fixed text-[11px] font-mono">${escapeHtml(capitalized)}</span>
+                    `;
+                }).join(' ');
 
                 return `
-                    <div class="p-4 rounded-xl glass-panel border border-white/5 hover:border-primary/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex-1 space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-label-sm border ${config.colorClass} flex items-center gap-1">
+                    <div class="p-5 rounded-2xl glass-panel border border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
+                        <div class="flex-1 space-y-2">
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <span class="px-3 py-1 rounded-full text-xs font-label-sm border font-semibold ${config.colorClass} flex items-center gap-1.5 shadow-sm">
                                     <span class="material-symbols-outlined text-sm">${config.icon}</span>
                                     ${escapeHtml(entry.categoria || 'Sin categoría')}
                                 </span>
                                 <span class="text-xs font-mono text-outline opacity-60">ID #${entry.id}</span>
-                                <span class="text-xs text-on-surface-variant opacity-60">• ${dateStr}</span>
+                                <span class="text-xs text-on-surface-variant font-medium flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm opacity-60">schedule</span>
+                                    ${dateStr}
+                                </span>
                             </div>
-                            <h5 class="text-on-surface font-semibold text-base">${escapeHtml(entry.titulo)}</h5>
+                            <h5 class="text-on-surface font-bold text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
                             <div class="flex flex-wrap gap-1.5 pt-1">
-                                ${keywordsPills}
+                                ${keywordsPills || '<span class="text-xs text-on-surface-variant italic opacity-60">Sin palabras clave</span>'}
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 md:border-l border-white/10 md:pl-4">
-                            <div class="text-right">
-                                <span class="block text-[10px] font-label-sm text-on-surface-variant">Confianza</span>
-                                <span class="text-sm font-bold text-primary-fixed">${probPct}%</span>
+                        <div class="flex items-center gap-4 md:border-l border-white/10 md:pl-5 min-w-[120px] justify-between md:justify-end">
+                            <div class="text-right md:text-right">
+                                <span class="block text-xs font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Confianza</span>
+                                <span class="text-2xl font-black text-primary-fixed">${probPct}%</span>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
         } else {
-            container.innerHTML = `<p class="text-center text-on-surface-variant text-sm py-6">No hay registros de clasificación guardados en la base de datos.</p>`;
+            listContainer.innerHTML = `
+                <div class="py-12 text-center glass-panel rounded-xl border border-white/5">
+                    <span class="material-symbols-outlined text-5xl text-outline mb-3 opacity-60">filter_list_off</span>
+                    <p class="text-on-surface-variant text-base font-semibold">No se encontraron registros para la categoría seleccionada.</p>
+                </div>
+            `;
         }
-
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    });
-}
-
-function toggleHistoryModal() {
-    const modal = document.getElementById('history-modal');
-    if (!modal) return;
-    if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+    } catch (err) {
+        console.warn('Error al cargar historial detallado:', err);
+        listContainer.innerHTML = `
+            <div class="py-12 text-center glass-panel rounded-xl border border-rose-500/20 bg-rose-950/10">
+                <span class="material-symbols-outlined text-5xl text-rose-400 mb-3">error</span>
+                <p class="text-rose-200 text-base font-semibold">Error al conectar con la base de datos.</p>
+                <p class="text-rose-400/80 text-xs mt-1 font-label-sm">${err.message}</p>
+            </div>
+        `;
     }
 }
 
@@ -316,10 +440,18 @@ function toggleHistoryModal() {
 function toggleJsonModal() {
     const modal = document.getElementById('json-modal');
     if (!modal) return;
-    
+
     if (modal.classList.contains('hidden')) {
         const jsonPre = document.getElementById('json-content');
-        jsonPre.textContent = lastJsonResponse ? JSON.stringify(lastJsonResponse, null, 2) : '{\n  "mensaje": "Aún no se ha realizado ninguna clasificación en esta sesión."\n}';
+        if (lastJsonResponse) {
+            const fullPayload = {
+                entrada: lastInput || { titulo: "", texto: "" },
+                resultado: lastJsonResponse
+            };
+            jsonPre.textContent = JSON.stringify(fullPayload, null, 2);
+        } else {
+            jsonPre.textContent = '{\n  "mensaje": "Aún no se ha realizado ninguna clasificación en esta sesión."\n}';
+        }
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     } else {
@@ -361,7 +493,7 @@ function setLoadingState(isLoading) {
             <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
             <div class="relative flex items-center gap-2">
                 <span class="material-symbols-outlined text-lg">bolt</span>
-                Clasificar con TechMind AI
+                Clasificar con TechMind
             </div>
         `;
     }
@@ -373,8 +505,8 @@ function showToast(message, type = 'info') {
 
     const toast = document.createElement('div');
     const bgClass = type === 'error' ? 'bg-rose-950/90 border-rose-500/50 text-rose-200' :
-                    type === 'warning' ? 'bg-amber-950/90 border-amber-500/50 text-amber-200' :
-                    'bg-emerald-950/90 border-emerald-500/50 text-emerald-200';
+        type === 'warning' ? 'bg-amber-950/90 border-amber-500/50 text-amber-200' :
+            'bg-emerald-950/90 border-emerald-500/50 text-emerald-200';
 
     toast.className = `glass-panel px-4 py-3 rounded-xl border ${bgClass} font-label-sm text-sm shadow-xl backdrop-blur-xl transition-all duration-300 transform translate-y-2 opacity-0 flex items-center gap-2`;
     toast.innerHTML = `<span>${message}</span>`;
