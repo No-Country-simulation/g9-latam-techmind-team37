@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>TechMind — Clasificador Inteligente de Conocimiento Técnico</title>
+    <title>TechMind - Clasificador Inteligente de Conocimiento Técnico</title>
     
     <!-- Google Fonts & Icons -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -18,50 +18,50 @@
                 extend: {
                     colors: {
                         "tertiary-fixed": "#6ffbbe",
-                        "primary-fixed": "#e9ddff",
+                        "primary-fixed": "var(--primary-fixed)",
                         "secondary": "#c0c1ff",
-                        "on-surface": "#dae2fd",
+                        "on-surface": "var(--on-surface)",
                         "secondary-container": "#3131c0",
                         "primary": "#d0bcff",
                         "on-tertiary": "#003824",
                         "tertiary-container": "#00a572",
-                        "surface-dim": "#0b1326",
+                        "surface-dim": "var(--background)",
                         "on-secondary-container": "#b0b2ff",
                         "on-primary-fixed-variant": "#5516be",
                         "error-container": "#93000a",
-                        "outline": "#958ea0",
+                        "outline": "var(--outline)",
                         "surface-variant": "#2d3449",
                         "tertiary": "#4edea3",
-                        "outline-variant": "#494454",
+                        "outline-variant": "var(--outline-variant)",
                         "error": "#ffb4ab",
-                        "on-background": "#dae2fd",
-                        "background": "#0b1326",
+                        "on-background": "var(--on-background)",
+                        "background": "var(--background)",
                         "on-secondary": "#1000a9",
                         "surface-bright": "#31394d",
-                        "surface": "#0b1326",
+                        "surface": "var(--surface)",
                         "inverse-primary": "#6d3bd7",
-                        "surface-container-high": "#222a3d",
+                        "surface-container-high": "var(--surface-container-high)",
                         "inverse-on-surface": "#283044",
                         "tertiary-fixed-dim": "#4edea3",
                         "on-tertiary-container": "#00311f",
                         "on-error": "#690005",
-                        "surface-container": "#171f33",
+                        "surface-container": "var(--surface-container)",
                         "secondary-fixed-dim": "#c0c1ff",
                         "on-primary-fixed": "#23005c",
-                        "surface-container-highest": "#2d3449",
+                        "surface-container-highest": "var(--surface-container-highest)",
                         "on-error-container": "#ffdad6",
-                        "surface-container-lowest": "#060e20",
+                        "surface-container-lowest": "var(--surface-container-lowest)",
                         "secondary-fixed": "#e1e0ff",
                         "on-secondary-fixed": "#07006c",
                         "primary-fixed-dim": "#d0bcff",
                         "surface-tint": "#d0bcff",
-                        "inverse-surface": "#dae2fd",
-                        "on-surface-variant": "#cbc3d7",
+                        "inverse-surface": "var(--on-surface)",
+                        "on-surface-variant": "var(--on-surface-variant)",
                         "on-primary-container": "#340080",
                         "on-primary": "#3c0091",
                         "primary-container": "#a078ff",
                         "on-tertiary-fixed": "#002113",
-                        "surface-container-low": "#131b2e"
+                        "surface-container-low": "var(--surface-container-low)"
                     },
                     borderRadius: {
                         "DEFAULT": "0.25rem",
@@ -88,14 +88,114 @@
         }
     </script>
     <style>
+        :root {
+            --background: #f0edf6;
+            --on-background: #1c1a22;
+            --surface: #f0edf6;
+            --on-surface: #1c1a22;
+            --on-surface-variant: #49454f;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #eae7f0;
+            --surface-container: #e2dfe9;
+            --surface-container-high: #dbd7e3;
+            --surface-container-highest: #d4d0dc;
+            --primary-fixed: #6750a4;
+            --primary-container: #eaddff;
+            --on-primary-container: #21005d;
+            --outline: #79747e;
+            --outline-variant: #c8c5d0;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(103, 80, 164, 0.15);
+            --glass-hover-border: rgba(103, 80, 164, 0.35);
+            --glass-hover-shadow: rgba(103, 80, 164, 0.08);
+            --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            --input-bg: #ffffff;
+            --subtle-border: rgba(103, 80, 164, 0.12);
+            --medium-border: rgba(103, 80, 164, 0.18);
+            --led-ok-bg: #15803d;
+            --led-ok-text: #15803d;
+            --led-error-bg: #dc2626;
+            --led-error-text: #dc2626;
+            --json-text: #065f46;
+            --json-bg: #f8f9fa;
+        }
+
+        .dark {
+            --background: #0b1326;
+            --on-background: #dae2fd;
+            --surface: #0b1326;
+            --on-surface: #dae2fd;
+            --on-surface-variant: #cbc3d7;
+            --surface-container-lowest: #060e20;
+            --surface-container-low: #131b2e;
+            --surface-container: #171f33;
+            --surface-container-high: #222a3d;
+            --surface-container-highest: #2d3449;
+            --primary-fixed: #e9ddff;
+            --primary-container: #a078ff;
+            --on-primary-container: #340080;
+            --outline: #958ea0;
+            --outline-variant: #494454;
+            --glass-bg: rgba(11, 19, 38, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --glass-hover-border: rgba(208, 188, 255, 0.2);
+            --glass-hover-shadow: rgba(208, 188, 255, 0.1);
+            --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --input-bg: #131b2e;
+            --subtle-border: rgba(255, 255, 255, 0.05);
+            --medium-border: rgba(255, 255, 255, 0.08);
+            --led-ok-bg: #34d399;
+            --led-ok-text: #34d399;
+            --led-error-bg: #f87171;
+            --led-error-text: #f87171;
+            --json-text: #6ee7b7;
+            --json-bg: var(--surface-container-lowest);
+        }
+
         .glass-panel {
-            background-color: rgba(11, 19, 38, 0.75);
+            background-color: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
         }
         .glass-panel:hover {
-            border-color: rgba(208, 188, 255, 0.3);
-            box-shadow: 0 0 20px rgba(208, 188, 255, 0.1);
+            border-color: var(--glass-hover-border);
+            box-shadow: 0 0 20px var(--glass-hover-shadow);
+        }
+        .tech-input {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--subtle-border) !important;
+            color: var(--on-surface) !important;
+        }
+        .tech-input:focus {
+            border-color: var(--primary-fixed) !important;
+            box-shadow: 0 0 0 4px rgba(103, 80, 164, 0.15) !important;
+        }
+        .tech-input::placeholder {
+            color: var(--on-surface-variant) !important;
+            opacity: 0.5;
+        }
+        .tech-select {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--subtle-border) !important;
+            color: var(--on-surface) !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2379747e' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            background-size: 12px !important;
+            padding-right: 32px !important;
+        }
+        .tech-select:focus {
+            border-color: var(--primary-fixed) !important;
+            box-shadow: 0 0 0 4px rgba(103, 80, 164, 0.15) !important;
+        }
+        .subtle-border {
+            border-color: var(--subtle-border) !important;
+        }
+        .medium-border {
+            border-color: var(--medium-border) !important;
         }
         .shimmer {
             background: linear-gradient(90deg, rgba(208, 188, 255, 0) 0%, rgba(208, 188, 255, 0.5) 50%, rgba(208, 188, 255, 0) 100%);
@@ -116,10 +216,10 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
 
-    <!-- Ambient Glow Background -->
-    <div class="fixed inset-0 z-0 pointer-events-none opacity-40">
+    <!-- Ambient Glow Background (dark mode only) -->
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-0 dark:opacity-40 transition-opacity duration-500">
         <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-inverse-primary/20 blur-[120px]"></div>
         <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-tertiary-fixed/10 blur-[120px]"></div>
     </div>
@@ -131,7 +231,7 @@
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300"></div>
 
     <!-- Side Navigation Shell -->
-    <aside id="sidebar" class="fixed left-0 top-0 h-screen w-64 border-r border-white/5 shadow-2xl bg-surface-container-low/80 backdrop-blur-2xl z-40 flex flex-col py-6 px-4 transition-transform duration-300 -translate-x-full md:translate-x-0">
+    <aside id="sidebar" class="fixed left-0 top-0 h-screen w-64 border-r subtle-border shadow-2xl bg-surface-container-low/80 backdrop-blur-2xl z-40 flex flex-col py-6 px-4 transition-transform duration-300 -translate-x-full md:translate-x-0">
         <div class="mb-10 px-3 flex justify-between items-center">
             <div>
                 <h1 class="font-headline-md text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-bold">
@@ -141,7 +241,7 @@
                 <p class="font-label-sm text-xs text-on-surface-variant mt-2 opacity-80">Organización Inteligente</p>
             </div>
             <!-- Close button only visible on mobile -->
-            <button id="btn-sidebar-close" class="md:hidden p-1.5 rounded-lg hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-white">
+            <button id="btn-sidebar-close" class="md:hidden p-1.5 rounded-lg hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-on-surface">
                 <span class="material-symbols-outlined text-2xl">close</span>
             </button>
         </div>
@@ -155,20 +255,31 @@
                 <span class="font-label-sm text-sm font-semibold">Historial BD</span>
             </a>
         </nav>
-        <!-- Server Status Badges inside Sidebar -->
-        <div class="mt-auto pt-6 border-t border-white/10 flex flex-col gap-3">
-            <p class="font-label-sm text-xs text-on-surface-variant opacity-60 text-center uppercase tracking-wider mb-1 font-semibold">Estado de Servicios</p>
-            <div id="status-springboot" class="flex items-center gap-3 glass-panel px-3.5 py-2.5 rounded-xl border border-white/5 bg-surface-container/50 hover:bg-surface-container-high transition-colors">
-                <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                <span class="font-label-sm text-xs text-rose-400 font-medium truncate">API Spring Boot :8080</span>
-            </div>
-            <div id="status-fastapi" class="flex items-center gap-3 glass-panel px-3.5 py-2.5 rounded-xl border border-white/5 bg-surface-container/50 hover:bg-surface-container-high transition-colors">
-                <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                <span class="font-label-sm text-xs text-rose-400 font-medium truncate">FastAPI ML :8000</span>
-            </div>
-            <div id="status-postgres" class="flex items-center gap-3 glass-panel px-3.5 py-2.5 rounded-xl border border-white/5 bg-surface-container/50 hover:bg-surface-container-high transition-colors">
-                <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                <span class="font-label-sm text-xs text-rose-400 font-medium truncate">PostgreSQL :5432</span>
+        <!-- Server Status Popover trigger inside Sidebar -->
+        <div class="relative mt-auto pt-6 border-t medium-border" style="overflow:visible;">
+            <!-- Status Trigger Button -->
+            <button id="btn-status-trigger" type="button" class="w-full flex items-center justify-between gap-3 glass-panel px-4 py-3 rounded-xl border subtle-border bg-surface-container hover:bg-surface-container-high transition-all text-on-surface-variant hover:text-on-surface cursor-pointer active:scale-95 focus:outline-none">
+                <div class="flex items-center gap-2.5">
+                    <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                    <span class="font-label-sm text-xs font-semibold">Estado de Servicios</span>
+                </div>
+                <span id="status-chevron" class="material-symbols-outlined text-lg transition-transform duration-300">expand_less</span>
+            </button>
+            
+            <!-- Status Popover Dropdown -->
+            <div id="status-popover" class="absolute bottom-full left-0 right-0 mb-3 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2 z-50">
+                <div id="status-springboot" class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">Spring Boot :8080</span>
+                </div>
+                <div id="status-fastapi" class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">FastAPI ML :8000</span>
+                </div>
+                <div id="status-postgres" class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full led-pulse shrink-0" style="background-color: var(--led-ok-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-ok-text);">PostgreSQL :5432</span>
+                </div>
             </div>
         </div>
     </aside>
@@ -177,17 +288,19 @@
     <main id="main-content" class="relative z-10 md:ml-64 min-h-screen flex flex-col p-4 md:p-8 transition-all duration-300">
         
         <!-- Header Section -->
-        <header class="flex flex-row items-center justify-between gap-6 mb-8 pt-4 md:pt-0 border-b border-white/5 pb-6">
+        <header class="flex flex-row items-center justify-between gap-6 mb-8 pt-4 md:pt-0 border-b subtle-border pb-6">
             <div class="flex items-center gap-4">
-                <!-- Sidebar Toggle Button (visible on mobile and desktop) -->
-                <button id="btn-sidebar-toggle" class="p-2.5 rounded-xl bg-surface-container-high/50 border border-white/5 text-on-surface-variant hover:text-white hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Toggle Sidebar">
-                    <span class="material-symbols-outlined text-2xl">menu</span>
+                <button id="btn-sidebar-toggle" class="p-2.5 rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Toggle Sidebar">
+                    <span class="material-symbols-outlined text-2xl" id="sidebar-toggle-icon">chevron_left</span>
                 </button>
                 <div>
                     <h2 class="font-headline-md text-2xl md:text-3xl text-on-surface font-bold tracking-tight">Clasificación de Contenido Técnico</h2>
                     <p class="font-body-md text-sm md:text-base text-on-surface-variant mt-1">Ingresá textos para clasificarlos en tiempo real.</p>
                 </div>
             </div>
+            <button id="btn-theme-toggle" type="button" class="p-2.5 rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Cambiar tema">
+                <span class="material-symbols-outlined text-2xl" id="theme-toggle-icon">light_mode</span>
+            </button>
         </header>
 
         <!-- Classifier View Section -->
@@ -201,27 +314,25 @@
                 <div class="glass-panel rounded-2xl p-6 md:p-8 flex-1 flex flex-col transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                     
-                    <h3 class="font-headline-md text-2xl text-on-surface mb-6 flex items-center gap-2.5 font-bold">
-                        <span class="material-symbols-outlined text-primary-fixed text-3xl">edit_document</span>
+                    <h3 class="font-headline-md text-2xl text-on-surface mb-6 font-bold">
                         Ingresar Contenido Técnico
                     </h3>
                     
                     <form class="flex flex-col gap-6 flex-1" onsubmit="return false;">
                         <div class="space-y-2">
                             <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold" for="content-title">Título del Documento o Artículo</label>
-                            <input id="content-title" type="text" class="w-full bg-surface-container-low/60 border border-white/10 rounded-xl px-4 py-3.5 text-on-surface font-body-md text-base focus:outline-none focus:border-primary-fixed focus:ring-4 focus:ring-primary-fixed/20 transition-all placeholder:text-outline-variant/60" placeholder="ej. Orquestación avanzada de contenedores con Kubernetes"/>
+                            <input id="content-title" type="text" class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all" placeholder="ej. Orquestación avanzada de contenedores con Kubernetes"/>
                         </div>
                         
                         <div class="space-y-2 flex-1 flex flex-col">
                             <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold" for="content-body">Contenido Técnico (Texto crudo, Markdown o Resumen)</label>
-                            <textarea id="content-body" class="w-full flex-1 min-h-[220px] bg-surface-container-low/60 border border-white/10 rounded-xl px-4 py-3.5 text-on-surface font-body-md text-base focus:outline-none focus:border-primary-fixed focus:ring-4 focus:ring-primary-fixed/20 transition-all placeholder:text-outline-variant/60 resize-none leading-relaxed" placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."></textarea>
+                            <textarea id="content-body" class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed" placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."></textarea>
                         </div>
                         
                         <div class="flex justify-center mt-4">
                             <button id="btn-classify" type="button" class="group relative px-10 py-4 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer">
                                 <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
                                 <div class="relative flex items-center gap-2.5">
-                                    <span class="material-symbols-outlined text-xl">bolt</span>
                                     <span>Clasificar con TechMind</span>
                                 </div>
                             </button>
@@ -235,19 +346,15 @@
                 <div id="results-card" class="glass-panel rounded-2xl p-6 md:p-8 flex-1 flex flex-col relative border-t-4 border-t-primary-fixed transition-all duration-500">
                     <div class="absolute top-0 right-8 w-24 h-1 bg-primary-fixed blur-md"></div>
                     
-                    <div class="flex justify-between items-start mb-6">
-                        <h3 class="font-headline-md text-2xl text-on-surface font-bold flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary-fixed text-3xl">auto_awesome</span>
+                        <h3 class="font-headline-md text-2xl text-on-surface font-bold text-center mt-2 mb-6">
                             Resultado del Análisis
                         </h3>
-                    </div>
 
                     <!-- Category Badge Container -->
-                    <div class="mb-8 text-center py-6 bg-surface-container/40 rounded-xl border border-white/5">
+                    <div class="mb-8 text-center py-6 rounded-xl border subtle-border" style="background-color: var(--surface-container);">
                         <p class="font-label-sm text-sm text-on-surface-variant mb-3 uppercase tracking-widest font-semibold">Categoría Predicha</p>
                         <div id="category-badge-container">
                             <div class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full border text-lg font-bold bg-primary/10 border-primary/30 text-primary-fixed">
-                                <span class="material-symbols-outlined text-2xl">psychology</span>
                                 <span>Esperando análisis...</span>
                             </div>
                         </div>
@@ -275,7 +382,7 @@
                     </div>
 
                     <!-- Toggle Action -->
-                    <div class="mt-auto pt-4 border-t border-white/5">
+                    <div class="mt-auto pt-4 border-t subtle-border">
                         <button id="btn-view-json" type="button" class="w-full py-3.5 rounded-xl border border-primary/20 bg-primary/5 text-primary-fixed font-label-sm text-sm font-semibold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 group cursor-pointer">
                             <span class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">code</span>
                             <span>Ver Respuesta JSON Cruda</span>
@@ -287,7 +394,7 @@
         </div>
 
             <!-- Recent Entries Footer Grid -->
-            <section id="history-section" class="mt-auto pt-8 border-t border-white/10">
+            <section id="history-section" class="mt-auto pt-8 border-t medium-border">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
                         <h3 class="font-headline-md text-2xl text-on-surface font-bold">Contenidos Clasificados Recientemente</h3>
@@ -306,7 +413,7 @@
 
         <!-- History View Section (Subpage) -->
         <div id="history-view-section" class="hidden flex-1 flex flex-col gap-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b subtle-border">
                 <div>
                     <h2 class="font-headline-md text-3xl text-on-surface font-bold tracking-tight">Historial de Consultas</h2>
                     <p class="font-body-md text-on-surface-variant mt-1">Revisá y filtrá todas las predicciones persistidas en PostgreSQL.</p>
@@ -316,12 +423,12 @@
                     <!-- Search Input -->
                     <div class="relative flex-1 min-w-[240px]">
                         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
-                        <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..." class="w-full bg-surface-container-high border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-on-surface placeholder:text-on-surface-variant/50 font-body-md text-sm focus:outline-none focus:border-primary-fixed focus:ring-4 focus:ring-primary-fixed/20 transition-all">
+                        <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..." class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 font-body-md text-sm focus:outline-none transition-all">
                     </div>
                     <!-- Category Filter -->
                     <div class="flex items-center gap-3">
                         <label for="filter-category" class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap">Filtrar:</label>
-                        <select id="filter-category" class="bg-surface-container-high border border-white/10 rounded-xl px-4 py-2.5 text-on-surface font-body-md text-sm focus:outline-none focus:border-primary-fixed focus:ring-4 focus:ring-primary-fixed/20 transition-all cursor-pointer">
+                        <select id="filter-category" class="tech-select rounded-xl px-4 py-2.5 font-body-md text-sm focus:outline-none transition-all cursor-pointer">
                             <option value="all">Todas las categorías</option>
                             <option value="Backend">Backend</option>
                             <option value="Frontend">Frontend</option>
@@ -346,18 +453,18 @@
 
     <!-- Modal JSON Respuesta Cruda -->
     <div id="json-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-md p-4">
-        <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 border border-white/10 shadow-2xl flex flex-col max-h-[80vh]">
-            <div class="flex justify-between items-center mb-4 pb-3 border-b border-white/10">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 border medium-border shadow-2xl flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b medium-border">
                 <h4 class="font-headline-md text-xl text-primary-fixed font-bold flex items-center gap-2">
                     <span class="material-symbols-outlined">code</span>
                     Respuesta JSON de Spring Boot / FastAPI
                 </h4>
-                <button id="modal-close" class="text-on-surface-variant hover:text-white transition-colors p-1 rounded-lg">
+                <button id="modal-close" class="text-on-surface-variant hover:text-on-surface transition-colors p-1 rounded-lg">
                     <span class="material-symbols-outlined text-2xl">close</span>
                 </button>
             </div>
-            <pre id="json-content" class="bg-surface-container-lowest/80 text-emerald-300 font-mono text-xs p-4 rounded-xl overflow-y-auto flex-1 leading-relaxed border border-white/5 selection:bg-emerald-800 selection:text-white"></pre>
-            <div class="mt-4 pt-3 border-t border-white/10 flex justify-end">
+            <pre id="json-content" class="font-mono text-xs p-4 rounded-xl overflow-y-auto flex-1 leading-relaxed border subtle-border" style="background-color: var(--json-bg); color: var(--json-text);"></pre>
+            <div class="mt-4 pt-3 border-t medium-border flex justify-end">
                 <button onclick="toggleJsonModal()" class="px-5 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-xs font-semibold transition-colors">Cerrar</button>
             </div>
         </div>

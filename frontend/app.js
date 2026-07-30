@@ -21,8 +21,24 @@ const CATEGORY_CONFIG = {
 let lastJsonResponse = null;
 let lastInput = null;
 let allHistoryData = [];
+let healthStates = {
+    springboot: false,
+    fastapi: false,
+    postgres: true
+};
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Load theme setting
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+    } else {
+        document.documentElement.classList.add('dark');
+    }
+    if (window.innerWidth < 768) {
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
+    }
     initHealthChecks();
     bindEvents();
     loadHistory(); // Carga el historial desde PostgreSQL al iniciar
@@ -36,24 +52,24 @@ async function initHealthChecks() {
         const res = await fetch(`${DS_API_URL}/health`);
         const data = await res.json();
         if (data.status === 'ok') {
-            setServiceStatus('status-fastapi', true, 'FastAPI ML :8000 (Listo)');
+            setServiceStatus('status-fastapi', true, 'FastAPI ML :8000');
         } else {
-            setServiceStatus('status-fastapi', false, 'FastAPI ML :8000 (Desconectado)');
+            setServiceStatus('status-fastapi', false, 'FastAPI ML :8000');
         }
     } catch {
-        setServiceStatus('status-fastapi', false, 'FastAPI ML :8000 (Desconectado)');
+        setServiceStatus('status-fastapi', false, 'FastAPI ML :8000');
     }
 
     // Check Spring Boot
     try {
         await fetch(`${API_BASE_URL}/contenido`, { method: 'OPTIONS' });
-        setServiceStatus('status-springboot', true, 'API Spring Boot :8080 (Listo)');
+        setServiceStatus('status-springboot', true, 'Spring Boot :8080');
     } catch {
-        setServiceStatus('status-springboot', false, 'API Spring Boot :8080 (Desconectado)');
+        setServiceStatus('status-springboot', false, 'Spring Boot :8080');
     }
 
     // PostgreSQL status
-    setServiceStatus('status-postgres', true, 'PostgreSQL :5432 (Activo)');
+    setServiceStatus('status-postgres', true, 'PostgreSQL :5432');
 }
 
 function setServiceStatus(elementId, isOk, text) {
@@ -63,13 +79,35 @@ function setServiceStatus(elementId, isOk, text) {
     const label = el.querySelector('span');
 
     if (isOk) {
-        led.className = 'w-2.5 h-2.5 rounded-full bg-tertiary-fixed led-pulse';
-        label.className = 'font-label-sm text-xs text-tertiary-fixed font-medium truncate';
+        led.className = 'w-2.5 h-2.5 rounded-full led-pulse shrink-0';
+        led.style.backgroundColor = 'var(--led-ok-bg)';
+        label.className = 'font-label-sm text-[11px] font-medium';
+        label.style.color = 'var(--led-ok-text)';
     } else {
-        led.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
-        label.className = 'font-label-sm text-xs text-rose-400 font-medium truncate';
+        led.className = 'w-2.5 h-2.5 rounded-full shrink-0';
+        led.style.backgroundColor = 'var(--led-error-bg)';
+        label.className = 'font-label-sm text-[11px] font-medium';
+        label.style.color = 'var(--led-error-text)';
     }
     label.textContent = text;
+
+    // Update trackers
+    if (elementId === 'status-springboot') healthStates.springboot = isOk;
+    if (elementId === 'status-fastapi') healthStates.fastapi = isOk;
+    if (elementId === 'status-postgres') healthStates.postgres = isOk;
+
+    // Update overall indicator
+    const overallLed = document.getElementById('overall-status-led');
+    if (overallLed) {
+        const allUp = healthStates.springboot && healthStates.fastapi && healthStates.postgres;
+        if (allUp) {
+            overallLed.className = 'w-2.5 h-2.5 rounded-full led-pulse';
+            overallLed.style.backgroundColor = 'var(--led-ok-bg)';
+        } else {
+            overallLed.className = 'w-2.5 h-2.5 rounded-full led-pulse';
+            overallLed.style.backgroundColor = 'var(--led-error-bg)';
+        }
+    }
 }
 
 // ── 2. Event Listeners ──────────────────────────────────────────────────────
@@ -102,6 +140,8 @@ function bindEvents() {
         if (mainContent && window.innerWidth >= 768) {
             mainContent.classList.remove('md:ml-64');
         }
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
     };
 
     // Toggle Sidebar Control
@@ -113,8 +153,11 @@ function bindEvents() {
             const isOpen = (window.innerWidth >= 768 && sidebar.classList.contains('md:translate-x-0')) ||
                            (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0'));
 
+            const toggleIcon = document.getElementById('sidebar-toggle-icon');
+
             if (isOpen) {
                 closeSidebar();
+                if (toggleIcon) toggleIcon.textContent = 'chevron_right';
             } else {
                 // Open it
                 sidebar.classList.remove('-translate-x-full');
@@ -125,12 +168,46 @@ function bindEvents() {
                     sidebar.classList.add('translate-x-0');
                     sidebarOverlay.classList.remove('hidden');
                 }
+                if (toggleIcon) toggleIcon.textContent = 'chevron_left';
             }
         };
 
         sidebarToggle.addEventListener('click', toggleSidebar);
         if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
         sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+
+    // Service Status Popover Control
+    const statusTrigger = document.getElementById('btn-status-trigger');
+    const statusPopover = document.getElementById('status-popover');
+    const statusChevron = document.getElementById('status-chevron');
+
+    if (statusTrigger && statusPopover) {
+        statusTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = !statusPopover.classList.contains('pointer-events-none');
+            if (isOpen) {
+                statusPopover.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+                statusPopover.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+                if (statusChevron) statusChevron.style.transform = 'rotate(0deg)';
+            } else {
+                statusPopover.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+                statusPopover.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+                if (statusChevron) statusChevron.style.transform = 'rotate(180deg)';
+            }
+        });
+
+        // Close popover when clicking anywhere else
+        document.addEventListener('click', () => {
+            statusPopover.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+            statusPopover.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+            if (statusChevron) statusChevron.style.transform = 'rotate(0deg)';
+        });
+
+        // Prevent closing when clicking inside the popover
+        statusPopover.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
     }
 
     // View Switcher Control (SPA subpage logic)
@@ -168,6 +245,21 @@ function bindEvents() {
 
         navClassifier.addEventListener('click', showClassifier);
         navHistory.addEventListener('click', showHistory);
+    }
+
+    // Theme Toggle Control
+    const themeToggle = document.getElementById('btn-theme-toggle');
+    const themeToggleIcon = document.getElementById('theme-toggle-icon');
+    if (themeToggle && themeToggleIcon) {
+        const isDark = document.documentElement.classList.contains('dark');
+        themeToggleIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const nowDark = document.documentElement.classList.contains('dark');
+            themeToggleIcon.textContent = nowDark ? 'light_mode' : 'dark_mode';
+            localStorage.setItem('theme', nowDark ? 'dark' : 'light');
+        });
     }
 
     // Filter Category and Search listeners
@@ -324,7 +416,6 @@ async function loadHistory() {
         } else {
             historyGrid.innerHTML = `
                 <div class="col-span-full py-8 text-center glass-panel rounded-xl">
-                    <span class="material-symbols-outlined text-4xl text-outline mb-2">history_toggle_off</span>
                     <p class="text-on-surface-variant text-sm font-label-sm">No hay publicaciones guardadas en la base de datos aún.</p>
                 </div>
             `;
@@ -492,7 +583,6 @@ function setLoadingState(isLoading) {
         btn.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
             <div class="relative flex items-center gap-2">
-                <span class="material-symbols-outlined text-lg">bolt</span>
                 Clasificar con TechMind
             </div>
         `;
