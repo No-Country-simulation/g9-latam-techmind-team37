@@ -1,9 +1,30 @@
-# CHANGELOG — TechMind · Ciencia de Datos
+# CHANGELOG — TechMind · Proyecto Completo
 
 > Todas las versiones están ordenadas de la más reciente a la más antigua.
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
+> Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
-## [1.1.0] — 2026-07-28 · Sprint 2 & QA Automation (actual)
+## [1.2.0] — 2026-07-30 · Health Check de Spring Boot + Actuator
+
+### Corregido
+- **Bug visual en la UI — indicador LED de Spring Boot siempre en rojo (`frontend/app.js`):** El health check usaba `fetch('/contenido', { method: 'OPTIONS' })` para detectar si Spring Boot estaba activo. El browser bloqueaba esta llamada por política CORS al tratarla de forma distinta a un preflight automático, lanzando siempre el bloque `catch` y mostrando el LED en rojo aunque el servidor estuviera operativo y la clasificación funcionara correctamente. Corregido reemplazando el método `OPTIONS` por `GET /actuator/health`, consistente con el patrón ya aplicado para FastAPI.
+
+### Añadido
+- **`spring-boot-starter-actuator` en `backend/api/api/pom.xml`:** Nueva dependencia que expone el endpoint estándar `GET /actuator/health` con respuesta `{ "status": "UP" }` cuando el servicio está operativo.
+- **Configuración de Actuator en `backend/api/api/src/main/resources/application.properties`:**
+  - `management.endpoints.web.exposure.include=health` — solo expone el endpoint de salud (no métricas ni información sensible).
+  - `management.endpoint.health.show-details=never` — respuesta mínima sin detalles internos.
+  - `management.endpoints.web.cors.allowed-origins=*` y `allowed-methods=GET` — permite que el frontend consulte el endpoint sin errores de CORS.
+
+### Documentación
+- **`backend/docs/ARQUITECTURA.md`:** Actualizados el bloque de `application.properties` con las nuevas propiedades de Actuator, el flujo de arranque (ahora lista los dos endpoints expuestos en `:8080`) y agregada la nueva sección *"Endpoint de Health Check"* con contrato JSON.
+- **`backend/docs/FUNCIONALIDADES.md`:** Título actualizado a *"Endpoints Disponibles"* (plural). Agregada sección `GET /actuator/health` con contrato completo, descripción de uso y contexto de integración con el frontend.
+- **`backend/docs/SETUP.md`:** Health check básico corregido (de `curl /contenido` a `curl /actuator/health`). Agregada entrada en Troubleshooting: *"El indicador de Spring Boot aparece en rojo en la UI"* con causa, verificación y solución.
+- **`frontend/README.md`:** Indicadores de estado detallados con el endpoint exacto que cada servicio usa para su health check.
+
+---
+
+## [1.1.0] — 2026-07-28 · Sprint 2 & QA Automation (anterior)
 
 ### Añadido
 - **Diagrama Infográfico de Arquitectura de Sistema:** Generado e integrado en `README.md` (`assets/techmind_project_flow.png`) mostrando el flujo visual multicontenedor (Frontend UI → Spring Boot :8080 → FastAPI ML :8000 → PostgreSQL 16 :5432).
@@ -141,4 +162,4 @@ Postman → Spring Boot (8080) → FastAPI (8000) → PostgreSQL (5432)
 
 ---
 
-*Mantenido por el equipo de Ciencia de Datos — TechMind G9 LATAM Team 37. Última actualización: 2026-07-22.*
+*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-07-30.*

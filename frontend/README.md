@@ -18,7 +18,10 @@ frontend/
 ## ✨ Funcionalidades Principales
 
 1. **Indicadores de Estado en Tiempo Real (Header):**
-   * Luces LED verdes pulsantes verificando la salud de **Spring Boot :8080**, **FastAPI ML :8000** y **PostgreSQL :5432**.
+   * Luces LED verdes pulsantes verificando la salud de los servicios al cargar la página:
+     - **Spring Boot :8080** → `GET /actuator/health` (respuesta esperada: `{"status":"UP"}`)
+     - **FastAPI ML :8000** → `GET /health` (respuesta esperada: `{"status":"ok"}`)
+     - **PostgreSQL :5432** → Estado inferido (activo si FastAPI responde correctamente)
 
 2. **Formulario de Ingesta & Clasificación:**
    * Campos para Título y Contenido Técnico con botón de acción animado *"Clasificar con TechMind AI"*.

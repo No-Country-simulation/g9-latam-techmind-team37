@@ -62,8 +62,13 @@ async function initHealthChecks() {
 
     // Check Spring Boot
     try {
-        await fetch(`${API_BASE_URL}/contenido`, { method: 'OPTIONS' });
-        setServiceStatus('status-springboot', true, 'Spring Boot :8080');
+        const res = await fetch(`${API_BASE_URL}/actuator/health`);
+        const data = await res.json();
+        if (data.status === 'UP') {
+            setServiceStatus('status-springboot', true, 'Spring Boot :8080');
+        } else {
+            setServiceStatus('status-springboot', false, 'Spring Boot :8080');
+        }
     } catch {
         setServiceStatus('status-springboot', false, 'Spring Boot :8080');
     }

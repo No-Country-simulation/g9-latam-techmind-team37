@@ -1,7 +1,8 @@
-# 📋 TechMind — Changelog de Bugs Corregidos
+# 📋 TechMind — Registro Técnico de Bugs Corregidos
 
-> Registro de todos los bugs identificados y corregidos durante la integración.
-> Última actualización: 2026-07-27
+> Registro detallado (causa, síntoma, solución y código) de todos los bugs identificados y corregidos durante la integración.
+> Para el historial de versiones del proyecto, ver el [`CHANGELOG.md`](../../../CHANGELOG.md) en la raíz del repositorio.
+> Última actualización: 2026-07-30
 
 ---
 
@@ -366,6 +367,6 @@ Estas etiquetas oficiales cuentan con soporte nativo tanto para `linux/amd64` (W
 
 ---
 
-*TechMind G9 LATAM Team 37 — Changelog actualizado el 2026-07-29*
+*TechMind G9 LATAM Team 37 — Registro técnico actualizado el 2026-07-30*
 
 
