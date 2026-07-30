@@ -53,7 +53,7 @@ def get_predicciones(limit: int = 50):
         cur = con.cursor()
         cur.execute(
             """
-            SELECT p.id, c.titulo, p.categoria, p.probabilidad, p.palabras_clave, p.created_at
+            SELECT p.id, c.titulo, p.categoria, p.probabilidad, p.palabras_clave, p.created_at, c.texto
             FROM predicciones p
             JOIN contenidos c ON c.id = p.contenido_id
             ORDER BY p.created_at DESC
@@ -69,9 +69,10 @@ def get_predicciones(limit: int = 50):
                 "id": r[0],
                 "titulo": r[1],
                 "categoria": r[2],
-                "probabilidad": float(r[3]),
+                "probabilidad": round(float(r[3]), 2),
                 "keywords": r[4].split(",") if r[4] else [],
-                "created_at": r[5].isoformat() + "Z" if r[5] else ""
+                "created_at": r[5].isoformat() + "Z" if r[5] else "",
+                "texto": r[6] if r[6] else ""
             }
             for r in rows
         ]

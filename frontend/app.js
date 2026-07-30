@@ -327,11 +327,19 @@ async function handleClassification() {
         }
 
         const data = await response.json();
+        // Redondear probabilidad a 2 decimales
+        if (data.probabilidad != null) {
+            data.probabilidad = Math.round(data.probabilidad * 100) / 100;
+        }
         lastJsonResponse = data;
         lastInput = { titulo, texto };
 
         // Renderizar resultado
         renderResult(data);
+
+        // Limpiar los campos de entrada para nuevas búsquedas
+        document.getElementById('content-title').value = '';
+        document.getElementById('content-body').value = '';
 
         // Recargar el historial actualizado desde PostgreSQL
         setTimeout(() => loadHistory(), 600);
@@ -363,7 +371,7 @@ function renderResult(data) {
     `;
 
     // 2. Porcentaje de Confianza
-    const percentage = ((probabilidad || 0) * 100).toFixed(1);
+    const percentage = ((probabilidad || 0) * 100).toFixed(2);
     document.getElementById('confidence-score').textContent = `${percentage}%`;
     const bar = document.getElementById('confidence-bar');
     bar.style.width = `${percentage}%`;
@@ -420,6 +428,7 @@ async function loadHistory() {
                             <span class="text-on-surface-variant font-label-sm text-[11px]">${timeLabel}</span>
                         </div>
                         <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
+                        <p class="text-on-surface-variant text-xs mt-1 line-clamp-2 opacity-70">${escapeHtml(entry.texto || '')}</p>
                         <div class="mt-3 flex items-center justify-between opacity-80 pt-2 border-t border-white/5">
                             <div class="flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-[15px] text-primary-fixed">auto_awesome</span>
@@ -510,6 +519,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                 </span>
                             </div>
                             <h5 class="text-on-surface font-bold text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
+                            <p class="text-on-surface-variant text-sm line-clamp-2 opacity-70">${escapeHtml(entry.texto || 'Sin descripción disponible')}</p>
                             <div class="flex flex-wrap gap-1.5 pt-1">
                                 ${keywordsPills || '<span class="text-xs text-on-surface-variant italic opacity-60">Sin palabras clave</span>'}
                             </div>

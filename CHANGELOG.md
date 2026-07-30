@@ -4,6 +4,19 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.3.0] — 2026-07-30 · Mejoras de UX en Clasificador
+
+### Corregido
+- **Ícono duplicado en sidebar (`frontend/index.html`):** El enlace de navegación "Clasificador" usaba el mismo ícono `psychology` que el logo principal "TechMind" en la parte superior del sidebar, generando confusión visual. Reemplazado por el ícono `category` de Material Symbols para diferenciar claramente ambos elementos.
+- **Decimales excesivos en probabilidad (`app/database.py` + `frontend/app.js`):** Los valores de probabilidad devueltos por el modelo ML se mostraban con hasta 4 decimales. Se aplica `round(float, 2)` en la API Python (`get_predicciones`) y `Math.round` en el frontend antes de renderizar. El porcentaje de confianza en la UI se muestra con 2 decimales.
+- **Efecto de brillo blanco/púrpura sobre el panel de resultados (`frontend/index.html`):** Eliminado el `<div>` con clase `bg-primary-fixed blur-md` posicionado en la esquina superior derecha del recuadro "Resultado del Análisis", que generaba un resplandor no deseado sobre el borde superior del panel.
+
+### Mejorado
+- **Limpieza automática de campos tras clasificar (`frontend/app.js`):** Al hacer clic en "Clasificar con TechMind" y recibir una respuesta exitosa, los campos de título y contenido se vacían automáticamente, preparando la interfaz para una nueva consulta sin necesidad de borrar manualmente el texto anterior.
+- **Descripción del contenido visible en historial (`app/database.py` + `frontend/app.js`):** La consulta SQL del endpoint `GET /predicciones` ahora incluye el campo `c.texto` de la tabla `contenidos`. El frontend muestra el texto/descripción truncado (con `line-clamp-2`) debajo del título tanto en las tarjetas recientes del clasificador como en la subpágina de historial detallado.
+
+---
+
 ## [1.2.0] — 2026-07-30 · Health Check de Spring Boot + Actuator
 
 ### Corregido
