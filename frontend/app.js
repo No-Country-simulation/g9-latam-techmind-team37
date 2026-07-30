@@ -140,14 +140,43 @@ function bindEvents() {
     const closeSidebar = () => {
         if (!sidebar) return;
         sidebar.classList.add('-translate-x-full');
-        sidebar.classList.remove('translate-x-0', 'md:translate-x-0');
-        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
-        if (mainContent && window.innerWidth >= 768) {
-            mainContent.classList.remove('md:ml-64');
+        sidebar.classList.remove('translate-x-0');
+        // Solo en desktop se descarta la clase md: y el margen del contenido.
+        // En mobile se conservan, para que al agrandar la ventana el sidebar
+        // reaparezca alineado con su margen en lugar de dejar un hueco vacío.
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('md:translate-x-0');
+            if (mainContent) mainContent.classList.remove('md:ml-64');
         }
+        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
         const toggleIcon = document.getElementById('sidebar-toggle-icon');
         if (toggleIcon) toggleIcon.textContent = 'chevron_right';
     };
+
+    // Al cruzar el breakpoint md (768px) se restablece el estado por defecto
+    // de cada tamaño: visible y fijo en desktop, oculto tras el overlay en mobile.
+    let wasDesktop = window.innerWidth >= 768;
+    const syncSidebarToBreakpoint = () => {
+        if (!sidebar) return;
+        const isDesktop = window.innerWidth >= 768;
+        if (isDesktop === wasDesktop) return; // ignora resize de teclado/toolbar móvil
+        wasDesktop = isDesktop;
+
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+        sidebar.classList.add('md:translate-x-0');
+        if (mainContent) mainContent.classList.add('md:ml-64');
+
+        if (isDesktop) {
+            sidebar.classList.remove('-translate-x-full', 'translate-x-0');
+            if (toggleIcon) toggleIcon.textContent = 'chevron_left';
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            sidebar.classList.remove('translate-x-0');
+            if (toggleIcon) toggleIcon.textContent = 'chevron_right';
+        }
+        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+    };
+    window.addEventListener('resize', syncSidebarToBreakpoint);
 
     // Toggle Sidebar Control
     const sidebarToggle = document.getElementById('btn-sidebar-toggle');
@@ -364,9 +393,9 @@ function renderResult(data) {
     const config = CATEGORY_CONFIG[categoria] || { icon: 'auto_awesome', colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
 
     badgeContainer.innerHTML = `
-        <div class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full border text-xl font-bold shadow-[0_0_25px_rgba(139,92,246,0.25)] ${config.colorClass} transition-all duration-300 transform scale-105">
-            <span class="material-symbols-outlined text-2xl">${config.icon}</span>
-            <span>${categoria}</span>
+        <div class="inline-flex max-w-full items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-lg sm:text-xl font-bold shadow-[0_0_25px_rgba(139,92,246,0.25)] ${config.colorClass} transition-all duration-300 transform scale-105">
+            <span class="material-symbols-outlined text-xl sm:text-2xl shrink-0">${config.icon}</span>
+            <span class="min-w-0">${categoria}</span>
         </div>
     `;
 
@@ -422,10 +451,10 @@ async function loadHistory() {
                 const timeLabel = formatTimeString(entry.created_at);
 
                 return `
-                    <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300">
-                        <div class="flex justify-between items-start mb-3">
+                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0">
+                        <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
                             <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(entry.categoria || 'Sin categoría')}</span>
-                            <span class="text-on-surface-variant font-label-sm text-[11px]">${timeLabel}</span>
+                            <span class="text-on-surface-variant font-label-sm text-[11px] shrink-0">${timeLabel}</span>
                         </div>
                         <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
                         <p class="text-on-surface-variant text-xs mt-1 line-clamp-2 opacity-70">${escapeHtml(entry.texto || '')}</p>
@@ -505,9 +534,9 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                 }).join(' ');
 
                 return `
-                    <div class="p-5 rounded-2xl glass-panel border border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
-                        <div class="flex-1 space-y-2">
-                            <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
+                        <div class="flex-1 min-w-0 space-y-2">
+                            <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                                 <span class="px-3 py-1 rounded-full text-xs font-label-sm border font-semibold ${config.colorClass} flex items-center gap-1.5 shadow-sm">
                                     <span class="material-symbols-outlined text-sm">${config.icon}</span>
                                     ${escapeHtml(entry.categoria || 'Sin categoría')}
@@ -518,16 +547,16 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                     ${dateStr}
                                 </span>
                             </div>
-                            <h5 class="text-on-surface font-bold text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
+                            <h5 class="text-on-surface font-bold text-base sm:text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
                             <p class="text-on-surface-variant text-sm line-clamp-2 opacity-70">${escapeHtml(entry.texto || 'Sin descripción disponible')}</p>
                             <div class="flex flex-wrap gap-1.5 pt-1">
                                 ${keywordsPills || '<span class="text-xs text-on-surface-variant italic opacity-60">Sin palabras clave</span>'}
                             </div>
                         </div>
-                        <div class="flex items-center gap-4 md:border-l border-white/10 md:pl-5 min-w-[120px] justify-between md:justify-end">
-                            <div class="text-right md:text-right">
+                        <div class="flex items-center gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[120px] shrink-0 justify-between md:justify-end">
+                            <div class="text-left md:text-right">
                                 <span class="block text-xs font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Confianza</span>
-                                <span class="text-2xl font-black text-primary-fixed">${probPct}%</span>
+                                <span class="text-xl sm:text-2xl font-black text-primary-fixed">${probPct}%</span>
                             </div>
                         </div>
                     </div>
@@ -660,7 +689,7 @@ function setLoadingState(isLoading) {
         btn.disabled = false;
         btn.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
-            <div class="relative flex items-center gap-2">
+            <div class="relative flex items-center justify-center gap-2">
                 Clasificar con TechMind
             </div>
         `;
@@ -676,8 +705,8 @@ function showToast(message, type = 'info') {
         type === 'warning' ? 'bg-amber-950/90 border-amber-500/50 text-amber-200' :
             'bg-emerald-950/90 border-emerald-500/50 text-emerald-200';
 
-    toast.className = `glass-panel px-4 py-3 rounded-xl border ${bgClass} font-label-sm text-sm shadow-xl backdrop-blur-xl transition-all duration-300 transform translate-y-2 opacity-0 flex items-center gap-2`;
-    toast.innerHTML = `<span>${message}</span>`;
+    toast.className = `glass-panel px-4 py-3 rounded-xl border ${bgClass} font-label-sm text-sm shadow-xl backdrop-blur-xl transition-all duration-300 transform translate-y-2 opacity-0 flex items-center gap-2 break-words`;
+    toast.innerHTML = `<span class="min-w-0">${message}</span>`;
 
     container.appendChild(toast);
 

@@ -214,38 +214,46 @@
             70% { box-shadow: 0 0 0 6px rgba(111, 251, 190, 0); }
             100% { box-shadow: 0 0 0 0 rgba(111, 251, 190, 0); }
         }
+        /* Evita que títulos/URLs sin espacios desborden el layout en pantallas angostas */
+        h1, h2, h3, h4, h5, p, label, span {
+            overflow-wrap: break-word;
+        }
+        /* Los glows ambientales con blur de 120px son costosos en GPU móvil */
+        @media (max-width: 767px) {
+            .ambient-glow { filter: blur(70px); }
+        }
     </style>
 </head>
-<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
+<body class="bg-background text-on-background min-h-[100dvh] font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
 
     <!-- Ambient Glow Background (dark mode only) -->
     <div class="fixed inset-0 z-0 pointer-events-none opacity-0 dark:opacity-40 transition-opacity duration-500">
-        <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-inverse-primary/20 blur-[120px]"></div>
-        <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-tertiary-fixed/10 blur-[120px]"></div>
+        <div class="ambient-glow absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-inverse-primary/20 blur-[120px]"></div>
+        <div class="ambient-glow absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-tertiary-fixed/10 blur-[120px]"></div>
     </div>
 
     <!-- Toast Notifications Container -->
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 max-w-md pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-4 left-4 right-4 sm:left-auto sm:top-6 sm:right-6 z-50 flex flex-col gap-3 sm:max-w-md pointer-events-none"></div>
 
     <!-- Sidebar Overlay for mobile -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300"></div>
 
     <!-- Side Navigation Shell -->
-    <aside id="sidebar" class="fixed left-0 top-0 h-screen w-64 border-r subtle-border shadow-2xl bg-surface-container-low/80 backdrop-blur-2xl z-40 flex flex-col py-6 px-4 transition-transform duration-300 -translate-x-full md:translate-x-0">
-        <div class="mb-10 px-3 flex justify-between items-center">
-            <div>
+    <aside id="sidebar" class="fixed left-0 top-0 h-[100dvh] w-64 max-w-[85vw] border-r subtle-border shadow-2xl bg-surface-container-low/80 backdrop-blur-2xl z-40 flex flex-col py-6 px-4 transition-transform duration-300 -translate-x-full md:translate-x-0">
+        <div class="mb-8 lg:mb-10 px-3 flex justify-between items-center gap-2">
+            <div class="min-w-0">
                 <h1 class="font-headline-md text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-bold">
-                    <span class="material-symbols-outlined text-3xl text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+                    <span class="material-symbols-outlined text-3xl text-primary shrink-0" style="font-variation-settings: 'FILL' 1;">psychology</span>
                     TechMind
                 </h1>
                 <p class="font-label-sm text-xs text-on-surface-variant mt-2 opacity-80">Organización Inteligente</p>
             </div>
             <!-- Close button only visible on mobile -->
-            <button id="btn-sidebar-close" class="md:hidden p-1.5 rounded-lg hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-on-surface">
+            <button id="btn-sidebar-close" class="md:hidden shrink-0 p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-on-surface">
                 <span class="material-symbols-outlined text-2xl">close</span>
             </button>
         </div>
-        <nav class="flex-1 space-y-3">
+        <nav class="flex-1 space-y-3 overflow-y-auto">
             <a id="nav-classifier" class="bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer">
                 <span class="material-symbols-outlined text-xl">category</span>
                 <span class="font-label-sm text-sm font-bold">Clasificador</span>
@@ -285,20 +293,20 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main id="main-content" class="relative z-10 md:ml-64 min-h-screen flex flex-col p-4 md:p-8 transition-all duration-300">
-        
+    <main id="main-content" class="relative z-10 md:ml-64 min-h-[100dvh] flex flex-col p-4 sm:p-6 md:p-8 transition-all duration-300">
+
         <!-- Header Section -->
-        <header class="flex flex-row items-center justify-between gap-6 mb-8 pt-4 md:pt-0 border-b subtle-border pb-6">
-            <div class="flex items-center gap-4">
-                <button id="btn-sidebar-toggle" class="p-2.5 rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Toggle Sidebar">
+        <header class="flex flex-row items-center justify-between gap-3 sm:gap-6 mb-6 sm:mb-8 pt-4 md:pt-0 border-b subtle-border pb-5 sm:pb-6">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <button id="btn-sidebar-toggle" class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Toggle Sidebar">
                     <span class="material-symbols-outlined text-2xl" id="sidebar-toggle-icon">chevron_left</span>
                 </button>
-                <div>
-                    <h2 class="font-headline-md text-2xl md:text-3xl text-on-surface font-bold tracking-tight">Clasificación de Contenido Técnico</h2>
-                    <p class="font-body-md text-sm md:text-base text-on-surface-variant mt-1">Ingresá textos para clasificarlos en tiempo real.</p>
+                <div class="min-w-0">
+                    <h2 class="font-headline-md text-lg sm:text-2xl md:text-3xl text-on-surface font-bold tracking-tight">Clasificación de Contenido Técnico</h2>
+                    <p class="font-body-md text-xs sm:text-sm md:text-base text-on-surface-variant mt-1">Ingresá textos para clasificarlos en tiempo real.</p>
                 </div>
             </div>
-            <button id="btn-theme-toggle" type="button" class="p-2.5 rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Cambiar tema">
+            <button id="btn-theme-toggle" type="button" class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Cambiar tema">
                 <span class="material-symbols-outlined text-2xl" id="theme-toggle-icon">light_mode</span>
             </button>
         </header>
@@ -307,14 +315,14 @@
         <div id="classifier-view-section" class="flex-1 flex flex-col">
 
             <!-- Dashboard Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mb-10 lg:mb-12">
+
             <!-- Left Column: Input Form -->
-            <section class="lg:col-span-7 xl:col-span-7 flex flex-col gap-6">
-                <div class="glass-panel rounded-2xl p-6 md:p-8 flex-1 flex flex-col transition-all duration-300 relative overflow-hidden group">
+            <section class="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 min-w-0">
+                <div class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                    
-                    <h3 class="font-headline-md text-2xl text-on-surface mb-6 font-bold">
+
+                    <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface mb-6 font-bold">
                         Ingresar Contenido Técnico
                     </h3>
                     
@@ -330,9 +338,9 @@
                         </div>
                         
                         <div class="flex justify-center mt-4">
-                            <button id="btn-classify" type="button" class="group relative px-10 py-4 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer">
+                            <button id="btn-classify" type="button" class="group relative w-full sm:w-auto px-6 sm:px-10 py-4 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer">
                                 <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
-                                <div class="relative flex items-center gap-2.5">
+                                <div class="relative flex items-center justify-center gap-2.5">
                                     <span>Clasificar con TechMind</span>
                                 </div>
                             </button>
@@ -342,18 +350,18 @@
             </section>
 
             <!-- Right Column: Results Card -->
-            <section class="lg:col-span-5 xl:col-span-5 flex flex-col gap-6">
-                <div id="results-card" class="glass-panel rounded-2xl p-6 md:p-8 flex-1 flex flex-col relative border-t-4 border-t-primary-fixed transition-all duration-500">
-                    
-                        <h3 class="font-headline-md text-2xl text-on-surface font-bold text-center mt-2 mb-6">
+            <section class="lg:col-span-5 xl:col-span-5 flex flex-col gap-6 min-w-0">
+                <div id="results-card" class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col relative border-t-4 border-t-primary-fixed transition-all duration-500">
+
+                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold text-center mt-2 mb-6">
                             Resultado del Análisis
                         </h3>
 
                     <!-- Category Badge Container -->
-                    <div class="mb-8 text-center py-6 rounded-xl border subtle-border" style="background-color: var(--surface-container);">
-                        <p class="font-label-sm text-sm text-on-surface-variant mb-3 uppercase tracking-widest font-semibold">Categoría Predicha</p>
+                    <div class="mb-8 text-center px-3 py-5 sm:py-6 rounded-xl border subtle-border" style="background-color: var(--surface-container);">
+                        <p class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 uppercase tracking-widest font-semibold">Categoría Predicha</p>
                         <div id="category-badge-container">
-                            <div class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full border text-lg font-bold bg-primary/10 border-primary/30 text-primary-fixed">
+                            <div class="inline-flex max-w-full items-center gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-base sm:text-lg font-bold bg-primary/10 border-primary/30 text-primary-fixed">
                                 <span>Esperando análisis...</span>
                             </div>
                         </div>
@@ -361,9 +369,9 @@
 
                     <!-- Confidence Meter -->
                     <div class="mb-8 space-y-3">
-                        <div class="flex justify-between items-end">
-                            <span class="font-label-sm text-sm text-on-surface-variant font-medium">Confianza del Modelo (Probabilidad)</span>
-                            <span id="confidence-score" class="font-label-sm text-base text-primary-fixed font-bold">0.0%</span>
+                        <div class="flex flex-wrap justify-between items-end gap-x-3 gap-y-1">
+                            <span class="font-label-sm text-xs sm:text-sm text-on-surface-variant font-medium min-w-0">Confianza del Modelo (Probabilidad)</span>
+                            <span id="confidence-score" class="font-label-sm text-base text-primary-fixed font-bold shrink-0">0.0%</span>
                         </div>
                         <div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden p-0.5">
                             <div id="confidence-bar" class="h-full bg-gradient-to-r from-primary-container to-tertiary-fixed rounded-full w-[0%] relative transition-all duration-700 ease-out">
@@ -373,10 +381,10 @@
                     </div>
 
                     <!-- Keyword Tags -->
-                    <div class="mb-8 flex-1">
-                        <p class="font-label-sm text-sm text-on-surface-variant mb-3 font-semibold uppercase tracking-wider">Palabras Clave Extraídas (TF-IDF)</p>
+                    <div class="mb-8 flex-1 min-w-0">
+                        <p class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 font-semibold uppercase tracking-wider">Palabras Clave Extraídas (TF-IDF)</p>
                         <div id="keywords-list" class="flex flex-wrap gap-2">
-                            <span class="text-on-surface-variant text-base italic opacity-60">Las entidades detectadas aparecerán aquí...</span>
+                            <span class="text-on-surface-variant text-sm sm:text-base italic opacity-60">Las entidades detectadas aparecerán aquí...</span>
                         </div>
                     </div>
 
@@ -384,7 +392,7 @@
                     <div class="mt-auto pt-4 border-t subtle-border">
                         <button id="btn-view-json" type="button" class="w-full py-3.5 rounded-xl border border-primary/20 bg-primary/5 text-primary-fixed font-label-sm text-sm font-semibold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 group cursor-pointer">
                             <span class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">code</span>
-                            <span>Ver Respuesta JSON</span>
+                            <span>Ver JSON</span>
                         </button>
                     </div>
                 </div>
@@ -395,13 +403,13 @@
             <!-- Recent Entries Footer Grid -->
             <section id="history-section" class="mt-auto pt-8 border-t medium-border">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <div>
-                        <h3 class="font-headline-md text-2xl text-on-surface font-bold">Contenidos Clasificados Recientemente</h3>
-                        <p class="font-label-sm text-sm text-on-surface-variant opacity-70">Persistidos en PostgreSQL mediante Spring Boot</p>
+                    <div class="min-w-0">
+                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold">Contenidos Clasificados Recientemente</h3>
+                        <p class="font-label-sm text-xs sm:text-sm text-on-surface-variant opacity-70">Persistidos en PostgreSQL mediante Spring Boot</p>
                     </div>
                 </div>
-                
-                <div id="history-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <div id="history-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     <div class="col-span-full py-8 text-center glass-panel rounded-xl">
                         <span class="material-symbols-outlined text-4xl text-outline mb-2 animate-spin">refresh</span>
                         <p class="text-on-surface-variant text-sm font-label-sm">Cargando publicaciones guardadas desde PostgreSQL...</p>
@@ -412,22 +420,22 @@
 
         <!-- History View Section (Subpage) -->
         <div id="history-view-section" class="hidden flex-1 flex flex-col gap-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b subtle-border">
-                <div>
-                    <h2 class="font-headline-md text-3xl text-on-surface font-bold tracking-tight">Historial de Consultas</h2>
-                    <p class="font-body-md text-on-surface-variant mt-1">Revisá y filtrá todas las predicciones persistidas en PostgreSQL.</p>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-6 pb-6 border-b subtle-border">
+                <div class="min-w-0">
+                    <h2 class="font-headline-md text-2xl sm:text-3xl text-on-surface font-bold tracking-tight">Historial de Consultas</h2>
+                    <p class="font-body-md text-sm sm:text-base text-on-surface-variant mt-1">Revisá y filtrá todas las predicciones persistidas en PostgreSQL.</p>
                 </div>
                 <!-- Search and Category Filters -->
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 flex-1 md:flex-initial max-w-xl">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 flex-1 md:flex-initial w-full md:w-auto max-w-full md:max-w-xl">
                     <!-- Search Input -->
-                    <div class="relative flex-1 min-w-[240px]">
+                    <div class="relative flex-1 min-w-0">
                         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
-                        <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..." class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 font-body-md text-sm focus:outline-none transition-all">
+                        <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..." class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all">
                     </div>
                     <!-- Category Filter -->
-                    <div class="flex items-center gap-3">
-                        <label for="filter-category" class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap">Filtrar:</label>
-                        <select id="filter-category" class="tech-select rounded-xl px-4 py-2.5 font-body-md text-sm focus:outline-none transition-all cursor-pointer">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <label for="filter-category" class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap shrink-0">Filtrar:</label>
+                        <select id="filter-category" class="tech-select flex-1 sm:flex-initial min-w-0 rounded-xl px-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all cursor-pointer">
                             <option value="all">Todas las categorías</option>
                             <option value="Backend">Backend</option>
                             <option value="Frontend">Frontend</option>
@@ -451,20 +459,20 @@
     </main>
 
     <!-- Modal JSON Respuesta Cruda -->
-    <div id="json-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-md p-4">
-        <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 border medium-border shadow-2xl flex flex-col max-h-[80vh]">
-            <div class="flex justify-between items-center mb-4 pb-3 border-b medium-border">
-                <h4 class="font-headline-md text-xl text-primary-fixed font-bold flex items-center gap-2">
-                    <span class="material-symbols-outlined">code</span>
-                    Respuesta JSON de Spring Boot / FastAPI
+    <div id="json-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-md p-3 sm:p-4">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl p-4 sm:p-6 border medium-border shadow-2xl flex flex-col max-h-[88dvh] sm:max-h-[80vh]">
+            <div class="flex justify-between items-center gap-2 mb-4 pb-3 border-b medium-border">
+                <h4 class="font-headline-md text-base sm:text-xl text-primary-fixed font-bold flex items-center gap-2 min-w-0">
+                    <span class="material-symbols-outlined shrink-0">code</span>
+                    JSON de Spring Boot / FastAPI
                 </h4>
-                <button id="modal-close" type="button" class="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors p-1.5 rounded-xl flex items-center justify-center cursor-pointer" title="Cerrar ventana">
+                <button id="modal-close" type="button" class="shrink-0 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors p-1.5 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center cursor-pointer" title="Cerrar ventana">
                     <span class="material-symbols-outlined text-2xl pointer-events-none">close</span>
                 </button>
             </div>
-            <pre id="json-content" class="font-mono text-xs p-4 rounded-xl overflow-y-auto flex-1 leading-relaxed border subtle-border" style="background-color: var(--json-bg); color: var(--json-text);"></pre>
+            <pre id="json-content" class="font-mono text-[11px] sm:text-xs p-3 sm:p-4 rounded-xl overflow-auto flex-1 leading-relaxed border subtle-border" style="background-color: var(--json-bg); color: var(--json-text);"></pre>
             <div class="mt-4 pt-3 border-t medium-border flex justify-end">
-                <button id="btn-copy-json" type="button" class="px-5 py-2.5 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary-fixed font-label-sm text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer active:scale-95 shadow-md">
+                <button id="btn-copy-json" type="button" class="w-full sm:w-auto justify-center px-5 py-2.5 min-h-[44px] rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary-fixed font-label-sm text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer active:scale-95 shadow-md">
                     <span class="material-symbols-outlined text-base">content_copy</span>
                     <span id="copy-btn-text">Copiar JSON</span>
                 </button>
