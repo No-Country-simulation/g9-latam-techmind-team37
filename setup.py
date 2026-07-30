@@ -222,7 +222,7 @@ def start_services():
     print(" ╚═════════════════════════════════════════════════════════════════════╝")
     print()
     info("Para conectar el backend Java de Spring Boot:")
-    print("  En otra terminal ejecutá: cd backend/api/api && ./mvnw spring-boot:run\n")
+    print("  En otra terminal ejecutá: cd backend/api && ./mvnw spring-boot:run\n")
     print("  Para detener la API de Python: Presioná CTRL + C\n")
 
     cmd_uvicorn = [VENV_UVICORN, "app.main:app", "--reload", "--port", "8000"]

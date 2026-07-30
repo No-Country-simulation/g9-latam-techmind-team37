@@ -3,10 +3,10 @@ FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
 
 # Copiar configuración Maven y código fuente
-COPY backend/api/api/mvnw .
-COPY backend/api/api/.mvn .mvn
-COPY backend/api/api/pom.xml .
-COPY backend/api/api/src src
+COPY backend/api/mvnw .
+COPY backend/api/.mvn .mvn
+COPY backend/api/pom.xml .
+COPY backend/api/src src
 
 # Sanitizar saltos de línea de Windows (CRLF -> LF), dar permisos de ejecución y compilar jar
 RUN sed -i 's/\r$//' mvnw && chmod +x mvnw && ./mvnw package -DskipTests

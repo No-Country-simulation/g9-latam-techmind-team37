@@ -169,7 +169,7 @@ Deberías ver `techmind-postgres` en la lista con el puerto `5432`.
 
 En una terminal separada:
 ```powershell
-cd backend\api\api
+cd backend\api
 .\mvnw spring-boot:run
 ```
 
@@ -231,7 +231,7 @@ Una vez instalado todo, para levantar los 4 componentes del sistema:
 docker-compose up -d
 
 # 2. Backend Java / Spring Boot (Terminal 1)
-cd backend\api\api
+cd backend\api
 .\mvnw spring-boot:run
 
 # 3. Microservicio Python / FastAPI (Terminal 2 con venv activo)
@@ -347,7 +347,7 @@ cp .env.example .env
 docker-compose up -d
 
 # Paso 6 — Iniciar Spring Boot (Crea las tablas con Flyway)
-cd backend/api/api && ./mvnw spring-boot:run
+cd backend/api && ./mvnw spring-boot:run
 
 # Paso 7 — Cargar dataset de entrenamiento (221 registros)
 python3 data-science/src/migrate_to_postgres.py
