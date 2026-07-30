@@ -284,6 +284,18 @@ function bindEvents() {
             loadDetailedHistory(category, e.target.value.trim().toLowerCase());
         });
     }
+
+    // JSON Modal Controls (View JSON button and Close button X)
+    const btnViewJson = document.getElementById('btn-view-json');
+    const modalClose = document.getElementById('modal-close');
+    
+    if (btnViewJson) {
+        btnViewJson.addEventListener('click', toggleJsonModal);
+    }
+
+    if (modalClose) {
+        modalClose.addEventListener('click', toggleJsonModal);
+    }
 }
 
 // ── 3. Clasificación via Spring Boot ────────────────────────────────────────
@@ -555,6 +567,57 @@ function toggleJsonModal() {
         modal.classList.remove('flex');
     }
 }
+
+function copyJsonToClipboard() {
+    const jsonPre = document.getElementById('json-content');
+    const copyBtn = document.getElementById('btn-copy-json');
+    const copyText = document.getElementById('copy-btn-text');
+    if (!jsonPre || !jsonPre.textContent) return;
+
+    navigator.clipboard.writeText(jsonPre.textContent).then(() => {
+        if (copyBtn && copyText) {
+            const originalText = copyText.textContent;
+            const originalIcon = copyBtn.querySelector('.material-symbols-outlined').textContent;
+            
+            copyText.textContent = '¡Copiado!';
+            copyBtn.querySelector('.material-symbols-outlined').textContent = 'check';
+            copyBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
+            
+            showToast('📋 JSON copiado al portapapeles con éxito', 'info');
+
+            setTimeout(() => {
+                copyText.textContent = originalText;
+                copyBtn.querySelector('.material-symbols-outlined').textContent = originalIcon;
+                copyBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
+            }, 2000);
+        }
+    }).catch(err => {
+        console.error('Error al copiar JSON:', err);
+        showToast('⚠️ No se pudo copiar el contenido', 'error');
+    });
+}
+
+// Global Backdrop Click & Escape Key listeners for JSON Modal
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('json-modal');
+    if (modal && !modal.classList.contains('hidden') && e.target === modal) {
+        toggleJsonModal();
+    }
+
+    const copyBtn = e.target.closest('#btn-copy-json');
+    if (copyBtn) {
+        copyJsonToClipboard();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('json-modal');
+        if (modal && !modal.classList.contains('hidden')) {
+            toggleJsonModal();
+        }
+    }
+});
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 

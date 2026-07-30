@@ -30,7 +30,7 @@ frontend/
    * **Badge de Categoría Predicha:** Icono y color único según la clase (`Backend`, `Frontend`, `Data Science`, `DevOps`, `Mobile`, `Bases de Datos`, `Seguridad`, `Cloud`).
    * **Barra de Confianza:** Porcentaje animado de probabilidad devuelto por el modelo.
    * **Tags de Palabras Clave:** Términos TF-IDF más relevantes del texto.
-   * **Modal JSON Crudo:** Permite a los evaluadores de la Hackathon inspeccionar la respuesta JSON completa.
+   * **Modal JSON Crudo:** Permite a los evaluadores e ingenieros inspeccionar la respuesta JSON completa (entrada + inferencia), con botón interactivo de **Copiar al Portapapeles** (feedback animado y notificación Toast) y cierres UX mediante la X superior, click en fondo oscuro o tecla `Escape`.
 
 4. **Historial Persistido en PostgreSQL:**
    * Consulta directa al endpoint `GET /predicciones` para listar los registros guardados en la base de datos.

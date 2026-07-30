@@ -8,6 +8,10 @@
 
 ### Corregido
 - **Bug visual en la UI — indicador LED de Spring Boot siempre en rojo (`frontend/app.js`):** El health check usaba `fetch('/contenido', { method: 'OPTIONS' })` para detectar si Spring Boot estaba activo. El browser bloqueaba esta llamada por política CORS al tratarla de forma distinta a un preflight automático, lanzando siempre el bloque `catch` y mostrando el LED en rojo aunque el servidor estuviera operativo y la clasificación funcionara correctamente. Corregido reemplazando el método `OPTIONS` por `GET /actuator/health`, consistente con el patrón ya aplicado para FastAPI.
+- **Redundancia y UX en Modal JSON de Inferencia (`frontend/index.html` y `frontend/app.js`):** Se eliminó el botón redundante "Cerrar" en la barra inferior del modal. Se habilitó el cierre nativo mediante el botón "X" en la barra superior, click en el fondo oscuro (backdrop) y presionado de la tecla `Escape`.
+
+### Añadido
+- **Botón "Copiar JSON" en Modal de Inferencia (`frontend/index.html` y `frontend/app.js`):** Reemplazado el pie del modal con una acción de exportación interactiva que copia todo el payload JSON (entrada + resultado) al portapapeles con feedback animado de 2 segundos ("¡Copiado!") y notificación Toast.
 
 ### Añadido
 - **`spring-boot-starter-actuator` en `backend/api/api/pom.xml`:** Nueva dependencia que expone el endpoint estándar `GET /actuator/health` con respuesta `{ "status": "UP" }` cuando el servicio está operativo.
