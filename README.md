@@ -4,7 +4,7 @@
 ### Organización Inteligente del Conocimiento Técnico
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=flat&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=flat&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.x-6DB33F?style=flat&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.4+-F7931E?style=flat&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
@@ -64,7 +64,7 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 
 ### ☕ Back-End (Java / Spring Boot)
 - **Java 17 (LTS)**: Lenguaje principal de backend transaccional.
-- **Spring Boot 3.x**: Framework base para APIs REST.
+- **Spring Boot 4.x**: Framework base para APIs REST.
 - **Spring Data JPA / Hibernate**: ORM para la persistencia de datos.
 - **Flyway**: Control de versiones y migraciones automáticas de base de datos (`V1__create_tables.sql`).
 - **Lombok**: Reducción de código repetitivo (Getters, Setters, Constructors).
@@ -100,7 +100,7 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 | **Rómulo García Maygua** | Data Science / ML | Ingesta de datos, exploración EDA y notebooks |
 | **Sergio Pablo Vilte** | Backend Java | Desarrollo API REST Spring Boot, controladores y servicio de predicción |
 | **Andrés Felipe Rojas** | Backend Java | Configuración Spring Boot, entidades JPA y DTOs |
-| **Noelia Rementería** | Backend Java | Configuración de base de datos y soporte backend |
+| **Noelia Rementeria** | Backend Java | Desarrollo API REST Spring Boot, configuración de base de datos y soporte backend |
 | **Camila Fagina** | Backend Java | Soporte backend y lógica transaccional |
 | **Federico Gutierrez** | Quality Assurance (QA) | Matriz de pruebas, testing manual de endpoints, Swagger y validación |
 
@@ -118,7 +118,7 @@ g9-latam-techmind-team37/
 │
 ├── backend/                               # API Backend Principal (Spring Boot / Java)
 │   ├── Dockerfile                         # Imagen Docker multi-stage de Spring Boot
-│   └── api/api/                           # Proyecto Maven / Spring Boot
+│   └── api                                # Proyecto Maven / Spring Boot
 │       ├── pom.xml
 │       ├── src/main/java/api/             # Controladores, Entidades JPA, DTOs y Servicios
 │       └── src/main/resources/            # application.properties y db/migration (Flyway)
