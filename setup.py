@@ -151,7 +151,7 @@ def start_docker():
 
     # Levantar el contenedor de PostgreSQL
     info("Levantando contenedor techmind-postgres (Puerto 5432) ...")
-    result = run("docker-compose up -d postgres")
+    result = run("docker compose up -d postgres")
     if result.returncode != 0:
         info("Intentando iniciar contenedor existente 'techmind-postgres'...")
         result = run("docker start techmind-postgres", capture_output=True)
@@ -287,15 +287,15 @@ def reset_docker_volumes():
 
         if answer in ("s", "si", "sí", "y", "yes"):
             info("Deteniendo contenedores y eliminando volumen...")
-            run("docker-compose --profile full down -v")
+            run("docker compose --profile full down -v")
             ok("Volumen eliminado. Flyway creará el schema correcto desde cero.")
         else:
             warn("Continuando sin limpiar el volumen. Si Spring Boot falla, ejecutá:")
-            warn("  docker-compose --profile full down -v")
+            warn("  docker compose --profile full down -v")
             warn("  python setup.py --docker")
     else:
         # Primera vez: bajar contenedores por las dudas
-        run("docker-compose --profile full down")
+        run("docker compose --profile full down")
 
 
 
@@ -332,7 +332,7 @@ def run_full_docker():
     # 3. Build y arranque del stack completo
     print()
     info("Compilando y levantando PostgreSQL + FastAPI + Spring Boot + Frontend en Docker...")
-    result = run("docker-compose --profile full up -d --build")
+    result = run("docker compose --profile full up -d --build")
     if result.returncode == 0:
         print()
         ok("¡Todo el stack fue dockerizado y levantado exitosamente en contenedores!")

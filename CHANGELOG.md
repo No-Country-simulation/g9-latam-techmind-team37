@@ -4,6 +4,19 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.3.1] — 2026-07-30 · Compatibilidad Docker Compose v2
+
+### Corregido
+- **`setup.py` — migración de `docker-compose` (v1) a `docker compose` (v2):** El script de setup usaba el binario standalone `docker-compose` (Docker Compose v1, deprecado desde 2023), que no está disponible en instalaciones modernas de Docker Engine. En servidores con Docker Compose v2 instalado como plugin, los comandos fallaban con error de comando no encontrado. Se reemplazaron las 6 llamadas afectadas:
+  - `docker compose up -d postgres`
+  - `docker compose --profile full up -d --build`
+  - `docker compose --profile full down`
+  - `docker compose --profile full down -v` (ejecución + mensajes de ayuda)
+
+  El comando `docker compose` (sin guión) es compatible con Windows (Docker Desktop), macOS (Docker Desktop) y Linux (Docker Engine 20.10+), por lo que el cambio es transparente en todos los entornos.
+
+---
+
 ## [1.3.0] — 2026-07-30 · Mejoras de UX en Clasificador
 
 ### Corregido
