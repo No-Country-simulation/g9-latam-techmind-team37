@@ -69,7 +69,7 @@ curl -X POST http://localhost:8080/contenido \
 ## 📁 Estructura del Repositorio
 
 ```
-g9-techmind-team37/
+g9-techmind-team37
 ├── .env                    # Variables de entorno locales
 ├── docker-compose.yml      # Infraestructura PostgreSQL
 ├── docs/                   # Documentación del proyecto
@@ -77,7 +77,7 @@ g9-techmind-team37/
 │   ├── ARQUITECTURA.md
 │   ├── INTEGRACION_FASTAPI.md
 │   └── SETUP.md
-└── api/api/                # Código fuente Spring Boot
+└── api                     # Código fuente Spring Boot
     ├── pom.xml
     └── src/
         ├── main/
