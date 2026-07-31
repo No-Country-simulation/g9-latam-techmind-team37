@@ -99,7 +99,7 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 | **Leandro Villamil** | Data Science / ML | Pipeline NLP, vectorización TF-IDF y entrenamiento del modelo, demostración de como funciona el proyecto con pruebas piloto, análisis y pruebas, Frontend, diseño responsivo UI/UX |
 | **Rómulo García Maygua** | Data Science / ML | Ingesta de datos, exploración EDA y notebooks |
 | **Sergio Pablo Vilte** | Backend Java | Desarrollo API REST Spring Boot, controladores y servicio de predicción |
-| **Andrés Felipe Rojas** | Backend Java | Configuración Spring Boot, entidades JPA y DTOs, Frontend |
+| **Andrés Felipe Rojas** | Backend Java | Configuración Spring Boot, entidades JPA y DTOs, Frontend, diseño responsivo UI/UX |
 | **Noelia Rementeria** | Backend Java | Desarrollo API REST Spring Boot, configuración de base de datos y soporte backend |
 | **Camila Fagina** | Backend Java | Soporte backend y lógica transaccional |
 | **Federico Gutierrez** | Quality Assurance (QA) | Matriz de pruebas, testing manual de endpoints, Swagger y validación, Frontend |
