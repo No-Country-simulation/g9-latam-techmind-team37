@@ -59,10 +59,11 @@
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
+        <!-- DevTools solo para desarrollo local; excluido del JAR de producción -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
+            <scope>test</scope>
             <optional>true</optional>
         </dependency>
         <dependency>

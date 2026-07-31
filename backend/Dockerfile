@@ -17,4 +17,11 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Límites de memoria para OCI Free Tier / servidores con RAM limitada (1–2 GB).
+# -Xms64m     : Heap inicial de 64 MB (no reserva RAM de más al arrancar)
+# -Xmx256m    : Heap máximo de 256 MB (evita que el OOM Killer del kernel mate el proceso)
+# -XX:+UseSerialGC : GC serie, consume menos overhead en CPUs de 1–2 núcleos
+ENTRYPOINT ["java", \
+  "-Xms64m", "-Xmx256m", \
+  "-XX:+UseSerialGC", \
+  "-jar", "app.jar"]

@@ -12,6 +12,7 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: techmind-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB:       techmind
       POSTGRES_USER:     techmind_user
@@ -32,6 +33,7 @@ services:
       context: .
       dockerfile: app/Dockerfile
     container_name: techmind-fastapi
+    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
@@ -53,6 +55,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: techmind-backend
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
@@ -76,6 +79,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
     container_name: techmind-frontend
+    restart: unless-stopped
     ports:
       - "5173:80"
     depends_on:
