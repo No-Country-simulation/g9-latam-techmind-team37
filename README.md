@@ -96,13 +96,13 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 | Integrante | Rol / Especialidad | Responsabilidades Principales |
 |-----------|-------------------|--------------------------------|
 | **Ernesto Llampa** | Data Science / Fullstack | Pipeline NLP, vectorización TF-IDF, entrenamiento del modelo, Integración completa, Frontend Web UI, auto-healing Docker & `setup.py` |
-| **Leandro Villamil** | Data Science / ML | Pipeline NLP, vectorización TF-IDF y entrenamiento del modelo, demostración de como funciona el proyecto con pruebas piloto, análisis y pruebas |
+| **Leandro Villamil** | Data Science / ML | Pipeline NLP, vectorización TF-IDF y entrenamiento del modelo, demostración de como funciona el proyecto con pruebas piloto, análisis y pruebas, Frontend, Diseño responsivo UI/UX |
 | **Rómulo García Maygua** | Data Science / ML | Ingesta de datos, exploración EDA y notebooks |
 | **Sergio Pablo Vilte** | Backend Java | Desarrollo API REST Spring Boot, controladores y servicio de predicción |
-| **Andrés Felipe Rojas** | Backend Java | Configuración Spring Boot, entidades JPA y DTOs |
+| **Andrés Felipe Rojas** | Backend Java | Configuración Spring Boot, entidades JPA y DTOs, Frontend |
 | **Noelia Rementeria** | Backend Java | Desarrollo API REST Spring Boot, configuración de base de datos y soporte backend |
 | **Camila Fagina** | Backend Java | Soporte backend y lógica transaccional |
-| **Federico Gutierrez** | Quality Assurance (QA) | Matriz de pruebas, testing manual de endpoints, Swagger y validación |
+| **Federico Gutierrez** | Quality Assurance (QA) | Matriz de pruebas, testing manual de endpoints, Swagger y validación, Frontend |
 
 ---
 
