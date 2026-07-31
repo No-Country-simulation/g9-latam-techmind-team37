@@ -4,6 +4,18 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.3.2] — 2026-07-31 · Estabilidad en OCI (memoria, devtools y auto-restart)
+
+### Corregido
+
+- **`backend/Dockerfile` — JVM sin límite de heap → OOM Killer del kernel:** Spring Boot corría sin flags `-Xmx`, por lo que la JVM podía crecer hasta consumir toda la RAM del servidor. En el OCI Free Tier (1 GB RAM), después de unas horas el kernel de Linux terminaba el proceso silenciosamente mediante el OOM Killer, dejando el servicio en rojo sin ningún error explícito en los logs de Docker. Corregido añadiendo `-Xms64m -Xmx256m -XX:+UseSerialGC` al `ENTRYPOINT`, limitando el heap máximo a 256 MB y usando el GC serie (más eficiente en CPUs de 1–2 núcleos).
+
+- **`backend/api/pom.xml` — `spring-boot-devtools` activo en producción:** La dependencia `spring-boot-devtools` tenía `<scope>runtime</scope>`, lo que hacía que se incluyera en el JAR final y se activara dentro del contenedor Docker, monitoreando el filesystem en busca de cambios y reiniciando la aplicación innecesariamente, consumiendo CPU y RAM de forma continua. Cambiado a `<scope>test</scope>` para excluirlo del artefacto de producción. El comportamiento en desarrollo local (IntelliJ / VS Code) no se ve afectado.
+
+- **`docker-compose.yml` — contenedores sin política de reinicio:** Ningún servicio tenía definida la directiva `restart`, por lo que si un contenedor crasheaba (por OOM u otro error) quedaba detenido permanentemente hasta intervención manual. Añadido `restart: unless-stopped` a los cuatro servicios (`postgres`, `fastapi`, `springboot`, `frontend`) para garantizar auto-recovery automático ante fallos y arranque automático tras un reinicio de la VM.
+
+---
+
 ## [1.3.1] — 2026-07-30 · Compatibilidad Docker Compose v2
 
 ### Corregido
@@ -192,4 +204,4 @@ Postman → Spring Boot (8080) → FastAPI (8000) → PostgreSQL (5432)
 
 ---
 
-*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-07-30.*
+*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-07-31.*
