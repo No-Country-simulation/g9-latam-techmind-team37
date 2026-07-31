@@ -1,10 +1,10 @@
 # docker-compose.yml — TechMind · Entorno local y despliegue completo
 #
 # Modo 1 — Desarrollo local (Solo PostgreSQL activo):
-#   docker-compose up -d
+#   docker compose up -d
 #
 # Modo 2 — Despliegue 100% Dockerizado (PostgreSQL + FastAPI + Spring Boot + Frontend):
-#   docker-compose --profile full up -d --build
+#   docker compose --profile full up -d --build
 #
 
 services:

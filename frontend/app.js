@@ -3,8 +3,12 @@
  * Conecta la interfaz Stitch con el Backend de Spring Boot (localhost:8080) y FastAPI (localhost:8000)
  */
 
-const API_BASE_URL = 'http://localhost:8080';
-const DS_API_URL = 'http://localhost:8000';
+// URLs de API — se detectan automáticamente según el host donde corre el frontend.
+// En local:  window.location.hostname = "localhost"
+// En OCI:    window.location.hostname = "<IP-pública-OCI>" o dominio
+const _HOST = window.location.hostname;
+const API_BASE_URL = `http://${_HOST}:8080`;
+const DS_API_URL   = `http://${_HOST}:8000`;
 
 // Configuración visual por categoría
 const CATEGORY_CONFIG = {
