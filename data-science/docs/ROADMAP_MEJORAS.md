@@ -65,7 +65,7 @@
 
 | Campo | Valor |
 |---|---|
-| **Estado** | ⬜ Pendiente |
+| **Estado** | ✅ Completado |
 | **Owner** | Ernesto |
 | **Esfuerzo** | 30 min |
 

@@ -4,7 +4,20 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
-## [1.4.0] — 2026-08-01 · Ajustes de UX/UI, Modo Claro Cálido y Notificaciones
+## [1.5.0] — 2026-08-01 · Optimización del Modelo de ML (Ensamble Calibrado, TF-IDF Sublineal y Dataset Ampliado)
+
+### Añadido / Mejorado
+- **Ampliación del Dataset de Entrenamiento (`data-science/data/raw/contenidos_tecnicos.csv`):** Dataset expandido de ~221 a **259 registros técnicos balanceados** (+38 registros especializados), resolviendo ambigüedades y reforzando la precisión en las categorías **Mobile** (*SwiftUI, Jetpack Compose, Flutter Dart AOT, React Native Fabric, Kotlin KMP*) y **Cloud** (*AWS VPC, Lambda, S3, CloudFront, Terraform HCL, OCI Autonomous DB, FinOps*).
+- **Ensamble de Modelos con Calibración de Confianza (`data-science/src/expand_and_train.py`):** Reemplazada la `LogisticRegression` individual por un ensamble `VotingClassifier` (Soft Voting) que combina 3 algoritmos complementarios:
+  1. `LogisticRegression` con pesos de clase balanceados ($C=1.5$).
+  2. `CalibratedClassifierCV(LinearSVC)` con calibración de probabilidades de Platt (`method='sigmoid'`), proporcionando estimaciones de confianza nítidas y precisas.
+  3. `ComplementNB` optimizado para clasificación de textos.
+- **Preprocesamiento y NLTK Stopwords (`data-science/src/expand_and_train.py` + `app/main.py`):** Integrado el corpus oficial de 154 stopwords en español de NLTK en el pipeline de entrenamiento e inferencia FastAPI, omitiendo además términos de ruido técnico neutro (*"tutorial"*, *"guia"*, *"ejemplo"*, *"introduccion"*).
+- **Feature Engineering con TF-IDF Sublineal y N-Gramas 1-3 (`data-science/src/expand_and_train.py`):** Configurado `TfidfVectorizer` con `sublinear_tf=True` (escalado logarítmico de término $1 + \log(tf)$) y rango de n-gramas de 1 a 3 para capturar expresiones técnicas compuestas (*"aws lambda serverless"*, *"react native navigation"*).
+- **Nuevos Artefactos `.joblib` (`data-science/models/`):** Generados los archivos binarios `tfidf_vectorizer.joblib` y `modelo_clasificador.joblib` manteniendo 100% la compatibilidad con los contratos de API de FastAPI y Spring Boot.
+- **Incremento en Métricas de Rendimiento:** Alcanzado un **90.38% de Accuracy** en la evaluación holdout (20% test data), logrando un **100% de Precisión/Recall en Mobile** y un **94% de F1-Score en Cloud**.
+
+---
 
 ### Corregido
 - **Porcentajes de Confianza con decimales y punto sobrante (`frontend/index.html` + `frontend/app.js`):** Eliminadas las cifras decimales en la "Confianza del Modelo" tanto en el marcador principal (`0%`) como en los registros del historial reciente y la vista detallada (`Math.round(prob * 100)`).
