@@ -346,7 +346,7 @@ async function handleClassification() {
     const texto = bodyInput.value.trim();
 
     if (!titulo || !texto) {
-        showToast('Hubo un error, por favor intenta de nuevo más tarde', 'error');
+        showToast('Por favor, llena todos los campos', 'warning');
         return;
     }
 

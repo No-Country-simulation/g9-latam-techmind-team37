@@ -16,7 +16,7 @@
 - **Ortografía y formato en textos del sistema (`frontend/index.html` + `frontend/app.js`):** Corregidos acentos, minúsculas tras comas o inicios de descripciones y estandarización ortográfica.
 
 ### Añadido
-- **Notificación de alerta en texto rojo ante fallos de clasificación (`frontend/app.js`):** Al presionar el botón de clasificación con datos incompletos o en caso de fallo, se despliega una alerta con texto explícitamente en color rojo (`#dc2626`) y la leyenda `Hubo un error, por favor intenta de nuevo más tarde`.
+- **Notificación de alerta cuando faltan campos al clasificar (`frontend/app.js`):** Al presionar el botón de clasificación con campos vacíos, se despliega la alerta con el mensaje exacto `Por favor, llena todos los campos`. Ante errores de conexión o servidor, se mantiene el mensaje `Hubo un error, por favor intenta de nuevo más tarde`.
 - **Navegación al inicio mediante el logo TechMind (`frontend/index.html` + `frontend/app.js`):** El elemento de marca "TechMind" en el sidebar redirige al usuario de vuelta a la vista principal (Home/Clasificador) al hacer clic.
 
 ---
