@@ -234,4 +234,4 @@ Postman → Spring Boot (8080) → FastAPI (8000) → PostgreSQL (5432)
 
 ---
 
-*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-07-31.*
+*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-08-02.*
