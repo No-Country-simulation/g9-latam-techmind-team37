@@ -6,16 +6,20 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>TechMind - Clasificador Inteligente de Conocimiento Técnico</title>
 
-    <!-- Google Fonts & Icons -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Preconnect y Preload de Google Fonts con display=block para eliminar la transición de fuentes (font swap) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@400;600;700&amp;display=block" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@400;600;700&amp;display=block"
         rel="stylesheet" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@400;600;700&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block"
         rel="stylesheet" />
 
     <!-- Tailwind Configuration (Stitch Cyber AI Theme) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -82,17 +86,21 @@
                         "unit": "4px"
                     },
                     fontFamily: {
-                        "body-md": ["Inter"],
-                        "label-sm": ["JetBrains Mono"],
-                        "body-lg": ["Inter"],
-                        "headline-md": ["Outfit"],
-                        "display-lg": ["Outfit"]
+                        "body-md": ["Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
+                        "label-sm": ["'JetBrains Mono'", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
+                        "body-lg": ["Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
+                        "headline-md": ["Outfit", "Inter", "system-ui", "-apple-system", "sans-serif"],
+                        "display-lg": ["Outfit", "Inter", "system-ui", "-apple-system", "sans-serif"]
                     }
                 }
             }
         }
     </script>
     <style>
+        html, body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
         :root {
             --background: #e8e2d5;
             --on-background: #231f18;
