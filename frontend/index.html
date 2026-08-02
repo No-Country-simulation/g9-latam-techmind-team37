@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html class="dark" lang="es">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>TechMind - Clasificador Inteligente de Conocimiento Técnico</title>
-    
+
     <!-- Google Fonts & Icons -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@400;600;700&amp;display=swap"
+        rel="stylesheet" />
+
     <!-- Tailwind Configuration (Stitch Cyber AI Theme) -->
     <script id="tailwind-config">
         tailwind.config = {
@@ -89,35 +94,35 @@
     </script>
     <style>
         :root {
-            --background: #f0edf6;
-            --on-background: #1c1a22;
-            --surface: #f0edf6;
-            --on-surface: #1c1a22;
-            --on-surface-variant: #49454f;
-            --surface-container-lowest: #ffffff;
-            --surface-container-low: #eae7f0;
-            --surface-container: #e2dfe9;
-            --surface-container-high: #dbd7e3;
-            --surface-container-highest: #d4d0dc;
-            --primary-fixed: #6750a4;
-            --primary-container: #eaddff;
-            --on-primary-container: #21005d;
-            --outline: #79747e;
-            --outline-variant: #c8c5d0;
-            --glass-bg: rgba(255, 255, 255, 0.8);
-            --glass-border: rgba(103, 80, 164, 0.15);
-            --glass-hover-border: rgba(103, 80, 164, 0.35);
-            --glass-hover-shadow: rgba(103, 80, 164, 0.08);
-            --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            --input-bg: #ffffff;
-            --subtle-border: rgba(103, 80, 164, 0.12);
-            --medium-border: rgba(103, 80, 164, 0.18);
+            --background: #e8e2d5;
+            --on-background: #231f18;
+            --surface: #e8e2d5;
+            --on-surface: #231f18;
+            --on-surface-variant: #524b3f;
+            --surface-container-lowest: #f5f0e6;
+            --surface-container-low: #dfd8c9;
+            --surface-container: #d6cfbf;
+            --surface-container-high: #ccc4b3;
+            --surface-container-highest: #c1b8a6;
+            --primary-fixed: #5c3e91;
+            --primary-container: #d9c8f5;
+            --on-primary-container: #1b0052;
+            --outline: #756d5e;
+            --outline-variant: #c4bcae;
+            --glass-bg: rgba(238, 232, 221, 0.9);
+            --glass-border: rgba(92, 62, 145, 0.16);
+            --glass-hover-border: rgba(92, 62, 145, 0.38);
+            --glass-hover-shadow: rgba(92, 62, 145, 0.1);
+            --glass-shadow: 0 4px 24px rgba(60, 50, 30, 0.08);
+            --input-bg: #eee7d9;
+            --subtle-border: rgba(92, 62, 145, 0.14);
+            --medium-border: rgba(92, 62, 145, 0.22);
             --led-ok-bg: #15803d;
             --led-ok-text: #15803d;
             --led-error-bg: #dc2626;
             --led-error-text: #dc2626;
-            --json-text: #065f46;
-            --json-bg: #f8f9fa;
+            --json-text: #044e3a;
+            --json-bg: #e2dbcd;
         }
 
         .dark {
@@ -158,23 +163,28 @@
             border: 1px solid var(--glass-border);
             box-shadow: var(--glass-shadow);
         }
+
         .glass-panel:hover {
             border-color: var(--glass-hover-border);
             box-shadow: 0 0 20px var(--glass-hover-shadow);
         }
+
         .tech-input {
             background-color: var(--input-bg) !important;
             border: 1px solid var(--subtle-border) !important;
             color: var(--on-surface) !important;
         }
+
         .tech-input:focus {
             border-color: var(--primary-fixed) !important;
             box-shadow: 0 0 0 4px rgba(103, 80, 164, 0.15) !important;
         }
+
         .tech-input::placeholder {
             color: var(--on-surface-variant) !important;
             opacity: 0.5;
         }
+
         .tech-select {
             background-color: var(--input-bg) !important;
             border: 1px solid var(--subtle-border) !important;
@@ -187,126 +197,189 @@
             background-size: 12px !important;
             padding-right: 32px !important;
         }
+
         .tech-select:focus {
             border-color: var(--primary-fixed) !important;
             box-shadow: 0 0 0 4px rgba(103, 80, 164, 0.15) !important;
         }
+
         .subtle-border {
             border-color: var(--subtle-border) !important;
         }
+
         .medium-border {
             border-color: var(--medium-border) !important;
         }
+
         .shimmer {
             background: linear-gradient(90deg, rgba(208, 188, 255, 0) 0%, rgba(208, 188, 255, 0.5) 50%, rgba(208, 188, 255, 0) 100%);
             background-size: 200% 100%;
             animation: shimmer-anim 2s infinite;
         }
+
         @keyframes shimmer-anim {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
         }
+
         .led-pulse {
             animation: pulse-green 2s infinite;
         }
+
         @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(111, 251, 190, 0.4); }
-            70% { box-shadow: 0 0 0 6px rgba(111, 251, 190, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(111, 251, 190, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(111, 251, 190, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(111, 251, 190, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(111, 251, 190, 0);
+            }
         }
+
         /* Evita que títulos/URLs sin espacios desborden el layout en pantallas angostas */
-        h1, h2, h3, h4, h5, p, label, span {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        p,
+        label,
+        span {
             overflow-wrap: break-word;
         }
+
         /* Los glows ambientales con blur de 120px son costosos en GPU móvil */
         @media (max-width: 767px) {
-            .ambient-glow { filter: blur(70px); }
+            .ambient-glow {
+                filter: blur(70px);
+            }
         }
     </style>
 </head>
-<body class="bg-background text-on-background min-h-[100dvh] font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
 
-    <!-- Ambient Glow Background (dark mode only) -->
-    <div class="fixed inset-0 z-0 pointer-events-none opacity-0 dark:opacity-40 transition-opacity duration-500">
-        <div class="ambient-glow absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-inverse-primary/20 blur-[120px]"></div>
-        <div class="ambient-glow absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-tertiary-fixed/10 blur-[120px]"></div>
+<body
+    class="bg-background text-on-background min-h-[100dvh] font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
+
+    <!-- Ambient Glow Background -->
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-20 dark:opacity-40 transition-opacity duration-500">
+        <div
+            class="ambient-glow absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-inverse-primary/20 blur-[120px]">
+        </div>
+        <div
+            class="ambient-glow absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-tertiary-fixed/10 blur-[120px]">
+        </div>
     </div>
 
     <!-- Toast Notifications Container -->
-    <div id="toast-container" class="fixed top-4 left-4 right-4 sm:left-auto sm:top-6 sm:right-6 z-50 flex flex-col gap-3 sm:max-w-md pointer-events-none"></div>
+    <div id="toast-container"
+        class="fixed top-4 left-4 right-4 sm:left-auto sm:top-6 sm:right-6 z-50 flex flex-col gap-3 sm:max-w-md pointer-events-none">
+    </div>
 
     <!-- Sidebar Overlay for mobile -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden transition-opacity duration-300"></div>
+    <div id="sidebar-overlay"
+        class="fixed inset-0 bg-black/60 z-30 hidden transition-opacity duration-300"></div>
 
     <!-- Side Navigation Shell -->
-    <aside id="sidebar" class="fixed left-0 top-0 h-[100dvh] w-64 max-w-[85vw] border-r subtle-border shadow-2xl bg-surface-container-low/80 backdrop-blur-2xl z-40 flex flex-col py-6 px-4 transition-transform duration-300 -translate-x-full md:translate-x-0">
+    <aside id="sidebar"
+        class="fixed left-0 top-0 h-[100dvh] w-64 max-w-[85vw] border-r subtle-border shadow-2xl bg-surface-container-low z-40 flex flex-col py-6 px-4 transition-transform duration-300 -translate-x-full md:translate-x-0">
         <div class="mb-8 lg:mb-10 px-3 flex justify-between items-center gap-2">
-            <div class="min-w-0">
-                <h1 class="font-headline-md text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-bold">
-                    <span class="material-symbols-outlined text-3xl text-primary shrink-0" style="font-variation-settings: 'FILL' 1;">psychology</span>
+            <div id="btn-brand-home" class="min-w-0 cursor-pointer group" title="Ir al inicio">
+                <h1
+                    class="font-headline-md text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-bold group-hover:opacity-80 transition-opacity">
+                    <span class="material-symbols-outlined text-3xl text-primary shrink-0"
+                        style="font-variation-settings: 'FILL' 1;">psychology</span>
                     TechMind
                 </h1>
-                <p class="font-label-sm text-xs text-on-surface-variant mt-2 opacity-80">Organización Inteligente</p>
+                <p class="font-label-sm text-xs text-on-surface-variant mt-2 opacity-80">Organización inteligente</p>
             </div>
             <!-- Close button only visible on mobile -->
-            <button id="btn-sidebar-close" class="md:hidden shrink-0 p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-on-surface">
+            <button id="btn-sidebar-close"
+                class="md:hidden shrink-0 p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-on-surface">
                 <span class="material-symbols-outlined text-2xl">close</span>
             </button>
         </div>
         <nav class="flex-1 space-y-3 overflow-y-auto">
-            <a id="nav-classifier" class="bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer">
+            <a id="nav-classifier"
+                class="bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer">
                 <span class="material-symbols-outlined text-xl">category</span>
                 <span class="font-label-sm text-sm font-bold">Clasificador</span>
             </a>
-            <a id="nav-history" class="text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer">
-                <span class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">history</span>
+            <a id="nav-history"
+                class="text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer">
+                <span
+                    class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">history</span>
                 <span class="font-label-sm text-sm font-semibold">Historial</span>
             </a>
         </nav>
         <!-- Server Status Popover trigger inside Sidebar -->
         <div class="relative mt-auto pt-6 border-t medium-border" style="overflow:visible;">
             <!-- Status Trigger Button -->
-            <button id="btn-status-trigger" type="button" class="w-full flex items-center justify-between gap-3 glass-panel px-4 py-3 rounded-xl border subtle-border bg-surface-container hover:bg-surface-container-high transition-all text-on-surface-variant hover:text-on-surface cursor-pointer active:scale-95 focus:outline-none">
+            <button id="btn-status-trigger" type="button"
+                class="w-full flex items-center justify-between gap-3 glass-panel px-4 py-3 rounded-xl border subtle-border bg-surface-container hover:bg-surface-container-high transition-all text-on-surface-variant hover:text-on-surface cursor-pointer active:scale-95 focus:outline-none">
                 <div class="flex items-center gap-2.5">
                     <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                    <span class="font-label-sm text-xs font-semibold">Estado de Servicios</span>
+                    <span class="font-label-sm text-xs font-semibold">Estado de servicios</span>
                 </div>
-                <span id="status-chevron" class="material-symbols-outlined text-lg transition-transform duration-300">expand_less</span>
+                <span id="status-chevron"
+                    class="material-symbols-outlined text-lg transition-transform duration-300">expand_less</span>
             </button>
-            
+
             <!-- Status Popover Dropdown -->
-            <div id="status-popover" class="absolute bottom-full left-0 right-0 mb-3 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2 z-50">
+            <div id="status-popover"
+                class="absolute bottom-full left-0 right-0 mb-3 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2 z-50">
                 <div id="status-springboot" class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">Spring Boot :8080</span>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">Spring
+                        Boot :8080</span>
                 </div>
                 <div id="status-fastapi" class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">FastAPI ML :8000</span>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">FastAPI ML
+                        :8000</span>
                 </div>
                 <div id="status-postgres" class="flex items-center gap-2">
-                    <div class="w-2.5 h-2.5 rounded-full led-pulse shrink-0" style="background-color: var(--led-ok-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-ok-text);">PostgreSQL :5432</span>
+                    <div class="w-2.5 h-2.5 rounded-full led-pulse shrink-0"
+                        style="background-color: var(--led-ok-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-ok-text);">PostgreSQL
+                        :5432</span>
                 </div>
             </div>
         </div>
     </aside>
 
     <!-- Main Content Area -->
-    <main id="main-content" class="relative z-10 md:ml-64 min-h-[100dvh] flex flex-col p-4 sm:p-6 md:p-8 transition-all duration-300">
+    <main id="main-content"
+        class="relative z-10 md:ml-64 min-h-[100dvh] flex flex-col p-4 sm:p-6 md:p-8 transition-all duration-300">
 
         <!-- Header Section -->
-        <header class="flex flex-row items-center justify-between gap-3 sm:gap-6 mb-6 sm:mb-8 pt-4 md:pt-0 border-b subtle-border pb-5 sm:pb-6">
+        <header
+            class="flex flex-row items-center justify-between gap-3 sm:gap-6 mb-6 sm:mb-8 pt-4 md:pt-0 border-b subtle-border pb-5 sm:pb-6">
             <div class="flex items-center gap-3 sm:gap-4 min-w-0">
-                <button id="btn-sidebar-toggle" class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Toggle Sidebar">
+                <button id="btn-sidebar-toggle"
+                    class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg"
+                    title="Toggle Sidebar">
                     <span class="material-symbols-outlined text-2xl" id="sidebar-toggle-icon">chevron_left</span>
                 </button>
                 <div class="min-w-0">
-                    <h2 class="font-headline-md text-lg sm:text-2xl md:text-3xl text-on-surface font-bold tracking-tight">Clasificación de Contenido Técnico</h2>
-                    <p class="font-body-md text-xs sm:text-sm md:text-base text-on-surface-variant mt-1">Ingresá textos para clasificarlos en tiempo real.</p>
+                    <h2
+                        class="font-headline-md text-lg sm:text-2xl md:text-3xl text-on-surface font-bold tracking-tight">
+                        Clasificación de contenido técnico</h2>
+                    <p class="font-body-md text-xs sm:text-sm md:text-base text-on-surface-variant mt-1">Ingresá textos
+                        para clasificarlos en tiempo real.</p>
                 </div>
             </div>
-            <button id="btn-theme-toggle" type="button" class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg" title="Cambiar tema">
+            <button id="btn-theme-toggle" type="button"
+                class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg"
+                title="Cambiar tema">
                 <span class="material-symbols-outlined text-2xl" id="theme-toggle-icon">light_mode</span>
             </button>
         </header>
@@ -317,102 +390,130 @@
             <!-- Dashboard Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mb-10 lg:mb-12">
 
-            <!-- Left Column: Input Form -->
-            <section class="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 min-w-0">
-                <div class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col transition-all duration-300 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-
-                    <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface mb-6 font-bold">
-                        Ingresar Contenido Técnico
-                    </h3>
-                    
-                    <form class="flex flex-col gap-6 flex-1" onsubmit="return false;">
-                        <div class="space-y-2">
-                            <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold" for="content-title">Título del Documento o Artículo</label>
-                            <input id="content-title" type="text" class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all" placeholder="ej. Orquestación avanzada de contenedores con Kubernetes"/>
+                <!-- Left Column: Input Form -->
+                <section class="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 min-w-0">
+                    <div
+                        class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col transition-all duration-300 relative overflow-hidden group">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                         </div>
-                        
-                        <div class="space-y-2 flex-1 flex flex-col">
-                            <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold" for="content-body">Contenido Técnico (Texto crudo, Markdown o Resumen)</label>
-                            <textarea id="content-body" class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed" placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."></textarea>
-                        </div>
-                        
-                        <div class="flex justify-center mt-4">
-                            <button id="btn-classify" type="button" class="group relative w-full sm:w-auto px-6 sm:px-10 py-4 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer">
-                                <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
-                                <div class="relative flex items-center justify-center gap-2.5">
-                                    <span>Clasificar con TechMind</span>
-                                </div>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </section>
 
-            <!-- Right Column: Results Card -->
-            <section class="lg:col-span-5 xl:col-span-5 flex flex-col gap-6 min-w-0">
-                <div id="results-card" class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col relative border-t-4 border-t-primary-fixed transition-all duration-500">
-
-                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold text-center mt-2 mb-6">
-                            Resultado del Análisis
+                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface mb-6 font-bold">
+                            Ingresar contenido técnico
                         </h3>
 
-                    <!-- Category Badge Container -->
-                    <div class="mb-8 text-center px-3 py-5 sm:py-6 rounded-xl border subtle-border" style="background-color: var(--surface-container);">
-                        <p class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 uppercase tracking-widest font-semibold">Categoría Predicha</p>
-                        <div id="category-badge-container">
-                            <div class="inline-flex max-w-full items-center gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-base sm:text-lg font-bold bg-primary/10 border-primary/30 text-primary-fixed">
-                                <span>Esperando análisis...</span>
+                        <form class="flex flex-col gap-6 flex-1" onsubmit="return false;">
+                            <div class="space-y-2">
+                                <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
+                                    for="content-title">Título del documento o artículo</label>
+                                <input id="content-title" type="text"
+                                    class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all"
+                                    placeholder="ej. orquestación avanzada de contenedores con Kubernetes" />
+                            </div>
+
+                            <div class="space-y-2 flex-1 flex flex-col">
+                                <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
+                                    for="content-body">Contenido técnico (texto crudo, markdown o resumen)</label>
+                                <textarea id="content-body"
+                                    class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed"
+                                    placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."></textarea>
+                            </div>
+
+                            <div class="flex justify-center mt-4">
+                                <button id="btn-classify" type="button"
+                                    class="group relative w-full sm:w-auto px-6 sm:px-10 py-4 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer">
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300">
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-2.5">
+                                        <span>Clasificar con TechMind</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Right Column: Results Card -->
+                <section class="lg:col-span-5 xl:col-span-5 flex flex-col gap-6 min-w-0">
+                    <div id="results-card"
+                        class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col relative border-t-4 border-t-primary-fixed transition-all duration-500">
+
+                        <h3
+                            class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold text-center mt-2 mb-6">
+                            Resultado del análisis
+                        </h3>
+
+                        <!-- Category Badge Container -->
+                        <div class="mb-8 text-center px-3 py-5 sm:py-6 rounded-xl border subtle-border"
+                            style="background-color: var(--surface-container);">
+                            <p
+                                class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 uppercase tracking-widest font-semibold">
+                                Categoría predicha</p>
+                            <div id="category-badge-container">
+                                <div
+                                    class="inline-flex max-w-full items-center gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-base sm:text-lg font-bold bg-primary/10 border-primary/30 text-primary-fixed">
+                                    <span>Esperando análisis...</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Confidence Meter -->
-                    <div class="mb-8 space-y-3">
-                        <div class="flex flex-wrap justify-between items-end gap-x-3 gap-y-1">
-                            <span class="font-label-sm text-xs sm:text-sm text-on-surface-variant font-medium min-w-0">Confianza del Modelo (Probabilidad)</span>
-                            <span id="confidence-score" class="font-label-sm text-base text-primary-fixed font-bold shrink-0">0.0%</span>
-                        </div>
-                        <div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden p-0.5">
-                            <div id="confidence-bar" class="h-full bg-gradient-to-r from-primary-container to-tertiary-fixed rounded-full w-[0%] relative transition-all duration-700 ease-out">
-                                <div class="absolute inset-0 shimmer"></div>
+                        <!-- Confidence Meter -->
+                        <div class="mb-8 space-y-3">
+                            <div class="flex flex-wrap justify-between items-end gap-x-3 gap-y-1">
+                                <span
+                                    class="font-label-sm text-xs sm:text-sm text-on-surface-variant font-medium min-w-0">Confianza
+                                    del Modelo</span>
+                                <span id="confidence-score"
+                                    class="font-label-sm text-base text-primary-fixed font-bold shrink-0">0%</span>
+                            </div>
+                            <div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden p-0.5">
+                                <div id="confidence-bar"
+                                    class="h-full bg-gradient-to-r from-primary-container to-tertiary-fixed rounded-full w-[0%] relative transition-all duration-700 ease-out">
+                                    <div class="absolute inset-0 shimmer"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Keyword Tags -->
-                    <div class="mb-8 flex-1 min-w-0">
-                        <p class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 font-semibold uppercase tracking-wider">Palabras Clave Extraídas (TF-IDF)</p>
-                        <div id="keywords-list" class="flex flex-wrap gap-2">
-                            <span class="text-on-surface-variant text-sm sm:text-base italic opacity-60">Las entidades detectadas aparecerán aquí...</span>
+                        <!-- Keyword Tags -->
+                        <div class="mb-8 flex-1 min-w-0">
+                            <p
+                                class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 font-semibold uppercase tracking-wider">
+                                Palabras clave extraídas</p>
+                            <div id="keywords-list" class="flex flex-wrap gap-2">
+                                <span class="text-on-surface-variant text-sm sm:text-base italic opacity-60">Las
+                                    entidades detectadas aparecerán aquí...</span>
+                            </div>
+                        </div>
+
+                        <!-- Toggle Action -->
+                        <div class="mt-auto pt-4 border-t subtle-border">
+                            <button id="btn-view-json" type="button"
+                                class="w-full py-3.5 rounded-xl border border-primary/20 bg-primary/5 text-primary-fixed font-label-sm text-sm font-semibold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 group cursor-pointer">
+                                <span
+                                    class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">code</span>
+                                <span>Ver JSON</span>
+                            </button>
                         </div>
                     </div>
+                </section>
 
-                    <!-- Toggle Action -->
-                    <div class="mt-auto pt-4 border-t subtle-border">
-                        <button id="btn-view-json" type="button" class="w-full py-3.5 rounded-xl border border-primary/20 bg-primary/5 text-primary-fixed font-label-sm text-sm font-semibold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 group cursor-pointer">
-                            <span class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">code</span>
-                            <span>Ver JSON</span>
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-        </div>
+            </div>
 
             <!-- Recent Entries Footer Grid -->
             <section id="history-section" class="mt-auto pt-8 border-t medium-border">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div class="min-w-0">
-                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold">Contenidos Clasificados Recientemente</h3>
-                        <p class="font-label-sm text-xs sm:text-sm text-on-surface-variant opacity-70">Persistidos en PostgreSQL mediante Spring Boot</p>
+                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold">Contenidos
+                            clasificados recientemente</h3>
                     </div>
                 </div>
 
                 <div id="history-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     <div class="col-span-full py-8 text-center glass-panel rounded-xl">
                         <span class="material-symbols-outlined text-4xl text-outline mb-2 animate-spin">refresh</span>
-                        <p class="text-on-surface-variant text-sm font-label-sm">Cargando publicaciones guardadas desde PostgreSQL...</p>
+                        <p class="text-on-surface-variant text-sm font-label-sm">Cargando publicaciones guardadas desde
+                            PostgreSQL...</p>
                     </div>
                 </div>
             </section>
@@ -420,22 +521,30 @@
 
         <!-- History View Section (Subpage) -->
         <div id="history-view-section" class="hidden flex-1 flex flex-col gap-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-6 pb-6 border-b subtle-border">
+            <div
+                class="flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-6 pb-6 border-b subtle-border">
                 <div class="min-w-0">
-                    <h2 class="font-headline-md text-2xl sm:text-3xl text-on-surface font-bold tracking-tight">Historial de Consultas</h2>
-                    <p class="font-body-md text-sm sm:text-base text-on-surface-variant mt-1">Revisá y filtrá todas las predicciones persistidas en PostgreSQL.</p>
+                    <h2 class="font-headline-md text-2xl sm:text-3xl text-on-surface font-bold tracking-tight">Historial
+                        de consultas</h2>
+                    <p class="font-body-md text-sm sm:text-base text-on-surface-variant mt-1">Revisá y filtrá todas las
+                        predicciones.</p>
                 </div>
                 <!-- Search and Category Filters -->
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 flex-1 md:flex-initial w-full md:w-auto max-w-full md:max-w-xl">
+                <div
+                    class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 flex-1 md:flex-initial w-full md:w-auto max-w-full md:max-w-xl">
                     <!-- Search Input -->
                     <div class="relative flex-1 min-w-0">
-                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
-                        <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..." class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all">
+                        <span
+                            class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
+                        <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..."
+                            class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all">
                     </div>
                     <!-- Category Filter -->
                     <div class="flex items-center gap-3 min-w-0">
-                        <label for="filter-category" class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap shrink-0">Filtrar:</label>
-                        <select id="filter-category" class="tech-select flex-1 sm:flex-initial min-w-0 rounded-xl px-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all cursor-pointer">
+                        <label for="filter-category"
+                            class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap shrink-0">Filtrar:</label>
+                        <select id="filter-category"
+                            class="tech-select flex-1 sm:flex-initial min-w-0 rounded-xl px-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all cursor-pointer">
                             <option value="all">Todas las categorías</option>
                             <option value="Backend">Backend</option>
                             <option value="Frontend">Frontend</option>
@@ -459,20 +568,28 @@
     </main>
 
     <!-- Modal JSON Respuesta Cruda -->
-    <div id="json-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-md p-3 sm:p-4">
-        <div class="glass-panel w-full max-w-2xl rounded-2xl p-4 sm:p-6 border medium-border shadow-2xl flex flex-col max-h-[88dvh] sm:max-h-[80vh]">
+    <div id="json-modal"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-md p-3 sm:p-4">
+        <div
+            class="glass-panel w-full max-w-2xl rounded-2xl p-4 sm:p-6 border medium-border shadow-2xl flex flex-col max-h-[88dvh] sm:max-h-[80vh]">
             <div class="flex justify-between items-center gap-2 mb-4 pb-3 border-b medium-border">
-                <h4 class="font-headline-md text-base sm:text-xl text-primary-fixed font-bold flex items-center gap-2 min-w-0">
+                <h4
+                    class="font-headline-md text-base sm:text-xl text-primary-fixed font-bold flex items-center gap-2 min-w-0">
                     <span class="material-symbols-outlined shrink-0">code</span>
                     JSON de Spring Boot / FastAPI
                 </h4>
-                <button id="modal-close" type="button" class="shrink-0 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors p-1.5 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center cursor-pointer" title="Cerrar ventana">
+                <button id="modal-close" type="button"
+                    class="shrink-0 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors p-1.5 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center cursor-pointer"
+                    title="Cerrar ventana">
                     <span class="material-symbols-outlined text-2xl pointer-events-none">close</span>
                 </button>
             </div>
-            <pre id="json-content" class="font-mono text-[11px] sm:text-xs p-3 sm:p-4 rounded-xl overflow-auto flex-1 leading-relaxed border subtle-border" style="background-color: var(--json-bg); color: var(--json-text);"></pre>
+            <pre id="json-content"
+                class="font-mono text-[11px] sm:text-xs p-3 sm:p-4 rounded-xl overflow-auto flex-1 leading-relaxed border subtle-border"
+                style="background-color: var(--json-bg); color: var(--json-text);"></pre>
             <div class="mt-4 pt-3 border-t medium-border flex justify-end">
-                <button id="btn-copy-json" type="button" class="w-full sm:w-auto justify-center px-5 py-2.5 min-h-[44px] rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary-fixed font-label-sm text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer active:scale-95 shadow-md">
+                <button id="btn-copy-json" type="button"
+                    class="w-full sm:w-auto justify-center px-5 py-2.5 min-h-[44px] rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary-fixed font-label-sm text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer active:scale-95 shadow-md">
                     <span class="material-symbols-outlined text-base">content_copy</span>
                     <span id="copy-btn-text">Copiar JSON</span>
                 </button>
@@ -485,4 +602,5 @@
     <!-- Script Principal -->
     <script src="app.js"></script>
 </body>
+
 </html>

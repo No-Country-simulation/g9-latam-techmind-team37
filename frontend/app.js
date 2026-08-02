@@ -12,14 +12,14 @@ const DS_API_URL   = `http://${_HOST}:8000`;
 
 // Configuración visual por categoría
 const CATEGORY_CONFIG = {
-    'Backend': { icon: 'dns', colorClass: 'text-blue-400 border-blue-500/50 bg-blue-500/10' },
-    'Frontend': { icon: 'view_quilt', colorClass: 'text-pink-400 border-pink-500/50 bg-pink-500/10' },
-    'Data Science': { icon: 'analytics', colorClass: 'text-emerald-400 border-emerald-500/50 bg-emerald-500/10' },
-    'DevOps': { icon: 'terminal', colorClass: 'text-cyan-400 border-cyan-500/50 bg-cyan-500/10' },
-    'Mobile': { icon: 'smartphone', colorClass: 'text-amber-400 border-amber-500/50 bg-amber-500/10' },
-    'Bases de Datos': { icon: 'storage', colorClass: 'text-orange-400 border-orange-500/50 bg-orange-500/10' },
-    'Seguridad': { icon: 'shield', colorClass: 'text-rose-400 border-rose-500/50 bg-rose-500/10' },
-    'Cloud': { icon: 'cloud_queue', colorClass: 'text-sky-400 border-sky-500/50 bg-sky-500/10' }
+    'Backend': { icon: 'dns', colorClass: 'text-blue-700 dark:text-blue-400 border-blue-500/40 bg-blue-500/10' },
+    'Frontend': { icon: 'view_quilt', colorClass: 'text-pink-700 dark:text-pink-400 border-pink-500/40 bg-pink-500/10' },
+    'Data Science': { icon: 'analytics', colorClass: 'text-emerald-700 dark:text-emerald-400 border-emerald-500/40 bg-emerald-500/10' },
+    'DevOps': { icon: 'terminal', colorClass: 'text-cyan-700 dark:text-cyan-400 border-cyan-500/40 bg-cyan-500/10' },
+    'Mobile': { icon: 'smartphone', colorClass: 'text-amber-700 dark:text-amber-400 border-amber-500/40 bg-amber-500/10' },
+    'Bases de Datos': { icon: 'storage', colorClass: 'text-orange-700 dark:text-orange-400 border-orange-500/40 bg-orange-500/10' },
+    'Seguridad': { icon: 'shield', colorClass: 'text-rose-700 dark:text-rose-400 border-rose-500/40 bg-rose-500/10' },
+    'Cloud': { icon: 'cloud_queue', colorClass: 'text-sky-700 dark:text-sky-400 border-sky-500/40 bg-sky-500/10' }
 };
 
 let lastJsonResponse = null;
@@ -283,6 +283,11 @@ function bindEvents() {
 
         navClassifier.addEventListener('click', showClassifier);
         navHistory.addEventListener('click', showHistory);
+
+        const brandHome = document.getElementById('btn-brand-home');
+        if (brandHome) {
+            brandHome.addEventListener('click', showClassifier);
+        }
     }
 
     // Theme Toggle Control
@@ -341,7 +346,7 @@ async function handleClassification() {
     const texto = bodyInput.value.trim();
 
     if (!titulo || !texto) {
-        showToast('⚠️ Por favor, ingresá un título y contenido técnico.', 'warning');
+        showToast('Hubo un error, por favor intenta de nuevo más tarde', 'error');
         return;
     }
 
@@ -377,11 +382,11 @@ async function handleClassification() {
         // Recargar el historial actualizado desde PostgreSQL
         setTimeout(() => loadHistory(), 600);
 
-        showToast('✨ Contenido clasificado y guardado en PostgreSQL correctamente', 'success');
+        showToast('Contenido clasificado y guardado', 'success');
 
     } catch (err) {
         console.error('Error al clasificar:', err);
-        showToast(`❌ Error: ${err.message}`, 'error');
+        showToast('Hubo un error, por favor intenta de nuevo más tarde', 'error');
     } finally {
         setLoadingState(false);
     }
@@ -394,7 +399,7 @@ function renderResult(data) {
 
     // 1. Categoría
     const badgeContainer = document.getElementById('category-badge-container');
-    const config = CATEGORY_CONFIG[categoria] || { icon: 'auto_awesome', colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
+    const config = CATEGORY_CONFIG[categoria] || { icon: 'topic', colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
 
     badgeContainer.innerHTML = `
         <div class="inline-flex max-w-full items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-lg sm:text-xl font-bold shadow-[0_0_25px_rgba(139,92,246,0.25)] ${config.colorClass} transition-all duration-300 transform scale-105">
@@ -403,8 +408,8 @@ function renderResult(data) {
         </div>
     `;
 
-    // 2. Porcentaje de Confianza
-    const percentage = ((probabilidad || 0) * 100).toFixed(2);
+    // 2. Porcentaje de Confianza (Entero sin decimales)
+    const percentage = Math.round((probabilidad || 0) * 100);
     document.getElementById('confidence-score').textContent = `${percentage}%`;
     const bar = document.getElementById('confidence-bar');
     bar.style.width = `${percentage}%`;
@@ -451,20 +456,19 @@ async function loadHistory() {
             historyGrid.innerHTML = recent.map(entry => {
                 const config = CATEGORY_CONFIG[entry.categoria] || { colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
-                const probPct = (prob * 100).toFixed(0);
+                const probPct = Math.round(prob * 100);
                 const timeLabel = formatTimeString(entry.created_at);
 
                 return `
-                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0">
+                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0">
                         <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
                             <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(entry.categoria || 'Sin categoría')}</span>
                             <span class="text-on-surface-variant font-label-sm text-[11px] shrink-0">${timeLabel}</span>
                         </div>
                         <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
                         <p class="text-on-surface-variant text-xs mt-1 line-clamp-2 opacity-70">${escapeHtml(entry.texto || '')}</p>
-                        <div class="mt-3 flex items-center justify-between opacity-80 pt-2 border-t border-white/5">
+                        <div class="mt-3 flex items-center justify-between opacity-80 pt-2 border-t border-black/5 dark:border-white/5">
                             <div class="flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-[15px] text-primary-fixed">auto_awesome</span>
                                 <span class="font-label-sm text-[11px] text-on-surface-variant">Confianza: ${probPct}%</span>
                             </div>
                             <span class="text-[10px] font-mono text-outline opacity-60">ID #${entry.id}</span>
@@ -481,6 +485,13 @@ async function loadHistory() {
         }
     } catch (err) {
         console.warn('Error al cargar historial desde PostgreSQL:', err);
+        historyGrid.innerHTML = `
+            <div class="col-span-full py-8 text-center glass-panel rounded-xl border border-rose-500/30 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-950/20">
+                <span class="material-symbols-outlined text-4xl text-rose-600 dark:text-rose-400 mb-2">error</span>
+                <p class="text-rose-700 dark:text-rose-200 text-sm font-semibold">Error al conectar con la base de datos.</p>
+                <p class="text-rose-600/80 dark:text-rose-400/80 text-xs mt-1 font-label-sm">${err.message || 'No se pudo consultar PostgreSQL.'}</p>
+            </div>
+        `;
     }
 }
 
@@ -494,7 +505,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
         listContainer.innerHTML = `
             <div class="py-8 text-center glass-panel rounded-xl">
                 <span class="material-symbols-outlined text-4xl text-outline mb-2 animate-spin">refresh</span>
-                <p class="text-on-surface-variant text-sm font-label-sm">Cargando historial detallado desde PostgreSQL...</p>
+                <p class="text-on-surface-variant text-sm font-label-sm">Cargando historial detallado ...</p>
             </div>
         `;
 
@@ -518,9 +529,9 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
 
         if (filteredData && filteredData.length > 0) {
             listContainer.innerHTML = filteredData.map(entry => {
-                const config = CATEGORY_CONFIG[entry.categoria] || { icon: 'auto_awesome', colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
+                const config = CATEGORY_CONFIG[entry.categoria] || { icon: 'topic', colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
-                const probPct = (prob * 100).toFixed(1);
+                const probPct = Math.round(prob * 100);
                 
                 let dateStr = 'Fecha no disponible';
                 if (entry.created_at) {
@@ -538,7 +549,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                 }).join(' ');
 
                 return `
-                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
+                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
                         <div class="flex-1 min-w-0 space-y-2">
                             <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                                 <span class="px-3 py-1 rounded-full text-xs font-label-sm border font-semibold ${config.colorClass} flex items-center gap-1.5 shadow-sm">
@@ -557,7 +568,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                 ${keywordsPills || '<span class="text-xs text-on-surface-variant italic opacity-60">Sin palabras clave</span>'}
                             </div>
                         </div>
-                        <div class="flex items-center gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[120px] shrink-0 justify-between md:justify-end">
+                        <div class="flex items-center gap-4 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[120px] shrink-0 justify-between md:justify-end">
                             <div class="text-left md:text-right">
                                 <span class="block text-xs font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Confianza</span>
                                 <span class="text-xl sm:text-2xl font-black text-primary-fixed">${probPct}%</span>
@@ -568,7 +579,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
             }).join('');
         } else {
             listContainer.innerHTML = `
-                <div class="py-12 text-center glass-panel rounded-xl border border-white/5">
+                <div class="py-12 text-center glass-panel rounded-xl border border-black/5 dark:border-white/5">
                     <span class="material-symbols-outlined text-5xl text-outline mb-3 opacity-60">filter_list_off</span>
                     <p class="text-on-surface-variant text-base font-semibold">No se encontraron registros para la categoría seleccionada.</p>
                 </div>
@@ -577,10 +588,10 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
     } catch (err) {
         console.warn('Error al cargar historial detallado:', err);
         listContainer.innerHTML = `
-            <div class="py-12 text-center glass-panel rounded-xl border border-rose-500/20 bg-rose-950/10">
-                <span class="material-symbols-outlined text-5xl text-rose-400 mb-3">error</span>
-                <p class="text-rose-200 text-base font-semibold">Error al conectar con la base de datos.</p>
-                <p class="text-rose-400/80 text-xs mt-1 font-label-sm">${err.message}</p>
+            <div class="py-12 text-center glass-panel rounded-xl border border-rose-500/30 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-950/20">
+                <span class="material-symbols-outlined text-5xl text-rose-600 dark:text-rose-400 mb-3">error</span>
+                <p class="text-rose-700 dark:text-rose-200 text-base font-semibold">Error al conectar con la base de datos.</p>
+                <p class="text-rose-600/80 dark:text-rose-400/80 text-xs mt-1 font-label-sm">${err.message}</p>
             </div>
         `;
     }
@@ -686,7 +697,7 @@ function setLoadingState(isLoading) {
             <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container opacity-80"></div>
             <div class="relative flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-lg animate-spin">refresh</span>
-                Analizando con ML...
+                Analizando...
             </div>
         `;
     } else {
@@ -705,12 +716,16 @@ function showToast(message, type = 'info') {
     if (!container) return;
 
     const toast = document.createElement('div');
-    const bgClass = type === 'error' ? 'bg-rose-950/90 border-rose-500/50 text-rose-200' :
-        type === 'warning' ? 'bg-amber-950/90 border-amber-500/50 text-amber-200' :
-            'bg-emerald-950/90 border-emerald-500/50 text-emerald-200';
+    const isError = type === 'error';
+    const bgClass = isError ? 'bg-red-100 dark:bg-rose-950/90 border-red-500/50 text-red-600 dark:text-red-400 font-semibold' :
+        type === 'warning' ? 'bg-amber-100 dark:bg-amber-950/90 border-amber-500/50 text-amber-800 dark:text-amber-200' :
+            'bg-emerald-100 dark:bg-emerald-950/90 border-emerald-500/50 text-emerald-800 dark:text-emerald-200';
 
     toast.className = `glass-panel px-4 py-3 rounded-xl border ${bgClass} font-label-sm text-sm shadow-xl backdrop-blur-xl transition-all duration-300 transform translate-y-2 opacity-0 flex items-center gap-2 break-words`;
-    toast.innerHTML = `<span class="min-w-0">${message}</span>`;
+    if (isError) {
+        toast.style.color = '#dc2626';
+    }
+    toast.innerHTML = `<span class="min-w-0" style="${isError ? 'color: #dc2626 !important;' : ''}">${message}</span>`;
 
     container.appendChild(toast);
 

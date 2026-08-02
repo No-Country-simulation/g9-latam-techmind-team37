@@ -4,6 +4,22 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.4.0] — 2026-08-01 · Ajustes de UX/UI, Modo Claro Cálido y Notificaciones
+
+### Corregido
+- **Porcentajes de Confianza con decimales y punto sobrante (`frontend/index.html` + `frontend/app.js`):** Eliminadas las cifras decimales en la "Confianza del Modelo" tanto en el marcador principal (`0%`) como en los registros del historial reciente y la vista detallada (`Math.round(prob * 100)`).
+- **Legibilidad del mensaje de error de BD en Modo Claro (`frontend/app.js`):** Actualizados los estilos en el bloque `catch` del historial para que las alertas de error de conexión a la base de datos se muestren en un color rojo oscuro bien definido (`text-rose-700 dark:text-rose-200`) y con alto contraste sobre fondo claro.
+- **Resplandor y deslumbre del Modo Claro (`frontend/index.html`):** Redefinidas las variables CSS `:root` hacia un diseño cálido cremita/arena mate (`#e8e2d5` y `#eee7d9`) con tipografía en tono café/carbón profundo (`#231f18`), eliminando la iluminación blanca cegadora de fondo e inputs.
+- **Ícono de estrellas en etiqueta de Confianza (`frontend/app.js`):** Eliminado el ícono de estrellas (`auto_awesome` ✨) posicionado al lado de la etiqueta "Confianza: %" en las tarjetas del historial.
+- **Efecto borroso en el Sidebar Móvil (`frontend/index.html`):** Eliminadas las clases `backdrop-blur-sm` y `backdrop-blur-2xl` en el overlay y panel de navegación lateral para evitar distorsiones al abrir el menú en dispositivos móviles.
+- **Ortografía y formato en textos del sistema (`frontend/index.html` + `frontend/app.js`):** Corregidos acentos, minúsculas tras comas o inicios de descripciones y estandarización ortográfica.
+
+### Añadido
+- **Notificación de alerta en texto rojo ante fallos de clasificación (`frontend/app.js`):** Al presionar el botón de clasificación con datos incompletos o en caso de fallo, se despliega una alerta con texto explícitamente en color rojo (`#dc2626`) y la leyenda `Hubo un error, por favor intenta de nuevo más tarde`.
+- **Navegación al inicio mediante el logo TechMind (`frontend/index.html` + `frontend/app.js`):** El elemento de marca "TechMind" en el sidebar redirige al usuario de vuelta a la vista principal (Home/Clasificador) al hacer clic.
+
+---
+
 ## [1.3.2] — 2026-07-31 · Estabilidad en OCI (memoria, devtools y auto-restart)
 
 ### Corregido
