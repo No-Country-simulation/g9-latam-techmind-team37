@@ -38,24 +38,31 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 </div>
 
 ```
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │                      Cliente Web (Navegador)                            │
-  │                      HTML5 + JS Vanilla + TailwindCSS                   │
-  │                      http://localhost:5173                              │
-  └────────────────────────────────────┬────────────────────────────────────┘
-                                       │ HTTP POST /contenido
-                                       ▼
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │              API Backend Principal — Spring Boot (Java 17)              │
-  │              Puerto 8080 · JPA / Hibernate · Flyway Migrations          │
-  └──────────────┬──────────────────────────────────────────┬───────────────┘
-                 │ HTTP POST /predecir                      │ JDBC
-                 ▼                                          ▼
-  ┌──────────────────────────────┐          ┌──────────────────────────────┐
-  │ Microservicio Data Science   │          │ Base de Datos PostgreSQL 16  │
-  │ FastAPI (Python) · :8000     │          │ Puerto 5432                  │
-  │ TF-IDF + LogisticRegression  │          │ contenidos · predicciones    │
-  └──────────────────────────────┘          └──────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│                    Oracle Cloud Infrastructure (OCI)                              │
+│ ┌───────────────────────────────────────────────────────────────────────────────┐ │
+│ │                  Docker & Docker Compose Multi-Container                      │ │
+│ │                                                                               │ │
+│ │ ┌───────────────────────────────────────────────────────────────────────────┐ │ │
+│ │ │                   Cliente Web / Frontend (Nginx)                          │ │ │
+│ │ │                   HTML5 + JS Vanilla + TailwindCSS                        │ │ │
+│ │ │                   http://localhost:5173                                   │ │ │
+│ │ └─────────────────────────────────────┬─────────────────────────────────────┘ │ │
+│ │                                       │ HTTP POST /contenido                  │ │
+│ │                                       ▼                                       │ │
+│ │ ┌───────────────────────────────────────────────────────────────────────────┐ │ │
+│ │ │            API Backend Principal — Spring Boot (Java 17)                  │ │ │
+│ │ │            Puerto 8080 · JPA / Hibernate · Flyway Migrations              │ │ │
+│ │ └──────────────┬──────────────────────────────────────────┬─────────────────┘ │ │
+│ │                │ HTTP POST /predecir                      │ JDBC              │ │
+│ │                ▼                                          ▼                   │ │
+│ │ ┌──────────────────────────────┐          ┌──────────────────────────────┐ │ │
+│ │ │ Microservicio Data Science   │          │ Base de Datos PostgreSQL 16  │ │ │
+│ │ │ FastAPI (Python) · :8000     │          │ Puerto 5432                  │ │ │
+│ │ │ Ensamble Calibrado (LR+SVC)  │          │ contenidos · predicciones    │ │ │
+│ │ └──────────────────────────────┘          └──────────────────────────────┘ │ │
+│ └───────────────────────────────────────────────────────────────────────────────┘ │
+└───────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -74,9 +81,10 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 - **Python 3.12**: Entorno de ejecución de inteligencia artificial.
 - **FastAPI & Uvicorn**: Microservicio asíncrono de alto rendimiento.
 - **Scikit-Learn**:
-  - `TfidfVectorizer` (3.000 características, unigramas y bigramas) para extracción de features y keywords.
-  - `LogisticRegression` (con pesos de clase balanceados) para la clasificación temática.
-- **Pandas & NumPy**: Procesamiento y limpieza del dataset técnico.
+  - `TfidfVectorizer` (sublineal, 6.000 características, n-gramas 1 a 3) para extracción de features y keywords.
+  - **Ensamble Calibrado (`VotingClassifier` Soft Voting)**: combina `LogisticRegression`, `CalibratedClassifierCV(LinearSVC)` y `ComplementNB` para máxima precisión y estimación de confianza.
+  - **Validación Cruzada Estratificada (K=5)** en desarrollo/notebook (87.28% CV Accuracy, 90.38% Holdout).
+- **Pandas & NumPy**: Procesamiento, augmentación de datos y limpieza del dataset técnico.
 - **Joblib**: Serialización y des-serialización de modelos entrenados.
 
 ### 🎨 Front-End (Web UI)
