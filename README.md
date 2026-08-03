@@ -56,11 +56,11 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 │ │ └──────────────┬──────────────────────────────────────────┬─────────────────┘ │ │
 │ │                │ HTTP POST /predecir                      │ JDBC              │ │
 │ │                ▼                                          ▼                   │ │
-│ │ ┌──────────────────────────────┐          ┌──────────────────────────────┐ │ │
-│ │ │ Microservicio Data Science   │          │ Base de Datos PostgreSQL 16  │ │ │
-│ │ │ FastAPI (Python) · :8000     │          │ Puerto 5432                  │ │ │
-│ │ │ Ensamble Calibrado (LR+SVC)  │          │ contenidos · predicciones    │ │ │
-│ │ └──────────────────────────────┘          └──────────────────────────────┘ │ │
+│ │ ┌──────────────────────────────┐          ┌──────────────────────────────┐    │ │
+│ │ │ Microservicio Data Science   │          │ Base de Datos PostgreSQL 16  │    │ │
+│ │ │ FastAPI (Python) · :8000     │          │ Puerto 5432                  │    │ │
+│ │ │ Ensamble Calibrado (LR+SVC)  │          │ contenidos · predicciones    │    │ │
+│ │ └──────────────────────────────┘          └──────────────────────────────┘    │ │
 │ └───────────────────────────────────────────────────────────────────────────────┘ │
 └───────────────────────────────────────────────────────────────────────────────────┘
 ```
