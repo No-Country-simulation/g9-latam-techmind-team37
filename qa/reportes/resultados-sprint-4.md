@@ -1,67 +1,53 @@
-# 🧪 Informe de Ejecución de Pruebas QA — Sprint 3
+# 🧪 Informe de Ejecución de Pruebas QA — Sprint 4
 
-> **Proyecto:** TechMind — Clasificación Inteligente de Contenido Técnico  
-> **Rol / Ejecutor:** QA Lead & Assistant (Soporte a Federico G. Gutiérrez)  
-> **Fecha de Ejecución:** 28 de Julio, 2026  
-> **Entorno:** Multicontenedor Docker (`PostgreSQL 16`, `FastAPI`, `Spring Boot`, `Nginx Frontend`)  
-> **Resultado Global:** 🟢 **100% Exitoso (14/14 Casos Aprobados)**  
+**Proyecto:** TechMind — Organización Inteligente del Conocimiento Técnico  
+**Componente:** Interfaz Web (Frontend React) / UI & UX & Integración Asíncrona 
+**Responsable QA:** Federico G. Gutierrez  
+**Fecha de Ejecución:** 02 de Agosto de 2026 
 
 ---
 
 ## 📈 Resumen Ejecutivo
+Durante la fase de validación de la capa de interfaz de usuario (Frontend), ejecutada desde http://localhost:5173/, se llevó a cabo la suite de pruebas funcionales, de validación de formularios, seguridad en la interfaz (XSS), reactividad del estado y experiencia de usuario (UI/UX). Se evaluó la interacción directa del usuario con el sistema, incluyendo el envío de datos al pipeline de procesamiento asíncrono (RabbitMQ / Spring Boot / FastAPI), la renderización dinámica de componentes, la gestión de modales, el control de peticiones duplicadas y la persistencia del tema visual (Modo Claro / Modo Oscuro).
 
-Se asumió el rol de **QA Automation / Manual Testing** para ejecutar la suite completa de verificación del sistema E2E (End-to-End). Las pruebas cubrieron tanto la API de Spring Boot (`:8080`), el microservicio de Ciencia de Datos FastAPI (`:8000`), el esquema de persistencia en PostgreSQL (`:5432`) y la resiliencia ante ataques de inyección y sobrecarga de payloads.
+Se logró un 100% de cobertura y éxito en los 9 casos planificados, garantizando una interfaz robusta, segura ante inyecciones de código HTML/JS en el cliente y altamente reactiva.
+
 
 ### 📊 Métricas Principales
-
-| Métrica | Valor |
-|---|---|
-| **Total de Casos Ejecutados** | **14** |
-| **Casos Exitosos (`PASS`)** | **14 (100%)** |
-| **Casos Fallidos (`FAIL`)** | **0 (0%)** |
-| **Tiempo de Respuesta Promedio** | **16.14 ms** |
-| **Tiempo Máximo de Respuesta (Payload ~35k char)** | **28.66 ms** |
-| **Errores de Base de Datos / Schemas** | **0** |
+* **Casos Planificados:** 9
+* **Casos Ejecutados:** 9
+* **Casos Exitosos (PASÓ):** 9
+* **Casos Fallidos (FALLÓ):** 0
+* **Porcentaje de Éxito:** 100%
 
 ---
 
-## 📋 Matriz de Casos de Prueba Ejecutados
-
-| ID | Nombre del Caso de Prueba | Endpoint Evaluado | Resultado Esperado | Resultado Obtenido | Latencia | Estado |
-|---|---|---|---|---|---|---|
-| **CP-17** | Health Check de Servicio ML | `GET :8000/health` | HTTP `200` (`status: ok`) | HTTP `200` (`model_loaded: true`) | 26.5 ms | 🟢 **PASS** |
-| **CP-18** | Catálogo de 8 Categorías ML | `GET :8000/categorias` | HTTP `200` (Array 8 ítems) | HTTP `200` (`categorias`: 8 ítems) | 2.39 ms | 🟢 **PASS** |
-| **CP-01** | Clasificación Backend E2E | `POST :8080/contenido` | HTTP `201` (`Backend`) | HTTP `201` (`Backend`, 63.57%) | 28.66 ms | 🟢 **PASS** |
-| **CP-02** | Clasificación Data Science E2E | `POST :8080/contenido` | HTTP `201` (`Data Science`) | HTTP `201` (`Data Science`, 58.45%) | 15.63 ms | 🟢 **PASS** |
-| **CP-03** | Clasificación DevOps E2E | `POST :8080/contenido` | HTTP `201` (`DevOps`) | HTTP `201` (`DevOps`, 59.82%) | 17.76 ms | 🟢 **PASS** |
-| **CP-04** | Clasificación Frontend E2E | `POST :8080/contenido` | HTTP `201` (`Frontend`) | HTTP `201` (`Frontend`, 61.12%) | 17.93 ms | 🟢 **PASS** |
-| **CP-05** | Clasificación Directa FastAPI | `POST :8000/predecir` | HTTP `200` OK | HTTP `200` OK | 5.50 ms | 🟢 **PASS** |
-| **CP-06** | Validación Título Vacío | `POST :8080/contenido` | HTTP `400` Bad Request | HTTP `400` Bad Request | 15.21 ms | 🟢 **PASS** |
-| **CP-07** | Validación Texto Vacío | `POST :8080/contenido` | HTTP `400` Bad Request | HTTP `400` Bad Request | 3.95 ms | 🟢 **PASS** |
-| **CP-08** | Omisión de Campo en Payload | `POST :8000/predecir` | HTTP `422` Unprocessable Entity | HTTP `422` Unprocessable Entity | 2.29 ms | 🟢 **PASS** |
-| **CP-09** | Resistencia a SQL Injection | `POST :8080/contenido` | HTTP `201` (Texto Sanitizado) | HTTP `201` (Sin ejecución SQL) | 16.02 ms | 🟢 **PASS** |
-| **CP-10** | UTF-8, Emojis y Caracteres Espec. | `POST :8080/contenido` | HTTP `201` (Reserva de Tildes/Emojis) | HTTP `201` OK | 15.84 ms | 🟢 **PASS** |
-| **CP-11** | Carga de Payload Extenso (~35k char) | `POST :8080/contenido` | HTTP `201` (Procesamiento < 2s) | HTTP `201` (Procesado en 25.74ms) | 25.74 ms | 🟢 **PASS** |
-| **CP-12** | Consulta de Historial en PostgreSQL | `GET :8000/predicciones` | HTTP `200` (Listado de Predicciones) | HTTP `200` OK (`JOIN` correcto) | 12.30 ms | 🟢 **PASS** |
+## 🧪 Desglose por Tipo de Prueba
+| Categoria | Planificado | PASÓ | FALLÓ | % Éxito |
+|-----------|-----------|-----------|-----------|-----------|
+| Funcional / Pipeline & Modales | 2 | 2 | 0 | 100 |
+| Validación de Controles e Interfaz | 1 | 1 | 0 | 100 |
+| Persistencia y Reactividad de Estado (UI) | 1 | 1 | 0 | 100 |
+| Seguridad y Sanitización Frontend (XSS) | 1 | 1 | 0 | 100 |
+| UX / Control de Performance (Debounce) | 1 | 1 | 0 | 100 |
+| Navegación & UI/UX (Light/Dark Mode) | 3 | 3 | 0 | 100 |
+| **TOTAL** | **9** | **9** | **0** | **100** |
 
 ---
 
-## 🔍 Análisis de Hallazgos y Calidad
-
-1. **Rendimiento Ultrarrápido (< 30 ms)**:
-   * La latencia media se mantuvo en **16.14 ms**, lo cual está dramáticamente por debajo del límite estipulado por el requerimiento no funcional (máximo 2000 ms).
-
-2. **Inmunidad a SQL Injection y Cross-Site Scripting (XSS)**:
-   * Al enviar payloads con sentencias maliciosas (`DROP TABLE`, `' OR '1'='1'`) y tags de JavaScript (`<script>`), el sistema procesó la entrada de manera segura usando consultas preparadas (`PreparedStatement` en Spring Data JPA) y limpió los caracteres en el pipeline de NLP.
-
-3. **Verificación del Bug Resuelto (`log_prediccion` / Foreign Key)**:
-   * Se confirmó que la eliminación del intento de inserción directa desde FastAPI solucionó al 100% los errores en `techmind-postgres`. Toda la persistencia ahora fluye limpiamente a través de Spring Boot asignando `contenido_id`.
-
-4. **Integridad del Historial**:
-   * Las consultas a `GET :8000/predicciones` devolvieron los datos unificados correctamente mediante `JOIN contenidos c ON c.id = p.contenido_id`, confirmando que el Frontend puede renderizar el modal de historial sin fallos.
+## 🐛 Registro de Incidentes y Bug Fixes
+| ID Bug | Componente | Descripción de la Falla | Solución Aplicada | Resultado Re-Test QA | Estado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **BUG-01** | Frontend / UI | Redundancia en controles de cierre del modal de JSON (coexistencia del icono "X" en la esquina superior y el botón "Cerrar" en la parte inferior). | Se removió el botón inferior "Cerrar" para eliminar la duplicidad y se reemplazó por la funcionalidad útil de "Copiar JSON". | **Exitoso.** Re-test realizado el 30/07/2026. Caso APROBADO. El modal ahora cuenta con un único control de cierre ("X") y acción de copia rápida. | **CERRADO** |
+| **BUG-02** | Frontend / UX | El formulario de ingreso técnico (#content-title y #content-body) no se restablece automáticamente tras ejecutar la clasificación, obligando a borrar el texto manualmente. | Se configuró el reset automático de los inputs tras procesar la consulta / se incorporó el control de limpieza del formulario. | **Exitoso.** Re-test realizado el 30/07/2026. Caso APROBADO. Los campos regresan a su estado inicial (vacíos) tras renderizar el resultado. | **CERRADO** |
+| **BUG-03** | Frontend / UI | Falta de actualización automática en los indicadores de estado de servicios (FastAPI y Spring Boot) al iniciar la aplicación, permaneciendo en rojo por falta de recursos hasta forzar recarga manual. | Migración de la aplicación a una nueva instancia dedicada con mayores recursos (4 vCPU / 32 GB RAM) y redespliegue de los cambios en [http://163.176.183.89:5173/](http://163.176.183.89:5173/). | **Exitoso.** Re-test realizado el 02/08/2026. Caso APROBADO. Servidores respondiendo de forma continua y estable. Indicadores de estado sincronizados correctamente en la carga inicial sin caídas de servicio.  | **CERRADO** |
 
 ---
 
-## 🎯 Conclusión para el Equipo y Federico
+## 🎯 Conclusión y Recomendaciones
+La capa de interfaz de usuario (Frontend) de **TechMind** ha demostrado un excelente grado de madurez técnica, estabilidad y usabilidad en la suite de pruebas del Sprint 4:
+- **Seguridad en Renderizado (XSS Client-Side):** El manejo dinámico del DOM en JavaScript (`app.js`) escapa de forma segura los valores ingresados en los campos de formulario (`<script>`, `onerror`). Se verificó que las cadenas maliciosas se renderizan como texto plano sin ejecutar vectores de ataque Cross-Site Scripting en el navegador.
+- **Manejo de Estado y Reactividad (Vanilla JS):** La integración entre la recepción de respuestas asíncronas de la API y el feed de *Contenidos Clasificados Recientemente* funciona correctamente de manera reactiva, insertando la card en el contenedor `#history-grid` sin requerir la recarga de la página (*force refresh*).
+- **Control de Peticiones Duplicadas (Debounce en UI):** El control de estados en el botón de envío (`#btn-classify`) deshabilita las interacciones subsecuentes inmediatamente tras el primer clic, previniendo condiciones de carrera (*race conditions*) y saturación de peticiones innecesarias hacia la API.
+- **Coherencia Visual y Accesibilidad (Tailwind Design System):** Los temas *Dark* y *Light* alternan y persisten correctamente las variables CSS globales (`:root` / `.dark`), manteniendo el contraste, la accesibilidad de lectura y la integridad estructural de la barra lateral (`#sidebar`) y los paneles con efecto *Glassmorphism*.
 
-La suite de pruebas fue completada de forma 100% satisfactoria. El sistema **TechMind** se encuentra en un estado **estable, seguro, de alto rendimiento y listo para producción**.

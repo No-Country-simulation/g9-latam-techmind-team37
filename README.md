@@ -137,33 +137,43 @@ g9-latam-techmind-team37/
 │       ├── ingest_documents.py            # Ingesta masiva de documentos PDF / DOCX
 │       └── migrate_to_postgres.py         # Carga inicial de datos a PostgreSQL
 │
-├── qa/                                   # Módulo de Quality Assurance
-│   ├── casos-de-prueba/                  # Documentación de diseño de pruebas         
-│   │   └── (v3.0) Matriz de Casos de Prueba.xlsx          
-│   ├── evidencias/                       # Respaldos y ejecuciones de las pruebas                   
+├── qa/                                    # Módulo de Quality Assurance
+│   ├── casos-de-prueba/                   # Documentación de diseño de pruebas         
+│   │   ├── (v1.1) Matriz de Bugs.xlsx
+│   │   ├── (v1.1) Matriz de Mejoras.xlsx
+│   │   └── (v4.0) Matriz de Casos de Prueba.xlsx         
+│   ├── evidencias/                        # Respaldos y ejecuciones de las pruebas                   
 │   │   ├── Capturas de Pantalla/  
-│   │   │   ├── Backend (Spring Boot) 
-│   │   │   ├── Base de Datos (PostgreSQL 16) 
-│   │   │   └── Data Science (FastAPI)          
+│   │   │   ├── Backend (Spring Boot)/ 
+│   │   │   ├── Base de Datos (PostgreSQL 16)/ 
+│   │   │   ├── Data Science (FastAPI)/   
+│   │   │   └── FrontEnd/    
+│   │   │       ├── Bugs/ 
+│   │   │       ├── Casos de Prueba/ 
+│   │   │       └── Mejoras/      
 │   │   └── JSON/
-│   │       ├── Backend (Spring Boot) 
-│   │       └── Data Science (FastAPI)  
-│   ├── reportes/                         # Informes y resultados finales
+│   │       ├── Backend (Spring Boot)/ 
+│   │       └── Data Science (FastAPI)/  
+│   ├── reportes/                          # Informes y resultados finales
 │   │   ├── informes/
-│   │   │   └── (v2.0) Reporte de Resultados.xlsx
+│   │   │   └── (v3.0) Reporte de Resultados.pdf
 │   │   ├── Reporte de BUGS/
-│   │   │   └── FIX-columna-informaciones_adicionales.md
-│   │   │   └── FIX-docker-multiarch-spring-boot.md
-│   │   ├── resultados-sprint-1.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 1
-│   │   ├── resultados-sprint-2.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 2
-│   │   └── resultados-sprint-3.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 3
-│   └── README.md                         # Documentación específica del módulo QA
+│   │   │   ├── FIX-Columna-informaciones_adicionales.md
+│   │   │   ├── FIX-Docker-multiarch-spring-boot.md 
+│   │   │   ├── FIX-Indicadores-de-estado-congelados-en-rojo-al-iniciar-la-aplicacion.md
+│   │   │   ├── FIX-Persistencia-del-formulario-tras-ejecutar-la clasificacion.md
+│   │   │   └── FIX-Redundancia-en-controles-del-modal-de-JSON.md
+│   │   ├── resultados-sprint-1.md         # Resumen ejecutivo de métricas, bugs encontrados del Sprint 1
+│   │   ├── resultados-sprint-2.md         # Resumen ejecutivo de métricas, bugs encontrados del Sprint 2
+│   │   ├── resultados-sprint-3.md         # Resumen ejecutivo de métricas, bugs encontrados del Sprint 3
+│   │   └── resultados-sprint-4.md         # Resumen ejecutivo de métricas, bugs encontrados del Sprint 4
+│   └── README.md                          # Documentación específica del módulo QA
 │
 │
-├── docker-compose.yml                    # Configuración de los 4 servicios en Docker
-├── setup.py                              # Installer y orquestador multiplataforma (Windows/Mac/Linux)
-├── how-to-run.md                         # Guía paso a paso de ejecución
-└── README.md                             # Documentación principal del proyecto
+├── docker-compose.yml                     # Configuración de los 4 servicios en Docker
+├── setup.py                               # Installer y orquestador multiplataforma (Windows/Mac/Linux)
+├── how-to-run.md                          # Guía paso a paso de ejecución
+└── README.md                              # Documentación principal del proyecto
 ```
 
 ---
