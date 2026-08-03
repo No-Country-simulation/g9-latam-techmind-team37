@@ -34,6 +34,29 @@
 
 ---
 
+## [1.5.1] — 2026-08-03 · Actualización del Notebook de Data Science (Alineación con Pipeline de Producción + Cross-Validation)
+
+### Cambiado
+- **Notebook reescrito para reflejar el pipeline de producción actual (`data-science/notebooks/TechMind_DataScience.ipynb`):** El notebook estaba desactualizado respecto a `expand_and_train.py` — mostraba 61 registros, usaba un `TfidfVectorizer` básico (1-2 n-gramas, 1500 features) y un `LogisticRegression` individual. Se reescribió completo (de 64 celdas dispersas a 40 celdas consolidadas y documentadas) para reflejar fielmente el pipeline de producción:
+  - Carga dinámica del CSV mostrando **259 registros** reales.
+  - Concatenación de `titulo + texto` en el preprocesamiento (alineado con la mejora del ensamble).
+  - `TfidfVectorizer` sublineal con n-gramas 1-3 y 6 000 features (idéntico a `expand_and_train.py`).
+  - **Ensamble Calibrado** (`LogisticRegression` + `CalibratedClassifierCV(LinearSVC)` + `ComplementNB`) con soft voting.
+  - Todos los gráficos (distribución de categorías, longitud de textos, confusion matrix) regenerados con los 259 registros actuales.
+  - Compatibilidad total con nbformat 4.5 (campo `id` en cada celda).
+
+### Añadido
+- **Validación Cruzada Estratificada K-Fold (K=5) (`data-science/notebooks/TechMind_DataScience.ipynb`):** Nueva sección 9 que usa el **100% de las muestras** para evaluar el modelo, eliminando la dependencia de un único corte de datos. Implementada con un `Pipeline(TF-IDF → Ensamble)` correcto que re-fitea el vectorizador en cada fold para evitar *data leakage*. Resultados obtenidos:
+  - Accuracy promedio CV: **87.28% ± 4.11%**
+  - Rango: [80.77% – 92.16%]
+  - Gráfico de barras por fold incluido.
+
+### Decisión de Arquitectura
+- `expand_and_train.py` permanece como **fuente de verdad de producción** (genera los artefactos `.joblib` para la API FastAPI).
+- El notebook actúa como **documentación viva y reproducible** del mismo pipeline, enriquecida con Cross-Validation como capa adicional de análisis para presentación.
+
+---
+
 ## [1.3.2] — 2026-07-31 · Estabilidad en OCI (memoria, devtools y auto-restart)
 
 ### Corregido
