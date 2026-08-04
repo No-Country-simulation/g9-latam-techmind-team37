@@ -219,19 +219,40 @@ def categorias():
 
 # ── Módulo de Métricas de Servidor OCI ───────────────────────────────────────
 
+import time
+
+START_TIME = time.time()
+
 try:
     import psutil
 except ImportError:
     psutil = None
 
 
+def format_uptime(seconds: float) -> str:
+    secs = int(seconds)
+    days = secs // 86400
+    hours = (secs % 86400) // 3600
+    minutes = (secs % 3600) // 60
+    if days > 0:
+        return f"{days}d {hours}h {minutes}m"
+    elif hours > 0:
+        return f"{hours}h {minutes}m"
+    else:
+        return f"{minutes}m {secs % 60}s"
+
+
 def obtener_metricas_sistema() -> dict:
+    uptime_sec = time.time() - START_TIME
     if psutil is not None:
         try:
+            if hasattr(psutil, "boot_time"):
+                uptime_sec = time.time() - psutil.boot_time()
             cpu = psutil.cpu_percent(interval=0.1)
             vm = psutil.virtual_memory()
             swap = psutil.swap_memory()
             return {
+                "uptime": format_uptime(uptime_sec),
                 "cpu_percent": round(cpu, 1),
                 "ram_total_mb": round(vm.total / (1024 * 1024), 1),
                 "ram_used_mb": round(vm.used / (1024 * 1024), 1),
@@ -271,6 +292,7 @@ def obtener_metricas_sistema() -> dict:
     ram_pct = round((ram_used / ram_total) * 100, 1) if ram_total > 0 else 0.0
 
     return {
+        "uptime": format_uptime(uptime_sec),
         "cpu_percent": load,
         "ram_total_mb": ram_total,
         "ram_used_mb": ram_used,

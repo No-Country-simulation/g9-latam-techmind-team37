@@ -7,11 +7,12 @@
 ## [1.6.1] — 2026-08-04 · Métricas en Tiempo Real del Servidor OCI (CPU, RAM y Swap)
 
 ### Añadido
-- **Endpoint de telemetría de hardware en FastAPI (`app/main.py`):** Creado el endpoint `GET /system-stats` respaldado por `psutil` (con fallback nativo a `/proc/meminfo` y `os.getloadavg()` en Linux), que expone métricas en tiempo real de consumo de CPU (%), RAM total/usada/disponible (MB) y Swap (MB).
-- **Widgets visuales de telemetría en el Frontend (`frontend/index.html` + `frontend/app.js`):** Expandido el popover *"Estado de servicios"* en la barra lateral (Sidebar) con 3 barras de progreso animadas en estética *Cyber AI Dark Mode*:
-  - 💻 **Carga de CPU (1 vCPU OCI)** con porcentaje actualizado dinámicamente.
-  - 🧠 **Consumo de RAM (1 GB OCI)** con lectura de megabytes usados/totales y badge indicador de **RAM Libre**.
-  - 🔄 **Consumo de Swap (2 GB OCI)** con barra de capacidad.
+- **Endpoint de telemetría de hardware en FastAPI (`app/main.py`):** Creado el endpoint `GET /system-stats` respaldado por `psutil` (con fallback nativo a `/proc/meminfo` y `os.getloadavg()` en Linux), que expone métricas en tiempo real de consumo de CPU (%), RAM total/usada/disponible (MB), Swap (MB) y **tiempo de actividad del servidor (Uptime)**.
+- **Widgets visuales de telemetría en el Frontend (`frontend/index.html` + `frontend/app.js`):** Expandido el popover *"Estado de servicios"* en la barra lateral (Sidebar) reemplazando la etiqueta fija con un badge dinámico de **Uptime** (`schedule`) y 3 barras de progreso animadas en estética *Cyber AI Dark Mode*:
+  - ⏱️ **Badge de Uptime del servidor** (ej. `2d 4h 15m`).
+  - 💻 **Carga de CPU** con porcentaje actualizado dinámicamente.
+  - 🧠 **Consumo de RAM** con lectura de megabytes usados/totales y badge indicador de **RAM Libre**.
+  - 🔄 **Consumo de Swap** con barra de capacidad.
   - **Polling en tiempo real:** Actualización automática cada 5 segundos.
   - **Código de colores reactivo:** Verde (RAM < 80%), Amarillo (RAM 80%-90%), Rojo (RAM > 90%).
 

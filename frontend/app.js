@@ -90,6 +90,10 @@ async function fetchSystemStats() {
         if (!res.ok) return;
         const data = await res.json();
 
+        // Uptime
+        const uptimeValEl = document.getElementById('sys-uptime-val');
+        if (uptimeValEl && data.uptime) uptimeValEl.textContent = data.uptime;
+
         // CPU
         const cpuValEl = document.getElementById('sys-cpu-val');
         const cpuBarEl = document.getElementById('sys-cpu-bar');
