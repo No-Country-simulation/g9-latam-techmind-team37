@@ -4,7 +4,7 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
-## [1.5.0] — 2026-08-03 · Mejoras de Isotipo, Hover Unificado y Funciones de Historial
+## [1.6.0] — 2026-08-03 · Mejoras de Isotipo, Hover Unificado y Funciones de Historial
 
 ### Añadido
 - **Botón "Ver más" / "Ver menos" en descripciones del Historial (`frontend/app.js`):** Agregada la capacidad de expandir y contraer descripciones extensas en las tarjetas de consulta tanto en el grid inicial como en la lista detallada.
@@ -16,7 +16,62 @@
 
 ---
 
-## [1.4.0] — 2026-08-01 · Ajustes de UX/UI, Modo Claro Cálido y Notificaciones
+## [1.5.2] — 2026-08-03 · Optimización de `docker-compose.yml` para OCI Free Tier (1 vCPU · 1 GB RAM · 2 GB Swap)
+
+### Mejorado
+- **Límites de memoria por contenedor (`docker-compose.yml`):** Se agregaron `mem_limit` y `memswap_limit` a los cuatro servicios para prevenir que el OOM Killer del kernel mate procesos silenciosamente cuando la RAM se agota. El presupuesto total queda dentro del límite de 1 GB de RAM real, usando el swap de 2 GB como colchón ante picos de carga:
+
+  | Servicio | `mem_limit` (RAM) | `memswap_limit` (RAM + Swap) |
+  |---|---|---|
+  | `postgres` | 150 MB | 300 MB |
+  | `fastapi` | 220 MB | 440 MB |
+  | `springboot` | 384 MB | 768 MB |
+  | `frontend` | 48 MB | 96 MB |
+  | **Total estimado** | **~982 MB** | **dentro del 1 GB** |
+
+- **Límites de CPU por contenedor (`docker-compose.yml`):** Se agregó la directiva `cpus` a cada servicio para evitar que un solo contenedor monopolice el único vCPU disponible:
+  - `postgres`: `0.25` (mayormente I/O)
+  - `fastapi`: `0.50` (inferencia por request)
+  - `springboot`: `0.50` (API transaccional)
+  - `frontend`: `0.10` (Nginx estático)
+
+- **Tuning de PostgreSQL para bajo consumo de RAM (`docker-compose.yml`):** Se agregó la directiva `command` con parámetros optimizados para entornos de 1 GB:
+  - `shared_buffers=32MB` (reducido desde el default de 128MB)
+  - `work_mem=4MB` (20 conexiones × 4MB = 80MB pico)
+  - `maintenance_work_mem=32MB`
+  - `effective_cache_size=128MB`
+  - `max_connections=20` (suficiente para el pool de Spring Boot)
+  - `wal_buffers=8MB`, `checkpoint_completion_target=0.9`
+
+- **Uvicorn single-worker (`docker-compose.yml`):** Se sobreescribió el `command` del servicio `fastapi` para forzar `--workers 1`, evitando que Uvicorn spawne múltiples workers en una instancia de 1 vCPU. Se agregó `--limit-max-requests 500` para que el worker se reinicie periódicamente y libere posibles memory leaks de las librerías de ML.
+
+- **Healthcheck más tolerante para PostgreSQL:** Se aumentó `start_period` de 0s a 20s para dar más tiempo de arranque a la base de datos en una instancia con I/O lenta (OCI Free Tier usa almacenamiento de bloque compartido).
+
+---
+
+## [1.5.1] — 2026-08-03 · Actualización del Notebook de Data Science (Alineación con Pipeline de Producción + Cross-Validation)
+
+### Añadido / Mejorado
+- **Ampliación del Dataset de Entrenamiento (`data-science/data/raw/contenidos_tecnicos.csv`):** Dataset expandido de ~221 a **259 registros técnicos balanceados** (+38 registros especializados), resolviendo ambigüedades y reforzando la precisión en las categorías **Mobile** (*SwiftUI, Jetpack Compose, Flutter Dart AOT, React Native Fabric, Kotlin KMP*) y **Cloud** (*AWS VPC, Lambda, S3, CloudFront, Terraform HCL, OCI Autonomous DB, FinOps*).
+- **Ensamble de Modelos con Calibración de Confianza (`data-science/src/expand_and_train.py`):** Reemplazada la `LogisticRegression` individual por un ensamble `VotingClassifier` (Soft Voting) que combina 3 algoritmos complementarios:
+  1. `LogisticRegression` con pesos de clase balanceados ($C=1.5$).
+  2. `CalibratedClassifierCV(LinearSVC)` con calibración de probabilidades de Platt (`method='sigmoid'`), proporcionando estimaciones de confianza nítidas y precisas.
+  3. `ComplementNB` optimizado para clasificación de textos.
+- **Preprocesamiento y NLTK Stopwords (`data-science/src/expand_and_train.py` + `app/main.py`):** Integrado el corpus oficial de 154 stopwords en español de NLTK en el pipeline de entrenamiento e inferencia FastAPI, omitiendo además términos de ruido técnico neutro (*"tutorial"*, *"guia"*, *"ejemplo"*, *"introduccion"*).
+- **Feature Engineering con TF-IDF Sublineal y N-Gramas 1-3 (`data-science/src/expand_and_train.py`):** Configurado `TfidfVectorizer` con `sublinear_tf=True` (escalado logarítmico de término $1 + \log(tf)$) y rango de n-gramas de 1 a 3 para capturar expresiones técnicas compuestas (*"aws lambda serverless"*, *"react native navigation"*).
+- **Nuevos Artefactos `.joblib` (`data-science/models/`):** Generados los archivos binarios `tfidf_vectorizer.joblib` y `modelo_clasificador.joblib` manteniendo 100% la compatibilidad con los contratos de API de FastAPI y Spring Boot.
+- **Incremento en Métricas de Rendimiento:** Alcanzado un **90.38% de Accuracy** en la evaluación holdout (20% test data), logrando un **100% de Precisión/Recall en Mobile** y un **94% de F1-Score en Cloud**.
+- **Notebook reescrito para reflejar el pipeline de producción actual (`data-science/notebooks/TechMind_DataScience.ipynb`):** El notebook estaba desactualizado respecto a `expand_and_train.py` — mostraba 61 registros, usaba un `TfidfVectorizer` básico (1-2 n-gramas, 1500 features) y un `LogisticRegression` individual. Se reescribió completo (de 64 celdas dispersas a 40 celdas consolidadas y documentadas) para reflejar fielmente el pipeline de producción:
+  - Carga dinámica del CSV mostrando **259 registros** reales.
+  - Concatenación de `titulo + texto` en el preprocesamiento (alineado con la mejora del ensamble).
+  - `TfidfVectorizer` sublineal con n-gramas 1-3 y 6 000 features (idéntico a `expand_and_train.py`).
+  - **Ensamble Calibrado** (`LogisticRegression` + `CalibratedClassifierCV(LinearSVC)` + `ComplementNB`) con soft voting.
+  - Todos los gráficos (distribución de categorías, longitud de textos, confusion matrix) regenerados con los 259 registros actuales.
+  - Compatibilidad total con nbformat 4.5 (campo `id` en cada celda).
+- **Validación Cruzada Estratificada K-Fold (K=5) (`data-science/notebooks/TechMind_DataScience.ipynb`):** Nueva sección 9 que usa el **100% de las muestras** para evaluar el modelo, eliminando la dependencia de un único corte de datos. Implementada con un `Pipeline(TF-IDF → Ensamble)` correcto que re-fitea el vectorizador en cada fold para evitar *data leakage*. Resultados obtenidos:
+  - Accuracy promedio CV: **87.28% ± 4.11%**
+  - Rango: [80.77% – 92.16%]
+  - Gráfico de barras por fold incluido.
 
 ### Corregido
 - **Porcentajes de Confianza con decimales y punto sobrante (`frontend/index.html` + `frontend/app.js`):** Eliminadas las cifras decimales en la "Confianza del Modelo" tanto en el marcador principal (`0%`) como en los registros del historial reciente y la vista detallada (`Math.round(prob * 100)`).
@@ -30,6 +85,10 @@
 ### Añadido
 - **Notificación de alerta cuando faltan campos al clasificar (`frontend/app.js`):** Al presionar el botón de clasificación con campos vacíos, se despliega la alerta con el mensaje exacto `Por favor, llena todos los campos`. Ante errores de conexión o servidor, se mantiene el mensaje `Hubo un error, por favor intenta de nuevo más tarde`.
 - **Navegación al inicio mediante el logo TechMind (`frontend/index.html` + `frontend/app.js`):** El elemento de marca "TechMind" en el sidebar redirige al usuario de vuelta a la vista principal (Home/Clasificador) al hacer clic.
+
+### Decisión de Arquitectura
+- `expand_and_train.py` permanece como **fuente de verdad de producción** (genera los artefactos `.joblib` para la API FastAPI).
+- El notebook actúa como **documentación viva y reproducible** del mismo pipeline, enriquecida con Cross-Validation como capa adicional de análisis para presentación.
 
 ---
 
@@ -233,4 +292,4 @@ Postman → Spring Boot (8080) → FastAPI (8000) → PostgreSQL (5432)
 
 ---
 
-*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-07-31.*
+*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-08-02.*

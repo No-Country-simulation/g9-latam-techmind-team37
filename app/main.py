@@ -30,23 +30,38 @@ load_dotenv()
 vectorizer = None
 modelo = None
 
-# ── Stopwords en español (igual que en el notebook) ───────────────────────────
-STOPWORDS_ES = {
-    "el","la","los","las","un","una","unos","unas","de","del","al","a","en","y","o",
-    "que","con","para","por","se","su","sus","es","son","este","esta","estos","estas",
-    "como","más","mas","muy","entre","sobre","desde","hasta","tambien","también","ser",
-    "utilizando","utiliza","permite","contenido","introduccion","introducción","tutorial",
-    "cómo","como","así","asi",
+# ── Stopwords en español y ruido técnico ─────────────────────────────────────
+try:
+    import nltk
+    nltk.download('stopwords', quiet=True)
+    from nltk.corpus import stopwords
+    STOPWORDS_ES = set(stopwords.words('spanish'))
+except Exception:
+    STOPWORDS_ES = {
+        "el","la","los","las","un","una","unos","unas","de","del","al","a","en","y","o",
+        "que","con","para","por","se","su","sus","es","son","este","esta","estos","estas",
+        "como","más","mas","muy","entre","sobre","desde","hasta","tambien","también","ser",
+        "utilizando","utiliza","permite","contenido","introduccion","introducción","tutorial",
+        "cómo","como","así","asi","uso","usando","ejemplo","guia","guía"
+    }
+
+RUIDO_TECNICO = {
+    "tutorial", "guia", "guía", "introduccion", "introducción", "explicacion", "explicación",
+    "concepto", "conceptos", "basico", "básicos", "basicos", "básica", "basica", "avanzado",
+    "avanzada", "desarrollo", "creacion", "creación", "uso", "usando", "ejemplo", "ejemplos",
+    "practica", "práctica", "practicas", "prácticas", "paso", "pasos", "aplicacion", "aplicación",
+    "aplicaciones", "sistema", "sistemas", "servicio", "servicios", "completo", "completa"
 }
+STOPWORDS_TOTAL = STOPWORDS_ES.union(RUIDO_TECNICO)
 
 
-# ── Funciones del pipeline (replicadas del notebook) ─────────────────────────
+# ── Funciones del pipeline ───────────────────────────────────────────────────
 
 def limpiar_texto(texto: str) -> str:
     texto = texto.lower()
     texto = re.sub(r"[^a-záéíóúñü0-9\s]", " ", texto)
     palabras = texto.split()
-    palabras = [p for p in palabras if p not in STOPWORDS_ES and len(p) > 2]
+    palabras = [p for p in palabras if p not in STOPWORDS_TOTAL and len(p) > 2]
     return " ".join(palabras)
 
 

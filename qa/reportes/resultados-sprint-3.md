@@ -22,7 +22,6 @@ Se logró un 100% de cobertura y éxito en los casos planificados, garantizando 
 ---
 
 ## 🧪 Desglose por Tipo de Prueba
-
 | Categoria | Planificado | PASÓ | FALLÓ | % Éxito |
 |-----------|-----------|-----------|-----------|-----------|
 | Clasificación y Persistencia Core | 1 | 1 | 0 | 100 |
@@ -34,7 +33,6 @@ Se logró un 100% de cobertura y éxito en los casos planificados, garantizando 
 
 ---
 ## 🐛 Registro de Incidentes y Bug Fixes
-
 | ID Bug | Componente | Descripción de la Falla | Solución Aplicada | Resultado Re-Test QA | Estado |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **BUG-ENV-01** | `backend/Dockerfile` | Fallo de build en macOS Apple Silicon (ARM64) por imagen `eclipse-temurin:17-jdk-alpine` solo compatible con AMD64 (`no match for platform in manifest`). | Se cambió la imagen base en `Dockerfile` a `eclipse-temurin:17-jdk` y `17-jre` (versiones multi-arquitectura nativas). | **Exitoso.** Build ejecutado mediante `python3 setup.py --docker` en ARM64 (Apple Silicon) y AMD64. Contenedor desplegado correctamente. | **CERRADO** |

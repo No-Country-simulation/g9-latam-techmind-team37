@@ -38,24 +38,31 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 </div>
 
 ```
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │                      Cliente Web (Navegador)                            │
-  │                      HTML5 + JS Vanilla + TailwindCSS                   │
-  │                      http://localhost:5173                              │
-  └────────────────────────────────────┬────────────────────────────────────┘
-                                       │ HTTP POST /contenido
-                                       ▼
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │              API Backend Principal — Spring Boot (Java 17)              │
-  │              Puerto 8080 · JPA / Hibernate · Flyway Migrations          │
-  └──────────────┬──────────────────────────────────────────┬───────────────┘
-                 │ HTTP POST /predecir                      │ JDBC
-                 ▼                                          ▼
-  ┌──────────────────────────────┐          ┌──────────────────────────────┐
-  │ Microservicio Data Science   │          │ Base de Datos PostgreSQL 16  │
-  │ FastAPI (Python) · :8000     │          │ Puerto 5432                  │
-  │ TF-IDF + LogisticRegression  │          │ contenidos · predicciones    │
-  └──────────────────────────────┘          └──────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│                    Oracle Cloud Infrastructure (OCI)                              │
+│ ┌───────────────────────────────────────────────────────────────────────────────┐ │
+│ │                  Docker & Docker Compose Multi-Container                      │ │
+│ │                                                                               │ │
+│ │ ┌───────────────────────────────────────────────────────────────────────────┐ │ │
+│ │ │                   Cliente Web / Frontend (Nginx)                          │ │ │
+│ │ │                   HTML5 + JS Vanilla + TailwindCSS                        │ │ │
+│ │ │                   http://localhost:5173                                   │ │ │
+│ │ └─────────────────────────────────────┬─────────────────────────────────────┘ │ │
+│ │                                       │ HTTP POST /contenido                  │ │
+│ │                                       ▼                                       │ │
+│ │ ┌───────────────────────────────────────────────────────────────────────────┐ │ │
+│ │ │            API Backend Principal — Spring Boot (Java 17)                  │ │ │
+│ │ │            Puerto 8080 · JPA / Hibernate · Flyway Migrations              │ │ │
+│ │ └──────────────┬──────────────────────────────────────────┬─────────────────┘ │ │
+│ │                │ HTTP POST /predecir                      │ JDBC              │ │
+│ │                ▼                                          ▼                   │ │
+│ │ ┌──────────────────────────────┐          ┌──────────────────────────────┐    │ │
+│ │ │ Microservicio Data Science   │          │ Base de Datos PostgreSQL 16  │    │ │
+│ │ │ FastAPI (Python) · :8000     │          │ Puerto 5432                  │    │ │
+│ │ │ Ensamble Calibrado (LR+SVC)  │          │ contenidos · predicciones    │    │ │
+│ │ └──────────────────────────────┘          └──────────────────────────────┘    │ │
+│ └───────────────────────────────────────────────────────────────────────────────┘ │
+└───────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -74,9 +81,10 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 - **Python 3.12**: Entorno de ejecución de inteligencia artificial.
 - **FastAPI & Uvicorn**: Microservicio asíncrono de alto rendimiento.
 - **Scikit-Learn**:
-  - `TfidfVectorizer` (3.000 características, unigramas y bigramas) para extracción de features y keywords.
-  - `LogisticRegression` (con pesos de clase balanceados) para la clasificación temática.
-- **Pandas & NumPy**: Procesamiento y limpieza del dataset técnico.
+  - `TfidfVectorizer` (sublineal, 6.000 características, n-gramas 1 a 3) para extracción de features y keywords.
+  - **Ensamble Calibrado (`VotingClassifier` Soft Voting)**: combina `LogisticRegression`, `CalibratedClassifierCV(LinearSVC)` y `ComplementNB` para máxima precisión y estimación de confianza.
+  - **Validación Cruzada Estratificada (K=5)** en desarrollo/notebook (87.28% CV Accuracy, 90.38% Holdout).
+- **Pandas & NumPy**: Procesamiento, augmentación de datos y limpieza del dataset técnico.
 - **Joblib**: Serialización y des-serialización de modelos entrenados.
 
 ### 🎨 Front-End (Web UI)
@@ -137,33 +145,43 @@ g9-latam-techmind-team37/
 │       ├── ingest_documents.py            # Ingesta masiva de documentos PDF / DOCX
 │       └── migrate_to_postgres.py         # Carga inicial de datos a PostgreSQL
 │
-├── qa/                                   # Módulo de Quality Assurance
-│   ├── casos-de-prueba/                  # Documentación de diseño de pruebas         
-│   │   └── (v3.0) Matriz de Casos de Prueba.xlsx          
-│   ├── evidencias/                       # Respaldos y ejecuciones de las pruebas                   
+├── qa/                                    # Módulo de Quality Assurance
+│   ├── casos-de-prueba/                   # Documentación de diseño de pruebas         
+│   │   ├── (v1.1) Matriz de Bugs.xlsx
+│   │   ├── (v1.1) Matriz de Mejoras.xlsx
+│   │   └── (v4.0) Matriz de Casos de Prueba.xlsx         
+│   ├── evidencias/                        # Respaldos y ejecuciones de las pruebas                   
 │   │   ├── Capturas de Pantalla/  
-│   │   │   ├── Backend (Spring Boot) 
-│   │   │   ├── Base de Datos (PostgreSQL 16) 
-│   │   │   └── Data Science (FastAPI)          
+│   │   │   ├── Backend (Spring Boot)/ 
+│   │   │   ├── Base de Datos (PostgreSQL 16)/ 
+│   │   │   ├── Data Science (FastAPI)/   
+│   │   │   └── FrontEnd/    
+│   │   │       ├── Bugs/ 
+│   │   │       ├── Casos de Prueba/ 
+│   │   │       └── Mejoras/      
 │   │   └── JSON/
-│   │       ├── Backend (Spring Boot) 
-│   │       └── Data Science (FastAPI)  
-│   ├── reportes/                         # Informes y resultados finales
+│   │       ├── Backend (Spring Boot)/ 
+│   │       └── Data Science (FastAPI)/  
+│   ├── reportes/                          # Informes y resultados finales
 │   │   ├── informes/
-│   │   │   └── (v2.0) Reporte de Resultados.xlsx
+│   │   │   └── (v3.0) Reporte de Resultados.pdf
 │   │   ├── Reporte de BUGS/
-│   │   │   └── FIX-columna-informaciones_adicionales.md
-│   │   │   └── FIX-docker-multiarch-spring-boot.md
-│   │   ├── resultados-sprint-1.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 1
-│   │   ├── resultados-sprint-2.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 2
-│   │   └── resultados-sprint-3.md        # Resumen ejecutivo de métricas, bugs encontrados del Sprint 3
-│   └── README.md                         # Documentación específica del módulo QA
+│   │   │   ├── FIX-Columna-informaciones_adicionales.md
+│   │   │   ├── FIX-Docker-multiarch-spring-boot.md 
+│   │   │   ├── FIX-Indicadores-de-estado-congelados-en-rojo-al-iniciar-la-aplicacion.md
+│   │   │   ├── FIX-Persistencia-del-formulario-tras-ejecutar-la clasificacion.md
+│   │   │   └── FIX-Redundancia-en-controles-del-modal-de-JSON.md
+│   │   ├── resultados-sprint-1.md         # Resumen ejecutivo de métricas, bugs encontrados del Sprint 1
+│   │   ├── resultados-sprint-2.md         # Resumen ejecutivo de métricas, bugs encontrados del Sprint 2
+│   │   ├── resultados-sprint-3.md         # Resumen ejecutivo de métricas, bugs encontrados del Sprint 3
+│   │   └── resultados-sprint-4.md         # Resumen ejecutivo de métricas, bugs encontrados del Sprint 4
+│   └── README.md                          # Documentación específica del módulo QA
 │
 │
-├── docker-compose.yml                    # Configuración de los 4 servicios en Docker
-├── setup.py                              # Installer y orquestador multiplataforma (Windows/Mac/Linux)
-├── how-to-run.md                         # Guía paso a paso de ejecución
-└── README.md                             # Documentación principal del proyecto
+├── docker-compose.yml                     # Configuración de los 4 servicios en Docker
+├── setup.py                               # Installer y orquestador multiplataforma (Windows/Mac/Linux)
+├── how-to-run.md                          # Guía paso a paso de ejecución
+└── README.md                              # Documentación principal del proyecto
 ```
 
 ---
