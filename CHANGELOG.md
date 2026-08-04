@@ -4,6 +4,18 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.5.0] — 2026-08-03 · Mejoras de Isotipo, Hover Unificado y Funciones de Historial
+
+### Añadido
+- **Botón "Ver más" / "Ver menos" en descripciones del Historial (`frontend/app.js`):** Agregada la capacidad de expandir y contraer descripciones extensas en las tarjetas de consulta tanto en el grid inicial como en la lista detallada.
+- **Botón "Copiar JSON" por consulta en el Historial (`frontend/app.js`):** Cada entrada del historial incorpora su propio botón interactivo para copiar el objeto JSON completo de la consulta al portapapeles con feedback instantáneo (`¡Copiado!`) y notificación flotante.
+
+### Corregido
+- **Contraste y color del Isotipo de TechMind en Modo Claro (`frontend/index.html`):** Ajustados los tonos del isotipo (`psychology`) a morado violeta intenso (`text-purple-700 dark:text-primary`) y el nombre TechMind a `text-purple-950 dark:text-primary-fixed`, resolviendo la falta de contraste en el modo claro.
+- **Hover unificado para Clasificador, Historial y Estado de servicios (`frontend/index.html` + `frontend/app.js`):** Creada la clase CSS `.sidebar-nav-item` que unifica el estilo hover para los 3 botones principales del sidebar con fondo violeta traslúcido, borde suave y elevación idéntica.
+
+---
+
 ## [1.4.0] — 2026-08-01 · Ajustes de UX/UI, Modo Claro Cálido y Notificaciones
 
 ### Corregido

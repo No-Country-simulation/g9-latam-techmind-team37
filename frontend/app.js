@@ -259,8 +259,8 @@ function bindEvents() {
             classifierView.classList.remove('hidden');
             historyView.classList.add('hidden');
             
-            navClassifier.className = "bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer";
-            navHistory.className = "text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer";
+            navClassifier.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
+            navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
             if (window.innerWidth < 768) {
                 closeSidebar();
@@ -271,8 +271,8 @@ function bindEvents() {
             classifierView.classList.add('hidden');
             historyView.classList.remove('hidden');
             
-            navHistory.className = "bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer";
-            navClassifier.className = "text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer";
+            navHistory.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
+            navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
             loadDetailedHistory();
 
@@ -458,20 +458,36 @@ async function loadHistory() {
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
                 const probPct = Math.round(prob * 100);
                 const timeLabel = formatTimeString(entry.created_at);
+                const textStr = entry.texto || entry.titulo || '';
+                const isLong = textStr.length > 30;
+                const expandBtnHtml = isLong ? `
+                    <div class="flex justify-end mt-1.5">
+                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="Expandir o contraer descripción">
+                            <span>Ver más</span>
+                            <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
+                        </button>
+                    </div>
+                ` : '';
 
                 return `
-                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0">
-                        <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
-                            <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(entry.categoria || 'Sin categoría')}</span>
-                            <span class="text-on-surface-variant font-label-sm text-[11px] shrink-0">${timeLabel}</span>
-                        </div>
-                        <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
-                        <p class="text-on-surface-variant text-xs mt-1 line-clamp-2 opacity-70">${escapeHtml(entry.texto || '')}</p>
-                        <div class="mt-3 flex items-center justify-between opacity-80 pt-2 border-t border-black/5 dark:border-white/5">
-                            <div class="flex items-center gap-1.5">
-                                <span class="font-label-sm text-[11px] text-on-surface-variant">Confianza: ${probPct}%</span>
+                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0 flex flex-col justify-between">
+                        <div>
+                            <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(entry.categoria || 'Sin categoría')}</span>
+                                <span class="text-on-surface-variant font-label-sm text-[11px] shrink-0">${timeLabel}</span>
                             </div>
-                            <span class="text-[10px] font-mono text-outline opacity-60">ID #${entry.id}</span>
+                            <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
+                            <p class="history-card-body text-on-surface-variant text-xs mt-1 line-clamp-2 opacity-80 leading-relaxed transition-all">${escapeHtml(textStr)}</p>
+                            ${expandBtnHtml}
+                        </div>
+                        <div class="mt-4 flex flex-wrap items-center justify-between opacity-90 pt-2.5 border-t border-black/5 dark:border-white/5 gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-label-sm text-[11px] text-on-surface-variant font-medium">Confianza: ${probPct}%</span>
+                            </div>
+                            <button type="button" class="btn-view-entry-json px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
+                                <span class="material-symbols-outlined text-xs pointer-events-none">code</span>
+                                <span class="pointer-events-none">Ver JSON</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -548,8 +564,19 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                     `;
                 }).join(' ');
 
+                const textStr = entry.texto || entry.titulo || '';
+                const isLong = textStr.length > 30;
+                const expandBtnHtml = isLong ? `
+                    <div class="flex justify-end mt-1.5">
+                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="Expandir o contraer descripción">
+                            <span>Ver más</span>
+                            <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
+                        </button>
+                    </div>
+                ` : '';
+
                 return `
-                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
+                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
                         <div class="flex-1 min-w-0 space-y-2">
                             <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                                 <span class="px-3 py-1 rounded-full text-xs font-label-sm border font-semibold ${config.colorClass} flex items-center gap-1.5 shadow-sm">
@@ -563,16 +590,21 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                 </span>
                             </div>
                             <h5 class="text-on-surface font-bold text-base sm:text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
-                            <p class="text-on-surface-variant text-sm line-clamp-2 opacity-70">${escapeHtml(entry.texto || 'Sin descripción disponible')}</p>
+                            <p class="history-card-body text-on-surface-variant text-sm line-clamp-2 opacity-80 leading-relaxed transition-all">${escapeHtml(textStr || 'Sin descripción disponible')}</p>
+                            ${expandBtnHtml}
                             <div class="flex flex-wrap gap-1.5 pt-1">
                                 ${keywordsPills || '<span class="text-xs text-on-surface-variant italic opacity-60">Sin palabras clave</span>'}
                             </div>
                         </div>
-                        <div class="flex items-center gap-4 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[120px] shrink-0 justify-between md:justify-end">
+                        <div class="flex flex-row md:flex-col items-center md:items-end justify-between gap-3 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[140px] shrink-0">
                             <div class="text-left md:text-right">
                                 <span class="block text-xs font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Confianza</span>
                                 <span class="text-xl sm:text-2xl font-black text-primary-fixed">${probPct}%</span>
                             </div>
+                            <button type="button" class="btn-view-entry-json px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
+                                <span class="material-symbols-outlined text-sm pointer-events-none">code</span>
+                                <span class="pointer-events-none">Ver JSON</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -597,7 +629,35 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
     }
 }
 
-// ── 7. Modal JSON Crudo ─────────────────────────────────────────────────────
+// ── 7. Modal JSON Crudo y Visualización de Consultas ─────────────────────────
+
+function showHistoryEntryJsonInModal(id) {
+    if (!id) return;
+    const entry = allHistoryData.find(item => String(item.id) === String(id));
+    if (!entry) {
+        showToast('⚠️ No se encontró la información de la consulta', 'warning');
+        return;
+    }
+
+    const fullPayload = {
+        entrada: { titulo: entry.titulo, texto: entry.texto },
+        resultado: {
+            id: entry.id,
+            categoria: entry.categoria,
+            probabilidad: entry.probabilidad,
+            informaciones_adicionales: entry.keywords,
+            created_at: entry.created_at
+        }
+    };
+
+    const modal = document.getElementById('json-modal');
+    const jsonPre = document.getElementById('json-content');
+    if (modal && jsonPre) {
+        jsonPre.textContent = JSON.stringify(fullPayload, null, 2);
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+}
 
 function toggleJsonModal() {
     const modal = document.getElementById('json-modal');
@@ -651,7 +711,7 @@ function copyJsonToClipboard() {
     });
 }
 
-// Global Backdrop Click & Escape Key listeners for JSON Modal
+// Global Backdrop Click & Escape Key listeners for JSON Modal, Expand & View buttons
 document.addEventListener('click', (e) => {
     const modal = document.getElementById('json-modal');
     if (modal && !modal.classList.contains('hidden') && e.target === modal) {
@@ -661,6 +721,31 @@ document.addEventListener('click', (e) => {
     const copyBtn = e.target.closest('#btn-copy-json');
     if (copyBtn) {
         copyJsonToClipboard();
+    }
+
+    const expandBtn = e.target.closest('.btn-toggle-expand');
+    if (expandBtn) {
+        // Encontrar el párrafo .history-card-body que es previo al div contenedor del botón
+        const parentDiv = expandBtn.parentElement;
+        const p = parentDiv ? parentDiv.previousElementSibling : null;
+        if (p && p.classList.contains('history-card-body')) {
+            const isExpanded = p.classList.contains('line-clamp-none');
+            if (isExpanded) {
+                p.classList.remove('line-clamp-none');
+                p.classList.add('line-clamp-2');
+                expandBtn.innerHTML = `<span>Ver más</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>`;
+            } else {
+                p.classList.remove('line-clamp-2');
+                p.classList.add('line-clamp-none');
+                expandBtn.innerHTML = `<span>Ver menos</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_less</span>`;
+            }
+        }
+    }
+
+    const viewItemBtn = e.target.closest('.btn-view-entry-json');
+    if (viewItemBtn) {
+        const id = viewItemBtn.getAttribute('data-id');
+        showHistoryEntryJsonInModal(id);
     }
 });
 

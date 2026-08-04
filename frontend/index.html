@@ -253,6 +253,49 @@
             }
         }
 
+        /* Sidebar buttons hover unificado para Clasificador, Historial y Estado de servicios */
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            font-family: var(--font-label-sm, inherit);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        /* Estado Activo (no hovered) */
+        .sidebar-nav-item.active-nav {
+            background-color: var(--primary-container) !important;
+            color: var(--on-primary-container) !important;
+            box-shadow: 0 4px 14px rgba(92, 62, 145, 0.2) !important;
+            border-color: transparent !important;
+        }
+
+        /* Hover unificado en Modo Claro (aplica a todos) */
+        .sidebar-nav-item:hover {
+            background-color: rgba(92, 62, 145, 0.12) !important;
+            color: #4c1d95 !important;
+            border-color: rgba(92, 62, 145, 0.25) !important;
+            box-shadow: 0 2px 10px rgba(92, 62, 145, 0.08) !important;
+        }
+
+        /* Hover unificado en Modo Oscuro (aplica a todos) */
+        .dark .sidebar-nav-item:hover {
+            background-color: rgba(160, 120, 255, 0.18) !important;
+            color: #e9ddff !important;
+            border-color: rgba(208, 188, 255, 0.3) !important;
+            box-shadow: 0 2px 12px rgba(160, 120, 255, 0.15) !important;
+        }
+
+        /* Fuerza que los iconos, textos y chevrons internos hereden el color en hover */
+        .sidebar-nav-item:hover *,
+        .sidebar-nav-item:hover span {
+            color: inherit !important;
+        }
+
         /* Evita que títulos/URLs sin espacios desborden el layout en pantallas angostas */
         h1,
         h2,
@@ -302,8 +345,8 @@
         <div class="mb-8 lg:mb-10 px-3 flex justify-between items-center gap-2">
             <div id="btn-brand-home" class="min-w-0 cursor-pointer group" title="Ir al inicio">
                 <h1
-                    class="font-headline-md text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-bold group-hover:opacity-80 transition-opacity">
-                    <span class="material-symbols-outlined text-3xl text-primary shrink-0"
+                    class="font-headline-md text-purple-950 dark:text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-extrabold group-hover:opacity-85 transition-opacity">
+                    <span class="material-symbols-outlined text-3xl text-purple-700 dark:text-primary shrink-0"
                         style="font-variation-settings: 'FILL' 1;">psychology</span>
                     TechMind
                 </h1>
@@ -317,12 +360,12 @@
         </div>
         <nav class="flex-1 space-y-3 overflow-y-auto">
             <a id="nav-classifier"
-                class="bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer">
+                class="sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-xl">category</span>
                 <span class="font-label-sm text-sm font-bold">Clasificador</span>
             </a>
             <a id="nav-history"
-                class="text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer">
+                class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
                 <span
                     class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">history</span>
                 <span class="font-label-sm text-sm font-semibold">Historial</span>
@@ -332,10 +375,10 @@
         <div class="relative mt-auto pt-6 border-t medium-border" style="overflow:visible;">
             <!-- Status Trigger Button -->
             <button id="btn-status-trigger" type="button"
-                class="w-full flex items-center justify-between gap-3 glass-panel px-4 py-3 rounded-xl border subtle-border bg-surface-container hover:bg-surface-container-high transition-all text-on-surface-variant hover:text-on-surface cursor-pointer active:scale-95 focus:outline-none">
+                class="sidebar-nav-item w-full flex items-center justify-between gap-3 text-on-surface-variant cursor-pointer active:scale-95 focus:outline-none">
                 <div class="flex items-center gap-2.5">
                     <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                    <span class="font-label-sm text-xs font-semibold">Estado de servicios</span>
+                    <span class="font-label-sm text-sm font-semibold">Estado de servicios</span>
                 </div>
                 <span id="status-chevron"
                     class="material-symbols-outlined text-lg transition-transform duration-300">expand_less</span>
@@ -608,7 +651,7 @@
 
 
     <!-- Script Principal -->
-    <script src="app.js"></script>
+    <script src="app.js?v=1.5.4"></script>
 </body>
 
 </html>
