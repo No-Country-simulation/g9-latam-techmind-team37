@@ -19,6 +19,7 @@
         rel="stylesheet" />
 
     <!-- Tailwind Configuration (Stitch Cyber AI Theme) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -370,6 +371,12 @@
                     class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">history</span>
                 <span class="font-label-sm text-sm font-semibold">Historial</span>
             </a>
+            <a id="nav-analytics"
+                class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
+                <span
+                    class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">analytics</span>
+                <span class="font-label-sm text-sm font-semibold">Análisis</span>
+            </a>
         </nav>
         <!-- Server Status Popover trigger inside Sidebar -->
         <div class="relative mt-auto pt-6 border-t medium-border" style="overflow:visible;">
@@ -666,6 +673,88 @@
             <!-- Detailed History Cards -->
             <div id="detailed-history-list" class="flex flex-col gap-4">
                 <!-- Dynamically populated by app.js -->
+            </div>
+        </div>
+
+        <!-- Analytics View Section -->
+        <div id="analytics-view-section" class="hidden flex-1 flex flex-col gap-6 lg:gap-8">
+            <!-- KPI Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+                <!-- KPI 1: Total Consultas -->
+                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
+                    <div class="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 shrink-0">
+                        <span class="material-symbols-outlined text-2xl">analytics</span>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Total Clasificaciones</p>
+                        <h3 id="kpi-total-queries" class="font-headline-md text-2xl font-bold text-on-surface mt-0.5">--</h3>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Categoría Líder -->
+                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
+                    <div class="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 shrink-0">
+                        <span class="material-symbols-outlined text-2xl">emoji_events</span>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Categoría Líder</p>
+                        <h3 id="kpi-top-category" class="font-headline-md text-xl font-bold text-on-surface mt-0.5">--</h3>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Confianza Promedio -->
+                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
+                    <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <span class="material-symbols-outlined text-2xl">verified</span>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Confianza Promedio</p>
+                        <h3 id="kpi-avg-confidence" class="font-headline-md text-2xl font-bold text-on-surface mt-0.5">--%</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+                <!-- Left Chart: Distribución por Categoría (Doughnut) -->
+                <div class="lg:col-span-5 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-purple-600 dark:text-primary">pie_chart</span>
+                            Distribución por Categoría
+                        </h3>
+                    </div>
+                    <div class="relative flex-1 min-h-[260px] max-h-[340px] flex items-center justify-center">
+                        <canvas id="chart-categories"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right Chart: Actividad por Hora del Día (Area Chart) -->
+                <div class="lg:col-span-7 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400">schedule</span>
+                            Actividad por Hora del Día (24h)
+                        </h3>
+                    </div>
+                    <div class="relative flex-1 min-h-[260px] max-h-[340px] flex items-center justify-center">
+                        <canvas id="chart-hourly"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bottom Full-Width Section: Palabras Clave Más Frecuentes (Interactive Tag Cloud) -->
+                <div class="lg:col-span-12 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400">label</span>
+                            Palabras Clave Más Frecuentes
+                        </h3>
+                        <span class="font-label-sm text-xs text-on-surface-variant">Top términos TF-IDF</span>
+                    </div>
+                    <div id="keywords-cloud-container" class="flex flex-wrap gap-2.5 items-center justify-start py-2">
+                        <!-- Renderizado dinámicamente como badges/pills con frecuencia -->
+                    </div>
+                </div>
             </div>
         </div>
 

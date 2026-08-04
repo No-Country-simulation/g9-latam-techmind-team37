@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     initHealthChecks();
     fetchSystemStats();
-    setInterval(fetchSystemStats, 5000);
-    setInterval(initHealthChecks, 15000);
+    setInterval(fetchSystemStats, 10000);
+    setInterval(initHealthChecks, 30000);
     bindEvents();
     loadHistory(); // Carga el historial desde PostgreSQL al iniciar
 });
@@ -301,16 +301,20 @@ function bindEvents() {
     // View Switcher Control (SPA subpage logic)
     const navClassifier = document.getElementById('nav-classifier');
     const navHistory = document.getElementById('nav-history');
+    const navAnalytics = document.getElementById('nav-analytics');
     const classifierView = document.getElementById('classifier-view-section');
     const historyView = document.getElementById('history-view-section');
+    const analyticsView = document.getElementById('analytics-view-section');
 
-    if (navClassifier && navHistory && classifierView && historyView) {
+    if (navClassifier && navHistory && navAnalytics && classifierView && historyView && analyticsView) {
         const showClassifier = () => {
             classifierView.classList.remove('hidden');
             historyView.classList.add('hidden');
-            
+            analyticsView.classList.add('hidden');
+
             navClassifier.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
             navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
             if (window.innerWidth < 768) {
                 closeSidebar();
@@ -320,9 +324,11 @@ function bindEvents() {
         const showHistory = () => {
             classifierView.classList.add('hidden');
             historyView.classList.remove('hidden');
-            
+            analyticsView.classList.add('hidden');
+
             navHistory.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
             navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
             loadDetailedHistory();
 
@@ -331,8 +337,26 @@ function bindEvents() {
             }
         };
 
+        const showAnalytics = () => {
+            classifierView.classList.add('hidden');
+            historyView.classList.add('hidden');
+            analyticsView.classList.remove('hidden');
+            analyticsView.classList.add('flex');
+
+            navAnalytics.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
+            navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+
+            loadAnalyticsDashboard();
+
+            if (window.innerWidth < 768) {
+                closeSidebar();
+            }
+        };
+
         navClassifier.addEventListener('click', showClassifier);
         navHistory.addEventListener('click', showHistory);
+        navAnalytics.addEventListener('click', showAnalytics);
 
         const brandHome = document.getElementById('btn-brand-home');
         if (brandHome) {
@@ -429,8 +453,14 @@ async function handleClassification() {
         document.getElementById('content-title').value = '';
         document.getElementById('content-body').value = '';
 
-        // Recargar el historial actualizado desde PostgreSQL
-        setTimeout(() => loadHistory(), 600);
+        // Recargar vistas activas solo si están visibles para proteger recursos del servidor
+        setTimeout(() => {
+            loadHistory();
+            const analyticsView = document.getElementById('analytics-view-section');
+            if (analyticsView && !analyticsView.classList.contains('hidden')) {
+                loadAnalyticsDashboard();
+            }
+        }, 600);
 
         showToast('Contenido clasificado y guardado', 'success');
 
@@ -877,4 +907,136 @@ function showToast(message, type = 'info') {
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+// ── 6. Dashboard de Analytics & Gráficos (Chart.js) ──────────────────────────
+
+let chartCategoriesInstance = null;
+let chartHourlyInstance = null;
+let chartKeywordsInstance = null;
+
+async function loadAnalyticsDashboard() {
+    try {
+        const tzOffset = -new Date().getTimezoneOffset();
+        const res = await fetch(`${DS_API_URL}/analytics?t=${Date.now()}&tz_offset=${tzOffset}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // 1. KPIs
+        const kpiTotal = document.getElementById('kpi-total-queries');
+        const kpiTop = document.getElementById('kpi-top-category');
+        const kpiAvg = document.getElementById('kpi-avg-confidence');
+
+        if (kpiTotal) kpiTotal.textContent = data.total_count || 0;
+        if (kpiTop) kpiTop.textContent = data.top_categoria || 'N/A';
+        if (kpiAvg) kpiAvg.textContent = `${data.avg_prob || 0}%`;
+
+        if (typeof Chart === 'undefined') return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#cbc3d7' : '#524b3f';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+
+        // 2. Chart 1: Doughnut (Distribución por Categoría)
+        const ctxCat = document.getElementById('chart-categories');
+        if (ctxCat) {
+            const catLabels = Object.keys(data.categorias || {});
+            const catValues = Object.values(data.categorias || {});
+            const colors = [
+                '#a078ff', '#4edea3', '#38bdf8', '#fbbf24',
+                '#f43f5e', '#fb923c', '#818cf8', '#2dd4bf'
+            ];
+
+            if (chartCategoriesInstance) chartCategoriesInstance.destroy();
+
+            chartCategoriesInstance = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: catLabels,
+                    datasets: [{
+                        data: catValues,
+                        backgroundColor: colors.slice(0, catLabels.length),
+                        borderWidth: 2,
+                        borderColor: isDark ? '#171f33' : '#e8e2d5'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: textColor, font: { family: 'Inter', size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Chart 2: Area Line (Actividad por Hora del Día)
+        const ctxHour = document.getElementById('chart-hourly');
+        if (ctxHour) {
+            const hourLabels = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
+            const hourValues = data.horas || Array(24).fill(0);
+
+            if (chartHourlyInstance) chartHourlyInstance.destroy();
+
+            chartHourlyInstance = new Chart(ctxHour, {
+                type: 'line',
+                data: {
+                    labels: hourLabels,
+                    datasets: [{
+                        label: 'Consultas',
+                        data: hourValues,
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#38bdf8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor, precision: 0 }, grid: { color: gridColor }, beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // 4. Keywords Tag Cloud Container
+        const kwContainer = document.getElementById('keywords-cloud-container');
+        if (kwContainer) {
+            const kwList = data.top_keywords || [];
+            if (kwList.length === 0) {
+                kwContainer.innerHTML = '<span class="font-label-sm text-xs text-on-surface-variant opacity-60">Sin datos de palabras clave</span>';
+            } else {
+                const maxCount = Math.max(...kwList.map(k => k.count), 1);
+                kwContainer.innerHTML = kwList.map(item => {
+                    const ratio = item.count / maxCount;
+                    const badgeClass = ratio > 0.7
+                        ? 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/40 text-sm py-1.5 px-3.5 font-bold shadow-md'
+                        : ratio > 0.4
+                        ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/30 text-xs py-1 px-3 font-semibold'
+                        : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 text-xs py-1 px-2.5 font-medium';
+
+                    return `
+                        <div class="inline-flex items-center gap-1.5 rounded-xl border ${badgeClass} transition-all hover:scale-105 cursor-default">
+                            <span>#${escapeHtml(item.word)}</span>
+                            <span class="text-[10px] opacity-75 bg-surface-container-high px-1.5 py-0.5 rounded-md font-mono">${item.count}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+    } catch (e) {
+        console.error('Error cargando analytics:', e);
+    }
 }

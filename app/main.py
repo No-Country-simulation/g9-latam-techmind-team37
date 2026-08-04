@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, field_validator
 
-from app.database import init_db, get_predicciones
+from app.database import init_db, get_predicciones, get_analytics_data
 
 load_dotenv()
 
@@ -52,7 +52,14 @@ RUIDO_TECNICO = {
     "practica", "práctica", "practicas", "prácticas", "paso", "pasos", "aplicacion", "aplicación",
     "aplicaciones", "sistema", "sistemas", "servicio", "servicios", "completo", "completa"
 }
-STOPWORDS_TOTAL = STOPWORDS_ES.union(RUIDO_TECNICO)
+RUIDO_CONECTORES = {
+    "mediante", "globalmente", "además", "ademas", "través", "traves", "debido", "según", "segun",
+    "cada", "forma", "manera", "principalmente", "especialmente", "actualmente", "diferentes",
+    "varios", "varias", "asimismo", "generalmente", "realmente", "nivel", "tipo", "tipos",
+    "parte", "partes", "medio", "medios", "modo", "modos", "hacer", "hace", "hacen", "haciendo",
+    "realizar", "realiza", "realizan", "realizando", "permite", "permiten", "permitiendo"
+}
+STOPWORDS_TOTAL = STOPWORDS_ES.union(RUIDO_TECNICO).union(RUIDO_CONECTORES)
 
 
 # ── Funciones del pipeline ───────────────────────────────────────────────────
@@ -311,3 +318,12 @@ def obtener_metricas_sistema() -> dict:
 )
 def system_stats():
     return obtener_metricas_sistema()
+
+
+@app.get(
+    "/analytics",
+    summary="Dashboard de estadísticas y análisis visual",
+    description="Devuelve métricas agrupadas de la base de datos PostgreSQL: distribución por categoría, horas pico de actividad y top keywords.",
+)
+def analytics(tz_offset: int = 0):
+    return get_analytics_data(tz_offset_minutes=tz_offset)

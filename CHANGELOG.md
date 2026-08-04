@@ -4,6 +4,35 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.7.0] — 2026-08-04 · Dashboard de Análisis Gráfico y Estadísticas en Tiempo Real (Chart.js + PostgreSQL)
+
+### Añadido
+- **Función y Endpoint de Analytics (`app/database.py` + `app/main.py`):** Creado el módulo `get_analytics_data()` y el endpoint `GET /analytics` en FastAPI, que ejecuta consultas SQL optimizadas sobre la base de datos PostgreSQL para obtener:
+  - **KPIs:** Total de predicciones registradas, categoría con mayor volumen de consultas y nivel promedio de confianza del modelo.
+  - **Distribución por Categoría:** Conteo relativo entre las 8 categorías del sistema.
+  - **Distribución Horaria (24h):** Actividad agrupada por hora del día (`EXTRACT(HOUR FROM created_at)`).
+  - **Frecuencia de Keywords:** Ranking de las 15 palabras clave más comunes normalizadas a minúsculas y desduplicadas por documento.
+
+- **Sección e Interfaz "Análisis" en la Web UI (`frontend/index.html` + `frontend/app.js`):**
+  - **Navegación:** Agregado el nuevo botón **"Análisis"** (`analytics`) en la barra de navegación lateral (Sidebar) ubicado justo debajo de *Historial*.
+  - **Librería de Gráficos:** Integración de **Chart.js 4.4+** vía CDN.
+  - **KPI Cards:** 3 tarjetas superiores (*Total Clasificaciones*, *Categoría Líder*, *Confianza Promedio*) con iconografía neón.
+  - **Visualizaciones Interactivas:**
+    1. 🍩 **Doughnut Chart:** Distribución porcentual por categoría técnica.
+    2. 📈 **Area Line Chart:** Curva de actividad de consultas a lo largo de las 24 horas del día.
+    3. 🏷️ **Nube de Etiquetas (Tag Cloud de Badges/Pills):** Reemplazado el gráfico de barras por una rejilla compacta de pastillas neón interactivas con contador de frecuencia (`#keyword  count`), ahorrando más del 60% de espacio vertical.
+  - **Compatibilidad de Tema:** Los gráficos adaptan dinámicamente sus colores, rejillas y etiquetas al cambiar entre *Modo Claro* y *Modo Oscuro*.
+
+### Corregido / Mejorado
+- **Refresco condicional/lazy de Analytics para conservar recursos (`frontend/app.js`):** La llamada a `loadAnalyticsDashboard()` tras una clasificación ahora verifica si la pestaña *"Análisis"* está activa. Si el usuario está en la vista del Clasificador, no realiza ninguna petición al servidor hasta que abra la pestaña.
+- **Intervalo equilibrado de polling de métricas (`frontend/app.js`):** Ajustado el intervalo de consulta de `fetchSystemStats` a 10 segundos, logrando un equilibrio perfecto entre fluidez en tiempo real y conservación de recursos en la VM de OCI.
+- **Evitado de caché en consultas de telemetría (`frontend/app.js`):** Agregado el parámetro de marcas de tiempo `?t=${Date.now()}` a las peticiones HTTP del dashboard para evitar que el navegador responda con datos cacheados.
+- **Adaptación automática a la zona horaria del usuario (`app/database.py` + `frontend/app.js`):** El frontend detecta automáticamente el desfasaje horario del navegador (`new Date().getTimezoneOffset()`) y lo envía en el parámetro `tz_offset`. PostgreSQL desplaza el cálculo de `EXTRACT(HOUR FROM (created_at + interval))` para que la curva de actividad 24h muestre exactamente las horas locales de la región del usuario (ej: 16:00 hs en lugar de 19:00 hs UTC).
+- **Filtro de conectores y adverbios genéricos (`app/main.py` + `app/database.py`):** Agregado el conjunto `RUIDO_CONECTORES` (*mediante, globalmente, además, través, según, principal, cada, etc.*) a las stopwords del pipeline NLP y a la agregación de analytics, asegurando que el ranking de palabras clave solo muestre conceptos y tecnologías puramente técnicas (*FastAPI, Docker, Spring Boot, PostgreSQL, JWT, etc.*).
+- **Normalización estricta de palabras clave (`app/database.py`):** Removidos corchetes `[` `]` y comillas simples/dobles residuales en la columna `palabras_clave` de PostgreSQL antes de contabilizar frecuencias.
+
+---
+
 ## [1.6.1] — 2026-08-04 · Métricas en Tiempo Real del Servidor OCI (CPU, RAM y Swap)
 
 ### Añadido
