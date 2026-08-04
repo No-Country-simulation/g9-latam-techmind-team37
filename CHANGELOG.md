@@ -4,7 +4,41 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
-## [1.5.0] — 2026-08-01 · Optimización del Modelo de ML (Ensamble Calibrado, TF-IDF Sublineal y Dataset Ampliado)
+## [1.5.2] — 2026-08-03 · Optimización de `docker-compose.yml` para OCI Free Tier (1 vCPU · 1 GB RAM · 2 GB Swap)
+
+### Mejorado
+- **Límites de memoria por contenedor (`docker-compose.yml`):** Se agregaron `mem_limit` y `memswap_limit` a los cuatro servicios para prevenir que el OOM Killer del kernel mate procesos silenciosamente cuando la RAM se agota. El presupuesto total queda dentro del límite de 1 GB de RAM real, usando el swap de 2 GB como colchón ante picos de carga:
+
+  | Servicio | `mem_limit` (RAM) | `memswap_limit` (RAM + Swap) |
+  |---|---|---|
+  | `postgres` | 150 MB | 300 MB |
+  | `fastapi` | 220 MB | 440 MB |
+  | `springboot` | 384 MB | 768 MB |
+  | `frontend` | 48 MB | 96 MB |
+  | **Total estimado** | **~982 MB** | **dentro del 1 GB** |
+
+- **Límites de CPU por contenedor (`docker-compose.yml`):** Se agregó la directiva `cpus` a cada servicio para evitar que un solo contenedor monopolice el único vCPU disponible:
+  - `postgres`: `0.25` (mayormente I/O)
+  - `fastapi`: `0.50` (inferencia por request)
+  - `springboot`: `0.50` (API transaccional)
+  - `frontend`: `0.10` (Nginx estático)
+
+- **Tuning de PostgreSQL para bajo consumo de RAM (`docker-compose.yml`):** Se agregó la directiva `command` con parámetros optimizados para entornos de 1 GB:
+  - `shared_buffers=32MB` (reducido desde el default de 128MB)
+  - `work_mem=4MB` (20 conexiones × 4MB = 80MB pico)
+  - `maintenance_work_mem=32MB`
+  - `effective_cache_size=128MB`
+  - `max_connections=20` (suficiente para el pool de Spring Boot)
+  - `wal_buffers=8MB`, `checkpoint_completion_target=0.9`
+
+- **Uvicorn single-worker (`docker-compose.yml`):** Se sobreescribió el `command` del servicio `fastapi` para forzar `--workers 1`, evitando que Uvicorn spawne múltiples workers en una instancia de 1 vCPU. Se agregó `--limit-max-requests 500` para que el worker se reinicie periódicamente y libere posibles memory leaks de las librerías de ML.
+
+- **Healthcheck más tolerante para PostgreSQL:** Se aumentó `start_period` de 0s a 20s para dar más tiempo de arranque a la base de datos en una instancia con I/O lenta (OCI Free Tier usa almacenamiento de bloque compartido).
+
+---
+
+## [1.5.1] — 2026-08-03 · Actualización del Notebook de Data Science (Alineación con Pipeline de Producción + Cross-Validation)
+
 
 ### Añadido / Mejorado
 - **Ampliación del Dataset de Entrenamiento (`data-science/data/raw/contenidos_tecnicos.csv`):** Dataset expandido de ~221 a **259 registros técnicos balanceados** (+38 registros especializados), resolviendo ambigüedades y reforzando la precisión en las categorías **Mobile** (*SwiftUI, Jetpack Compose, Flutter Dart AOT, React Native Fabric, Kotlin KMP*) y **Cloud** (*AWS VPC, Lambda, S3, CloudFront, Terraform HCL, OCI Autonomous DB, FinOps*).
