@@ -387,22 +387,73 @@
             <!-- Status Popover Dropdown -->
             <div id="status-popover"
                 class="absolute bottom-full left-0 right-0 mb-3 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2 z-50">
+                
+                <!-- Microservicios -->
+                <div class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant">Microservicios</div>
                 <div id="status-springboot" class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">Spring
-                        Boot :8080</span>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">Spring Boot :8080</span>
                 </div>
                 <div id="status-fastapi" class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">FastAPI ML
-                        :8000</span>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">FastAPI ML :8000</span>
                 </div>
                 <div id="status-postgres" class="flex items-center gap-2">
-                    <div class="w-2.5 h-2.5 rounded-full led-pulse shrink-0"
-                        style="background-color: var(--led-ok-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-ok-text);">PostgreSQL
-                        :5432</span>
+                    <div class="w-2.5 h-2.5 rounded-full led-pulse shrink-0" style="background-color: var(--led-ok-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-ok-text);">PostgreSQL :5432</span>
                 </div>
+
+                <div class="border-t medium-border my-0.5"></div>
+
+                <!-- Métricas del Servidor OCI -->
+                <div class="flex items-center justify-between">
+                    <span class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant">Servidor OCI</span>
+                    <span class="font-label-sm text-[10px] text-tertiary-container dark:text-tertiary font-semibold">1 vCPU · 1 GB RAM</span>
+                </div>
+
+                <!-- Metric 1: CPU -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-[11px] font-label-sm">
+                        <span class="text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px]">memory</span> CPU
+                        </span>
+                        <span id="sys-cpu-val" class="font-semibold text-on-surface">--%</span>
+                    </div>
+                    <div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+                        <div id="sys-cpu-bar" class="bg-cyan-500 h-full w-0% transition-all duration-500"></div>
+                    </div>
+                </div>
+
+                <!-- Metric 2: RAM -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-[11px] font-label-sm">
+                        <span class="text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px]">developer_board</span> RAM Usada
+                        </span>
+                        <span id="sys-ram-val" class="font-semibold text-on-surface">-- / -- MB</span>
+                    </div>
+                    <div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+                        <div id="sys-ram-bar" class="bg-purple-500 h-full w-0% transition-all duration-500"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] pt-0.5">
+                        <span id="sys-ram-free-badge" class="text-emerald-600 dark:text-emerald-400 font-medium">Libre: -- MB</span>
+                        <span id="sys-ram-pct" class="text-on-surface-variant font-mono">--%</span>
+                    </div>
+                </div>
+
+                <!-- Metric 3: Swap -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-[11px] font-label-sm">
+                        <span class="text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px]">swap_horiz</span> Swap
+                        </span>
+                        <span id="sys-swap-val" class="font-semibold text-on-surface">-- / -- MB</span>
+                    </div>
+                    <div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+                        <div id="sys-swap-bar" class="bg-amber-500 h-full w-0% transition-all duration-500"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </aside>

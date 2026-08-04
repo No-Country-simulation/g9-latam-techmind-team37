@@ -215,3 +215,77 @@ def categorias():
     if modelo is None:
         raise HTTPException(status_code=503, detail="Modelo no cargado")
     return {"categorias": sorted(modelo.classes_.tolist())}
+
+
+# ── Módulo de Métricas de Servidor OCI ───────────────────────────────────────
+
+try:
+    import psutil
+except ImportError:
+    psutil = None
+
+
+def obtener_metricas_sistema() -> dict:
+    if psutil is not None:
+        try:
+            cpu = psutil.cpu_percent(interval=0.1)
+            vm = psutil.virtual_memory()
+            swap = psutil.swap_memory()
+            return {
+                "cpu_percent": round(cpu, 1),
+                "ram_total_mb": round(vm.total / (1024 * 1024), 1),
+                "ram_used_mb": round(vm.used / (1024 * 1024), 1),
+                "ram_free_mb": round(vm.available / (1024 * 1024), 1),
+                "ram_percent": round(vm.percent, 1),
+                "swap_total_mb": round(swap.total / (1024 * 1024), 1),
+                "swap_used_mb": round(swap.used / (1024 * 1024), 1),
+                "swap_percent": round(swap.percent, 1),
+            }
+        except Exception:
+            pass
+
+    load = 0.0
+    if hasattr(os, "getloadavg"):
+        try:
+            load = round(os.getloadavg()[0] * 100 / (os.cpu_count() or 1), 1)
+        except Exception:
+            pass
+
+    ram_total, ram_avail = 1024.0, 512.0
+    if os.path.exists("/proc/meminfo"):
+        try:
+            mem = {}
+            with open("/proc/meminfo", "r") as f:
+                for line in f:
+                    parts = line.split(":")
+                    if len(parts) == 2:
+                        key = parts[0].strip()
+                        val = parts[1].strip().split()[0]
+                        mem[key] = int(val)
+            ram_total = round(mem.get("MemTotal", 1048576) / 1024, 1)
+            ram_avail = round(mem.get("MemAvailable", mem.get("MemFree", 524288)) / 1024, 1)
+        except Exception:
+            pass
+
+    ram_used = round(ram_total - ram_avail, 1)
+    ram_pct = round((ram_used / ram_total) * 100, 1) if ram_total > 0 else 0.0
+
+    return {
+        "cpu_percent": load,
+        "ram_total_mb": ram_total,
+        "ram_used_mb": ram_used,
+        "ram_free_mb": ram_avail,
+        "ram_percent": ram_pct,
+        "swap_total_mb": 0.0,
+        "swap_used_mb": 0.0,
+        "swap_percent": 0.0,
+    }
+
+
+@app.get(
+    "/system-stats",
+    summary="Métricas de hardware del servidor OCI",
+    description="Devuelve el consumo en tiempo real de CPU, RAM (total, usada, libre) y Swap de la instancia.",
+)
+def system_stats():
+    return obtener_metricas_sistema()

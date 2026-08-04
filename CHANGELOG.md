@@ -4,6 +4,19 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.6.1] — 2026-08-04 · Métricas en Tiempo Real del Servidor OCI (CPU, RAM y Swap)
+
+### Añadido
+- **Endpoint de telemetría de hardware en FastAPI (`app/main.py`):** Creado el endpoint `GET /system-stats` respaldado por `psutil` (con fallback nativo a `/proc/meminfo` y `os.getloadavg()` en Linux), que expone métricas en tiempo real de consumo de CPU (%), RAM total/usada/disponible (MB) y Swap (MB).
+- **Widgets visuales de telemetría en el Frontend (`frontend/index.html` + `frontend/app.js`):** Expandido el popover *"Estado de servicios"* en la barra lateral (Sidebar) con 3 barras de progreso animadas en estética *Cyber AI Dark Mode*:
+  - 💻 **Carga de CPU (1 vCPU OCI)** con porcentaje actualizado dinámicamente.
+  - 🧠 **Consumo de RAM (1 GB OCI)** con lectura de megabytes usados/totales y badge indicador de **RAM Libre**.
+  - 🔄 **Consumo de Swap (2 GB OCI)** con barra de capacidad.
+  - **Polling en tiempo real:** Actualización automática cada 5 segundos.
+  - **Código de colores reactivo:** Verde (RAM < 80%), Amarillo (RAM 80%-90%), Rojo (RAM > 90%).
+
+---
+
 ## [1.6.0] — 2026-08-03 · Mejoras de Isotipo, Hover Unificado y Funciones de Historial
 
 ### Añadido

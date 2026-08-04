@@ -44,11 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (toggleIcon) toggleIcon.textContent = 'chevron_right';
     }
     initHealthChecks();
+    fetchSystemStats();
+    setInterval(fetchSystemStats, 5000);
+    setInterval(initHealthChecks, 15000);
     bindEvents();
     loadHistory(); // Carga el historial desde PostgreSQL al iniciar
 });
 
-// ── 1. Health Checks de Servicios ──────────────────────────────────────────
+// ── 1. Health Checks & Métricas de Servidor ───────────────────────────────
 
 async function initHealthChecks() {
     // Check FastAPI
@@ -79,6 +82,49 @@ async function initHealthChecks() {
 
     // PostgreSQL status
     setServiceStatus('status-postgres', true, 'PostgreSQL :5432');
+}
+
+async function fetchSystemStats() {
+    try {
+        const res = await fetch(`${DS_API_URL}/system-stats`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // CPU
+        const cpuValEl = document.getElementById('sys-cpu-val');
+        const cpuBarEl = document.getElementById('sys-cpu-bar');
+        if (cpuValEl) cpuValEl.textContent = `${data.cpu_percent}%`;
+        if (cpuBarEl) cpuBarEl.style.width = `${Math.min(100, data.cpu_percent)}%`;
+
+        // RAM
+        const ramValEl = document.getElementById('sys-ram-val');
+        const ramBarEl = document.getElementById('sys-ram-bar');
+        const ramFreeEl = document.getElementById('sys-ram-free-badge');
+        const ramPctEl = document.getElementById('sys-ram-pct');
+
+        if (ramValEl) ramValEl.textContent = `${data.ram_used_mb} / ${data.ram_total_mb} MB`;
+        if (ramPctEl) ramPctEl.textContent = `${data.ram_percent}%`;
+        if (ramFreeEl) ramFreeEl.textContent = `Libre: ${data.ram_free_mb} MB`;
+        if (ramBarEl) {
+            ramBarEl.style.width = `${Math.min(100, data.ram_percent)}%`;
+            if (data.ram_percent > 90) {
+                ramBarEl.className = 'bg-rose-500 h-full transition-all duration-500';
+            } else if (data.ram_percent > 80) {
+                ramBarEl.className = 'bg-amber-500 h-full transition-all duration-500';
+            } else {
+                ramBarEl.className = 'bg-purple-500 h-full transition-all duration-500';
+            }
+        }
+
+        // Swap
+        const swapValEl = document.getElementById('sys-swap-val');
+        const swapBarEl = document.getElementById('sys-swap-bar');
+        if (swapValEl) swapValEl.textContent = `${data.swap_used_mb} / ${data.swap_total_mb} MB`;
+        if (swapBarEl) swapBarEl.style.width = `${Math.min(100, data.swap_percent)}%`;
+
+    } catch (e) {
+        // Ignorar si no está disponible
+    }
 }
 
 function setServiceStatus(elementId, isOk, text) {
