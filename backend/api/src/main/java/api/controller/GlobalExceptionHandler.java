@@ -26,4 +26,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(Map.of("error", ex.getMessage()));
     }
-}
+    @ExceptionHandler(api.service.UsuarioService.UsuarioYaExisteException.class)
+    public ResponseEntity<Map<String, String>> handleUsuarioYaExiste(api.service.UsuarioService.UsuarioYaExisteException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(api.service.UsuarioService.CredencialesInvalidasException.class)
+    public ResponseEntity<Map<String, String>> handleCredencialesInvalidas(api.service.UsuarioService.CredencialesInvalidasException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", ex.getMessage()));
+    }}
