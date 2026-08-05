@@ -81,4 +81,96 @@ def get_predicciones(limit: int = 50):
         return []
 
 
+def get_analytics_data(tz_offset_minutes: int = 0):
+    """
+    Agrupa estadísticas visuales de la base de datos PostgreSQL:
+    - KPIs (total predicciones, categoría líder, avg probabilidad)
+    - Conteo por categoría (Doughnut chart)
+    - Conteo por hora del día 00-23 adaptado a la zona horaria del usuario (Area chart)
+    - Top 15 palabras clave más frecuentes (Tag cloud)
+    """
+    try:
+        con = get_connection()
+        cur = con.cursor()
+
+        # 1. Total & Avg Prob
+        cur.execute("SELECT COUNT(*), AVG(probabilidad) FROM predicciones;")
+        tot_row = cur.fetchone()
+        total_count = tot_row[0] if tot_row and tot_row[0] else 0
+        avg_prob = round(float(tot_row[1]) * 100, 1) if tot_row and tot_row[1] else 0.0
+
+        # 2. Categorías
+        cur.execute("""
+            SELECT categoria, COUNT(*) AS total
+            FROM predicciones
+            GROUP BY categoria
+            ORDER BY total DESC;
+        """)
+        cat_rows = cur.fetchall()
+        categorias = {r[0]: r[1] for r in cat_rows}
+        top_categoria = cat_rows[0][0] if cat_rows else "N/A"
+
+        # 3. Horas del día (00 a 23) ajustadas a la zona horaria del usuario
+        cur.execute(
+            """
+            SELECT EXTRACT(HOUR FROM (created_at + (%s || ' minutes')::interval))::int AS hora, COUNT(*)
+            FROM predicciones
+            WHERE created_at IS NOT NULL
+            GROUP BY hora
+            ORDER BY hora;
+            """,
+            (tz_offset_minutes,),
+        )
+        hour_rows = cur.fetchall()
+        hour_dict = {r[0]: r[1] for r in hour_rows}
+        horas = [hour_dict.get(h, 0) for h in range(24)]
+
+        # 4. Top Keywords (normalizado a minúsculas y desduplicado por documento)
+        cur.execute("SELECT palabras_clave FROM predicciones WHERE palabras_clave IS NOT NULL AND palabras_clave != '';")
+        kw_rows = cur.fetchall()
+        STOPWORDS_IGNORE = {
+            "mediante", "globalmente", "además", "ademas", "través", "traves", "debido", "según", "segun",
+            "cada", "forma", "manera", "principalmente", "especialmente", "actualmente", "diferentes",
+            "varios", "varias", "asimismo", "generalmente", "realmente", "nivel", "tipo", "tipos",
+            "parte", "partes", "medio", "medios", "modo", "modos", "hacer", "hace", "hacen", "haciendo",
+            "realizar", "realiza", "realizan", "realizando", "permite", "permiten", "permitiendo",
+            "tutorial", "guia", "guía", "introduccion", "introducción", "explicacion", "explicación",
+            "concepto", "conceptos", "basico", "básicos", "basicos", "básica", "basica", "avanzado",
+            "avanzada", "desarrollo", "creacion", "creación", "uso", "usando", "ejemplo", "ejemplos"
+        }
+        kw_counts = {}
+        for row in kw_rows:
+            raw_text = row[0].replace("[", "").replace("]", "").replace('"', '').replace("'", "")
+            words = set([
+                w.strip().lower() for w in raw_text.split(",")
+                if w.strip() and len(w.strip()) > 2 and w.strip().lower() not in STOPWORDS_IGNORE
+            ])
+            for w in words:
+                kw_counts[w] = kw_counts.get(w, 0) + 1
+
+        top_kw = sorted(kw_counts.items(), key=lambda x: x[1], reverse=True)[:15]
+
+        cur.close()
+        con.close()
+
+        return {
+            "total_count": total_count,
+            "avg_prob": avg_prob,
+            "top_categoria": top_categoria,
+            "categorias": categorias,
+            "horas": horas,
+            "top_keywords": [{"word": k[0], "count": k[1]} for k in top_kw]
+        }
+    except Exception as exc:
+        print(f"⚠️ Error al generar analytics desde PostgreSQL: {exc}")
+        return {
+            "total_count": 0,
+            "avg_prob": 0.0,
+            "top_categoria": "Sin datos",
+            "categorias": {},
+            "horas": [0] * 24,
+            "top_keywords": []
+        }
+
+
 

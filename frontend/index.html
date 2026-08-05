@@ -19,6 +19,7 @@
         rel="stylesheet" />
 
     <!-- Tailwind Configuration (Stitch Cyber AI Theme) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -253,6 +254,49 @@
             }
         }
 
+        /* Sidebar buttons hover unificado para Clasificador, Historial y Estado de servicios */
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            font-family: var(--font-label-sm, inherit);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        /* Estado Activo (no hovered) */
+        .sidebar-nav-item.active-nav {
+            background-color: var(--primary-container) !important;
+            color: var(--on-primary-container) !important;
+            box-shadow: 0 4px 14px rgba(92, 62, 145, 0.2) !important;
+            border-color: transparent !important;
+        }
+
+        /* Hover unificado en Modo Claro (aplica a todos) */
+        .sidebar-nav-item:hover {
+            background-color: rgba(92, 62, 145, 0.12) !important;
+            color: #4c1d95 !important;
+            border-color: rgba(92, 62, 145, 0.25) !important;
+            box-shadow: 0 2px 10px rgba(92, 62, 145, 0.08) !important;
+        }
+
+        /* Hover unificado en Modo Oscuro (aplica a todos) */
+        .dark .sidebar-nav-item:hover {
+            background-color: rgba(160, 120, 255, 0.18) !important;
+            color: #e9ddff !important;
+            border-color: rgba(208, 188, 255, 0.3) !important;
+            box-shadow: 0 2px 12px rgba(160, 120, 255, 0.15) !important;
+        }
+
+        /* Fuerza que los iconos, textos y chevrons internos hereden el color en hover */
+        .sidebar-nav-item:hover *,
+        .sidebar-nav-item:hover span {
+            color: inherit !important;
+        }
+
         /* Evita que títulos/URLs sin espacios desborden el layout en pantallas angostas */
         h1,
         h2,
@@ -302,8 +346,8 @@
         <div class="mb-8 lg:mb-10 px-3 flex justify-between items-center gap-2">
             <div id="btn-brand-home" class="min-w-0 cursor-pointer group" title="Ir al inicio">
                 <h1
-                    class="font-headline-md text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-bold group-hover:opacity-80 transition-opacity">
-                    <span class="material-symbols-outlined text-3xl text-primary shrink-0"
+                    class="font-headline-md text-purple-950 dark:text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-extrabold group-hover:opacity-85 transition-opacity">
+                    <span class="material-symbols-outlined text-3xl text-purple-700 dark:text-primary shrink-0"
                         style="font-variation-settings: 'FILL' 1;">psychology</span>
                     TechMind
                 </h1>
@@ -317,25 +361,31 @@
         </div>
         <nav class="flex-1 space-y-3 overflow-y-auto">
             <a id="nav-classifier"
-                class="bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer">
+                class="sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-xl">category</span>
                 <span class="font-label-sm text-sm font-bold">Clasificador</span>
             </a>
             <a id="nav-history"
-                class="text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer">
+                class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
                 <span
                     class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">history</span>
                 <span class="font-label-sm text-sm font-semibold">Historial</span>
+            </a>
+            <a id="nav-analytics"
+                class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
+                <span
+                    class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">analytics</span>
+                <span class="font-label-sm text-sm font-semibold">Análisis</span>
             </a>
         </nav>
         <!-- Server Status Popover trigger inside Sidebar -->
         <div class="relative mt-auto pt-6 border-t medium-border" style="overflow:visible;">
             <!-- Status Trigger Button -->
             <button id="btn-status-trigger" type="button"
-                class="w-full flex items-center justify-between gap-3 glass-panel px-4 py-3 rounded-xl border subtle-border bg-surface-container hover:bg-surface-container-high transition-all text-on-surface-variant hover:text-on-surface cursor-pointer active:scale-95 focus:outline-none">
+                class="sidebar-nav-item w-full flex items-center justify-between gap-3 text-on-surface-variant cursor-pointer active:scale-95 focus:outline-none">
                 <div class="flex items-center gap-2.5">
                     <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                    <span class="font-label-sm text-xs font-semibold">Estado de servicios</span>
+                    <span class="font-label-sm text-sm font-semibold">Estado de servicios</span>
                 </div>
                 <span id="status-chevron"
                     class="material-symbols-outlined text-lg transition-transform duration-300">expand_less</span>
@@ -344,22 +394,75 @@
             <!-- Status Popover Dropdown -->
             <div id="status-popover"
                 class="absolute bottom-full left-0 right-0 mb-3 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2 z-50">
+                
+                <!-- Microservicios -->
+                <div class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant">Microservicios</div>
                 <div id="status-springboot" class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">Spring
-                        Boot :8080</span>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">Spring Boot :8080</span>
                 </div>
                 <div id="status-fastapi" class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">FastAPI ML
-                        :8000</span>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">FastAPI ML :8000</span>
                 </div>
                 <div id="status-postgres" class="flex items-center gap-2">
-                    <div class="w-2.5 h-2.5 rounded-full led-pulse shrink-0"
-                        style="background-color: var(--led-ok-bg);"></div>
-                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-ok-text);">PostgreSQL
-                        :5432</span>
+                    <div class="w-2.5 h-2.5 rounded-full led-pulse shrink-0" style="background-color: var(--led-ok-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-ok-text);">PostgreSQL :5432</span>
                 </div>
+
+                <div class="border-t medium-border my-0.5"></div>
+
+                <!-- Métricas del Servidor OCI -->
+                <div class="flex items-center justify-between">
+                    <span class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant">Servidor OCI</span>
+                    <span class="font-label-sm text-[10px] text-tertiary-container dark:text-tertiary font-medium flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[12px]">schedule</span> Uptime: <span id="sys-uptime-val" class="font-semibold">--</span>
+                    </span>
+                </div>
+
+                <!-- Metric 1: CPU -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-[11px] font-label-sm">
+                        <span class="text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px]">memory</span> CPU
+                        </span>
+                        <span id="sys-cpu-val" class="font-semibold text-on-surface">--%</span>
+                    </div>
+                    <div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+                        <div id="sys-cpu-bar" class="bg-cyan-500 h-full w-0% transition-all duration-500"></div>
+                    </div>
+                </div>
+
+                <!-- Metric 2: RAM -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-[11px] font-label-sm">
+                        <span class="text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px]">developer_board</span> RAM Usada
+                        </span>
+                        <span id="sys-ram-val" class="font-semibold text-on-surface">-- / -- MB</span>
+                    </div>
+                    <div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+                        <div id="sys-ram-bar" class="bg-purple-500 h-full w-0% transition-all duration-500"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] pt-0.5">
+                        <span id="sys-ram-free-badge" class="text-emerald-600 dark:text-emerald-400 font-medium">Libre: -- MB</span>
+                        <span id="sys-ram-pct" class="text-on-surface-variant font-mono">--%</span>
+                    </div>
+                </div>
+
+                <!-- Metric 3: Swap -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-[11px] font-label-sm">
+                        <span class="text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px]">swap_horiz</span> Swap
+                        </span>
+                        <span id="sys-swap-val" class="font-semibold text-on-surface">-- / -- MB</span>
+                    </div>
+                    <div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+                        <div id="sys-swap-bar" class="bg-amber-500 h-full w-0% transition-all duration-500"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </aside>
@@ -573,6 +676,88 @@
             </div>
         </div>
 
+        <!-- Analytics View Section -->
+        <div id="analytics-view-section" class="hidden flex-1 flex flex-col gap-6 lg:gap-8">
+            <!-- KPI Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+                <!-- KPI 1: Total Consultas -->
+                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
+                    <div class="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 shrink-0">
+                        <span class="material-symbols-outlined text-2xl">analytics</span>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Total Clasificaciones</p>
+                        <h3 id="kpi-total-queries" class="font-headline-md text-2xl font-bold text-on-surface mt-0.5">--</h3>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Categoría Líder -->
+                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
+                    <div class="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 shrink-0">
+                        <span class="material-symbols-outlined text-2xl">emoji_events</span>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Categoría Líder</p>
+                        <h3 id="kpi-top-category" class="font-headline-md text-xl font-bold text-on-surface mt-0.5">--</h3>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Confianza Promedio -->
+                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
+                    <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <span class="material-symbols-outlined text-2xl">verified</span>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Confianza Promedio</p>
+                        <h3 id="kpi-avg-confidence" class="font-headline-md text-2xl font-bold text-on-surface mt-0.5">--%</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+                <!-- Left Chart: Distribución por Categoría (Doughnut) -->
+                <div class="lg:col-span-5 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-purple-600 dark:text-primary">pie_chart</span>
+                            Distribución por Categoría
+                        </h3>
+                    </div>
+                    <div class="relative flex-1 min-h-[260px] max-h-[340px] flex items-center justify-center">
+                        <canvas id="chart-categories"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right Chart: Actividad por Hora del Día (Area Chart) -->
+                <div class="lg:col-span-7 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400">schedule</span>
+                            Actividad por Hora del Día (24h)
+                        </h3>
+                    </div>
+                    <div class="relative flex-1 min-h-[260px] max-h-[340px] flex items-center justify-center">
+                        <canvas id="chart-hourly"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bottom Full-Width Section: Palabras Clave Más Frecuentes (Interactive Tag Cloud) -->
+                <div class="lg:col-span-12 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400">label</span>
+                            Palabras Clave Más Frecuentes
+                        </h3>
+                        <span class="font-label-sm text-xs text-on-surface-variant">Top términos TF-IDF</span>
+                    </div>
+                    <div id="keywords-cloud-container" class="flex flex-wrap gap-2.5 items-center justify-start py-2">
+                        <!-- Renderizado dinámicamente como badges/pills con frecuencia -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Modal JSON Respuesta Cruda -->
@@ -608,7 +793,7 @@
 
 
     <!-- Script Principal -->
-    <script src="app.js"></script>
+    <script src="app.js?v=1.5.4"></script>
 </body>
 
 </html>

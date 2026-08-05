@@ -44,11 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (toggleIcon) toggleIcon.textContent = 'chevron_right';
     }
     initHealthChecks();
+    fetchSystemStats();
+    setInterval(fetchSystemStats, 10000);
+    setInterval(initHealthChecks, 30000);
     bindEvents();
     loadHistory(); // Carga el historial desde PostgreSQL al iniciar
 });
 
-// ── 1. Health Checks de Servicios ──────────────────────────────────────────
+// ── 1. Health Checks & Métricas de Servidor ───────────────────────────────
 
 async function initHealthChecks() {
     // Check FastAPI
@@ -79,6 +82,53 @@ async function initHealthChecks() {
 
     // PostgreSQL status
     setServiceStatus('status-postgres', true, 'PostgreSQL :5432');
+}
+
+async function fetchSystemStats() {
+    try {
+        const res = await fetch(`${DS_API_URL}/system-stats`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Uptime
+        const uptimeValEl = document.getElementById('sys-uptime-val');
+        if (uptimeValEl && data.uptime) uptimeValEl.textContent = data.uptime;
+
+        // CPU
+        const cpuValEl = document.getElementById('sys-cpu-val');
+        const cpuBarEl = document.getElementById('sys-cpu-bar');
+        if (cpuValEl) cpuValEl.textContent = `${data.cpu_percent}%`;
+        if (cpuBarEl) cpuBarEl.style.width = `${Math.min(100, data.cpu_percent)}%`;
+
+        // RAM
+        const ramValEl = document.getElementById('sys-ram-val');
+        const ramBarEl = document.getElementById('sys-ram-bar');
+        const ramFreeEl = document.getElementById('sys-ram-free-badge');
+        const ramPctEl = document.getElementById('sys-ram-pct');
+
+        if (ramValEl) ramValEl.textContent = `${data.ram_used_mb} / ${data.ram_total_mb} MB`;
+        if (ramPctEl) ramPctEl.textContent = `${data.ram_percent}%`;
+        if (ramFreeEl) ramFreeEl.textContent = `Libre: ${data.ram_free_mb} MB`;
+        if (ramBarEl) {
+            ramBarEl.style.width = `${Math.min(100, data.ram_percent)}%`;
+            if (data.ram_percent > 90) {
+                ramBarEl.className = 'bg-rose-500 h-full transition-all duration-500';
+            } else if (data.ram_percent > 80) {
+                ramBarEl.className = 'bg-amber-500 h-full transition-all duration-500';
+            } else {
+                ramBarEl.className = 'bg-purple-500 h-full transition-all duration-500';
+            }
+        }
+
+        // Swap
+        const swapValEl = document.getElementById('sys-swap-val');
+        const swapBarEl = document.getElementById('sys-swap-bar');
+        if (swapValEl) swapValEl.textContent = `${data.swap_used_mb} / ${data.swap_total_mb} MB`;
+        if (swapBarEl) swapBarEl.style.width = `${Math.min(100, data.swap_percent)}%`;
+
+    } catch (e) {
+        // Ignorar si no está disponible
+    }
 }
 
 function setServiceStatus(elementId, isOk, text) {
@@ -251,16 +301,20 @@ function bindEvents() {
     // View Switcher Control (SPA subpage logic)
     const navClassifier = document.getElementById('nav-classifier');
     const navHistory = document.getElementById('nav-history');
+    const navAnalytics = document.getElementById('nav-analytics');
     const classifierView = document.getElementById('classifier-view-section');
     const historyView = document.getElementById('history-view-section');
+    const analyticsView = document.getElementById('analytics-view-section');
 
-    if (navClassifier && navHistory && classifierView && historyView) {
+    if (navClassifier && navHistory && navAnalytics && classifierView && historyView && analyticsView) {
         const showClassifier = () => {
             classifierView.classList.remove('hidden');
             historyView.classList.add('hidden');
-            
-            navClassifier.className = "bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer";
-            navHistory.className = "text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer";
+            analyticsView.classList.add('hidden');
+
+            navClassifier.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
+            navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
             if (window.innerWidth < 768) {
                 closeSidebar();
@@ -270,9 +324,11 @@ function bindEvents() {
         const showHistory = () => {
             classifierView.classList.add('hidden');
             historyView.classList.remove('hidden');
-            
-            navHistory.className = "bg-primary-container text-on-primary-container rounded-xl flex items-center gap-3 p-3.5 transition-all shadow-md shadow-primary-container/20 cursor-pointer";
-            navClassifier.className = "text-on-surface-variant flex items-center gap-3 p-3.5 hover:bg-surface-variant/50 transition-all rounded-xl group cursor-pointer";
+            analyticsView.classList.add('hidden');
+
+            navHistory.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
+            navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
             loadDetailedHistory();
 
@@ -281,8 +337,26 @@ function bindEvents() {
             }
         };
 
+        const showAnalytics = () => {
+            classifierView.classList.add('hidden');
+            historyView.classList.add('hidden');
+            analyticsView.classList.remove('hidden');
+            analyticsView.classList.add('flex');
+
+            navAnalytics.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
+            navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+
+            loadAnalyticsDashboard();
+
+            if (window.innerWidth < 768) {
+                closeSidebar();
+            }
+        };
+
         navClassifier.addEventListener('click', showClassifier);
         navHistory.addEventListener('click', showHistory);
+        navAnalytics.addEventListener('click', showAnalytics);
 
         const brandHome = document.getElementById('btn-brand-home');
         if (brandHome) {
@@ -379,8 +453,14 @@ async function handleClassification() {
         document.getElementById('content-title').value = '';
         document.getElementById('content-body').value = '';
 
-        // Recargar el historial actualizado desde PostgreSQL
-        setTimeout(() => loadHistory(), 600);
+        // Recargar vistas activas solo si están visibles para proteger recursos del servidor
+        setTimeout(() => {
+            loadHistory();
+            const analyticsView = document.getElementById('analytics-view-section');
+            if (analyticsView && !analyticsView.classList.contains('hidden')) {
+                loadAnalyticsDashboard();
+            }
+        }, 600);
 
         showToast('Contenido clasificado y guardado', 'success');
 
@@ -458,20 +538,36 @@ async function loadHistory() {
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
                 const probPct = Math.round(prob * 100);
                 const timeLabel = formatTimeString(entry.created_at);
+                const textStr = entry.texto || entry.titulo || '';
+                const isLong = textStr.length > 30;
+                const expandBtnHtml = isLong ? `
+                    <div class="flex justify-end mt-1.5">
+                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="Expandir o contraer descripción">
+                            <span>Ver más</span>
+                            <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
+                        </button>
+                    </div>
+                ` : '';
 
                 return `
-                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0">
-                        <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
-                            <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(entry.categoria || 'Sin categoría')}</span>
-                            <span class="text-on-surface-variant font-label-sm text-[11px] shrink-0">${timeLabel}</span>
-                        </div>
-                        <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
-                        <p class="text-on-surface-variant text-xs mt-1 line-clamp-2 opacity-70">${escapeHtml(entry.texto || '')}</p>
-                        <div class="mt-3 flex items-center justify-between opacity-80 pt-2 border-t border-black/5 dark:border-white/5">
-                            <div class="flex items-center gap-1.5">
-                                <span class="font-label-sm text-[11px] text-on-surface-variant">Confianza: ${probPct}%</span>
+                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0 flex flex-col justify-between">
+                        <div>
+                            <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(entry.categoria || 'Sin categoría')}</span>
+                                <span class="text-on-surface-variant font-label-sm text-[11px] shrink-0">${timeLabel}</span>
                             </div>
-                            <span class="text-[10px] font-mono text-outline opacity-60">ID #${entry.id}</span>
+                            <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
+                            <p class="history-card-body text-on-surface-variant text-xs mt-1 line-clamp-2 opacity-80 leading-relaxed transition-all">${escapeHtml(textStr)}</p>
+                            ${expandBtnHtml}
+                        </div>
+                        <div class="mt-4 flex flex-wrap items-center justify-between opacity-90 pt-2.5 border-t border-black/5 dark:border-white/5 gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-label-sm text-[11px] text-on-surface-variant font-medium">Confianza: ${probPct}%</span>
+                            </div>
+                            <button type="button" class="btn-view-entry-json px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
+                                <span class="material-symbols-outlined text-xs pointer-events-none">code</span>
+                                <span class="pointer-events-none">Ver JSON</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -548,8 +644,19 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                     `;
                 }).join(' ');
 
+                const textStr = entry.texto || entry.titulo || '';
+                const isLong = textStr.length > 30;
+                const expandBtnHtml = isLong ? `
+                    <div class="flex justify-end mt-1.5">
+                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="Expandir o contraer descripción">
+                            <span>Ver más</span>
+                            <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
+                        </button>
+                    </div>
+                ` : '';
+
                 return `
-                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
+                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
                         <div class="flex-1 min-w-0 space-y-2">
                             <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                                 <span class="px-3 py-1 rounded-full text-xs font-label-sm border font-semibold ${config.colorClass} flex items-center gap-1.5 shadow-sm">
@@ -563,16 +670,21 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                 </span>
                             </div>
                             <h5 class="text-on-surface font-bold text-base sm:text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
-                            <p class="text-on-surface-variant text-sm line-clamp-2 opacity-70">${escapeHtml(entry.texto || 'Sin descripción disponible')}</p>
+                            <p class="history-card-body text-on-surface-variant text-sm line-clamp-2 opacity-80 leading-relaxed transition-all">${escapeHtml(textStr || 'Sin descripción disponible')}</p>
+                            ${expandBtnHtml}
                             <div class="flex flex-wrap gap-1.5 pt-1">
                                 ${keywordsPills || '<span class="text-xs text-on-surface-variant italic opacity-60">Sin palabras clave</span>'}
                             </div>
                         </div>
-                        <div class="flex items-center gap-4 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[120px] shrink-0 justify-between md:justify-end">
+                        <div class="flex flex-row md:flex-col items-center md:items-end justify-between gap-3 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[140px] shrink-0">
                             <div class="text-left md:text-right">
                                 <span class="block text-xs font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Confianza</span>
                                 <span class="text-xl sm:text-2xl font-black text-primary-fixed">${probPct}%</span>
                             </div>
+                            <button type="button" class="btn-view-entry-json px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
+                                <span class="material-symbols-outlined text-sm pointer-events-none">code</span>
+                                <span class="pointer-events-none">Ver JSON</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -597,7 +709,35 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
     }
 }
 
-// ── 7. Modal JSON Crudo ─────────────────────────────────────────────────────
+// ── 7. Modal JSON Crudo y Visualización de Consultas ─────────────────────────
+
+function showHistoryEntryJsonInModal(id) {
+    if (!id) return;
+    const entry = allHistoryData.find(item => String(item.id) === String(id));
+    if (!entry) {
+        showToast('⚠️ No se encontró la información de la consulta', 'warning');
+        return;
+    }
+
+    const fullPayload = {
+        entrada: { titulo: entry.titulo, texto: entry.texto },
+        resultado: {
+            id: entry.id,
+            categoria: entry.categoria,
+            probabilidad: entry.probabilidad,
+            informaciones_adicionales: entry.keywords,
+            created_at: entry.created_at
+        }
+    };
+
+    const modal = document.getElementById('json-modal');
+    const jsonPre = document.getElementById('json-content');
+    if (modal && jsonPre) {
+        jsonPre.textContent = JSON.stringify(fullPayload, null, 2);
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+}
 
 function toggleJsonModal() {
     const modal = document.getElementById('json-modal');
@@ -651,7 +791,7 @@ function copyJsonToClipboard() {
     });
 }
 
-// Global Backdrop Click & Escape Key listeners for JSON Modal
+// Global Backdrop Click & Escape Key listeners for JSON Modal, Expand & View buttons
 document.addEventListener('click', (e) => {
     const modal = document.getElementById('json-modal');
     if (modal && !modal.classList.contains('hidden') && e.target === modal) {
@@ -661,6 +801,31 @@ document.addEventListener('click', (e) => {
     const copyBtn = e.target.closest('#btn-copy-json');
     if (copyBtn) {
         copyJsonToClipboard();
+    }
+
+    const expandBtn = e.target.closest('.btn-toggle-expand');
+    if (expandBtn) {
+        // Encontrar el párrafo .history-card-body que es previo al div contenedor del botón
+        const parentDiv = expandBtn.parentElement;
+        const p = parentDiv ? parentDiv.previousElementSibling : null;
+        if (p && p.classList.contains('history-card-body')) {
+            const isExpanded = p.classList.contains('line-clamp-none');
+            if (isExpanded) {
+                p.classList.remove('line-clamp-none');
+                p.classList.add('line-clamp-2');
+                expandBtn.innerHTML = `<span>Ver más</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>`;
+            } else {
+                p.classList.remove('line-clamp-2');
+                p.classList.add('line-clamp-none');
+                expandBtn.innerHTML = `<span>Ver menos</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_less</span>`;
+            }
+        }
+    }
+
+    const viewItemBtn = e.target.closest('.btn-view-entry-json');
+    if (viewItemBtn) {
+        const id = viewItemBtn.getAttribute('data-id');
+        showHistoryEntryJsonInModal(id);
     }
 });
 
@@ -742,4 +907,136 @@ function showToast(message, type = 'info') {
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+// ── 6. Dashboard de Analytics & Gráficos (Chart.js) ──────────────────────────
+
+let chartCategoriesInstance = null;
+let chartHourlyInstance = null;
+let chartKeywordsInstance = null;
+
+async function loadAnalyticsDashboard() {
+    try {
+        const tzOffset = -new Date().getTimezoneOffset();
+        const res = await fetch(`${DS_API_URL}/analytics?t=${Date.now()}&tz_offset=${tzOffset}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // 1. KPIs
+        const kpiTotal = document.getElementById('kpi-total-queries');
+        const kpiTop = document.getElementById('kpi-top-category');
+        const kpiAvg = document.getElementById('kpi-avg-confidence');
+
+        if (kpiTotal) kpiTotal.textContent = data.total_count || 0;
+        if (kpiTop) kpiTop.textContent = data.top_categoria || 'N/A';
+        if (kpiAvg) kpiAvg.textContent = `${data.avg_prob || 0}%`;
+
+        if (typeof Chart === 'undefined') return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#cbc3d7' : '#524b3f';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+
+        // 2. Chart 1: Doughnut (Distribución por Categoría)
+        const ctxCat = document.getElementById('chart-categories');
+        if (ctxCat) {
+            const catLabels = Object.keys(data.categorias || {});
+            const catValues = Object.values(data.categorias || {});
+            const colors = [
+                '#a078ff', '#4edea3', '#38bdf8', '#fbbf24',
+                '#f43f5e', '#fb923c', '#818cf8', '#2dd4bf'
+            ];
+
+            if (chartCategoriesInstance) chartCategoriesInstance.destroy();
+
+            chartCategoriesInstance = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: catLabels,
+                    datasets: [{
+                        data: catValues,
+                        backgroundColor: colors.slice(0, catLabels.length),
+                        borderWidth: 2,
+                        borderColor: isDark ? '#171f33' : '#e8e2d5'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: textColor, font: { family: 'Inter', size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Chart 2: Area Line (Actividad por Hora del Día)
+        const ctxHour = document.getElementById('chart-hourly');
+        if (ctxHour) {
+            const hourLabels = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
+            const hourValues = data.horas || Array(24).fill(0);
+
+            if (chartHourlyInstance) chartHourlyInstance.destroy();
+
+            chartHourlyInstance = new Chart(ctxHour, {
+                type: 'line',
+                data: {
+                    labels: hourLabels,
+                    datasets: [{
+                        label: 'Consultas',
+                        data: hourValues,
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#38bdf8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor, precision: 0 }, grid: { color: gridColor }, beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // 4. Keywords Tag Cloud Container
+        const kwContainer = document.getElementById('keywords-cloud-container');
+        if (kwContainer) {
+            const kwList = data.top_keywords || [];
+            if (kwList.length === 0) {
+                kwContainer.innerHTML = '<span class="font-label-sm text-xs text-on-surface-variant opacity-60">Sin datos de palabras clave</span>';
+            } else {
+                const maxCount = Math.max(...kwList.map(k => k.count), 1);
+                kwContainer.innerHTML = kwList.map(item => {
+                    const ratio = item.count / maxCount;
+                    const badgeClass = ratio > 0.7
+                        ? 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/40 text-sm py-1.5 px-3.5 font-bold shadow-md'
+                        : ratio > 0.4
+                        ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/30 text-xs py-1 px-3 font-semibold'
+                        : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 text-xs py-1 px-2.5 font-medium';
+
+                    return `
+                        <div class="inline-flex items-center gap-1.5 rounded-xl border ${badgeClass} transition-all hover:scale-105 cursor-default">
+                            <span>#${escapeHtml(item.word)}</span>
+                            <span class="text-[10px] opacity-75 bg-surface-container-high px-1.5 py-0.5 rounded-md font-mono">${item.count}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+    } catch (e) {
+        console.error('Error cargando analytics:', e);
+    }
 }

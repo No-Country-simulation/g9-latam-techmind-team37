@@ -4,7 +4,95 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
-## [1.5.0] — 2026-08-01 · Optimización del Modelo de ML (Ensamble Calibrado, TF-IDF Sublineal y Dataset Ampliado)
+## [1.7.0] — 2026-08-04 · Dashboard de Análisis Gráfico y Estadísticas en Tiempo Real (Chart.js + PostgreSQL)
+
+### Añadido
+- **Función y Endpoint de Analytics (`app/database.py` + `app/main.py`):** Creado el módulo `get_analytics_data()` y el endpoint `GET /analytics` en FastAPI, que ejecuta consultas SQL optimizadas sobre la base de datos PostgreSQL para obtener:
+  - **KPIs:** Total de predicciones registradas, categoría con mayor volumen de consultas y nivel promedio de confianza del modelo.
+  - **Distribución por Categoría:** Conteo relativo entre las 8 categorías del sistema.
+  - **Distribución Horaria (24h):** Actividad agrupada por hora del día (`EXTRACT(HOUR FROM created_at)`).
+  - **Frecuencia de Keywords:** Ranking de las 15 palabras clave más comunes normalizadas a minúsculas y desduplicadas por documento.
+
+- **Sección e Interfaz "Análisis" en la Web UI (`frontend/index.html` + `frontend/app.js`):**
+  - **Navegación:** Agregado el nuevo botón **"Análisis"** (`analytics`) en la barra de navegación lateral (Sidebar) ubicado justo debajo de *Historial*.
+  - **Librería de Gráficos:** Integración de **Chart.js 4.4+** vía CDN.
+  - **KPI Cards:** 3 tarjetas superiores (*Total Clasificaciones*, *Categoría Líder*, *Confianza Promedio*) con iconografía neón.
+  - **Visualizaciones Interactivas:**
+    1. 🍩 **Doughnut Chart:** Distribución porcentual por categoría técnica.
+    2. 📈 **Area Line Chart:** Curva de actividad de consultas a lo largo de las 24 horas del día.
+    3. 🏷️ **Nube de Etiquetas (Tag Cloud de Badges/Pills):** Reemplazado el gráfico de barras por una rejilla compacta de pastillas neón interactivas con contador de frecuencia (`#keyword  count`), ahorrando más del 60% de espacio vertical.
+  - **Compatibilidad de Tema:** Los gráficos adaptan dinámicamente sus colores, rejillas y etiquetas al cambiar entre *Modo Claro* y *Modo Oscuro*.
+
+### Corregido / Mejorado
+- **Refresco condicional/lazy de Analytics para conservar recursos (`frontend/app.js`):** La llamada a `loadAnalyticsDashboard()` tras una clasificación ahora verifica si la pestaña *"Análisis"* está activa. Si el usuario está en la vista del Clasificador, no realiza ninguna petición al servidor hasta que abra la pestaña.
+- **Intervalo equilibrado de polling de métricas (`frontend/app.js`):** Ajustado el intervalo de consulta de `fetchSystemStats` a 10 segundos, logrando un equilibrio perfecto entre fluidez en tiempo real y conservación de recursos en la VM de OCI.
+- **Evitado de caché en consultas de telemetría (`frontend/app.js`):** Agregado el parámetro de marcas de tiempo `?t=${Date.now()}` a las peticiones HTTP del dashboard para evitar que el navegador responda con datos cacheados.
+- **Adaptación automática a la zona horaria del usuario (`app/database.py` + `frontend/app.js`):** El frontend detecta automáticamente el desfasaje horario del navegador (`new Date().getTimezoneOffset()`) y lo envía en el parámetro `tz_offset`. PostgreSQL desplaza el cálculo de `EXTRACT(HOUR FROM (created_at + interval))` para que la curva de actividad 24h muestre exactamente las horas locales de la región del usuario (ej: 16:00 hs en lugar de 19:00 hs UTC).
+- **Filtro de conectores y adverbios genéricos (`app/main.py` + `app/database.py`):** Agregado el conjunto `RUIDO_CONECTORES` (*mediante, globalmente, además, través, según, principal, cada, etc.*) a las stopwords del pipeline NLP y a la agregación de analytics, asegurando que el ranking de palabras clave solo muestre conceptos y tecnologías puramente técnicas (*FastAPI, Docker, Spring Boot, PostgreSQL, JWT, etc.*).
+- **Normalización estricta de palabras clave (`app/database.py`):** Removidos corchetes `[` `]` y comillas simples/dobles residuales en la columna `palabras_clave` de PostgreSQL antes de contabilizar frecuencias.
+
+---
+
+## [1.6.1] — 2026-08-04 · Métricas en Tiempo Real del Servidor OCI (CPU, RAM y Swap)
+
+### Añadido
+- **Endpoint de telemetría de hardware en FastAPI (`app/main.py`):** Creado el endpoint `GET /system-stats` respaldado por `psutil` (con fallback nativo a `/proc/meminfo` y `os.getloadavg()` en Linux), que expone métricas en tiempo real de consumo de CPU (%), RAM total/usada/disponible (MB), Swap (MB) y **tiempo de actividad del servidor (Uptime)**.
+- **Widgets visuales de telemetría en el Frontend (`frontend/index.html` + `frontend/app.js`):** Expandido el popover *"Estado de servicios"* en la barra lateral (Sidebar) reemplazando la etiqueta fija con un badge dinámico de **Uptime** (`schedule`) y 3 barras de progreso animadas en estética *Cyber AI Dark Mode*:
+  - ⏱️ **Badge de Uptime del servidor** (ej. `2d 4h 15m`).
+  - 💻 **Carga de CPU** con porcentaje actualizado dinámicamente.
+  - 🧠 **Consumo de RAM** con lectura de megabytes usados/totales y badge indicador de **RAM Libre**.
+  - 🔄 **Consumo de Swap** con barra de capacidad.
+  - **Polling en tiempo real:** Actualización automática cada 5 segundos.
+  - **Código de colores reactivo:** Verde (RAM < 80%), Amarillo (RAM 80%-90%), Rojo (RAM > 90%).
+
+---
+
+## [1.6.0] — 2026-08-03 · Mejoras de Isotipo, Hover Unificado y Funciones de Historial
+
+### Añadido
+- **Botón "Ver más" / "Ver menos" en descripciones del Historial (`frontend/app.js`):** Agregada la capacidad de expandir y contraer descripciones extensas en las tarjetas de consulta tanto en el grid inicial como en la lista detallada.
+- **Botón "Copiar JSON" por consulta en el Historial (`frontend/app.js`):** Cada entrada del historial incorpora su propio botón interactivo para copiar el objeto JSON completo de la consulta al portapapeles con feedback instantáneo (`¡Copiado!`) y notificación flotante.
+
+### Corregido
+- **Contraste y color del Isotipo de TechMind en Modo Claro (`frontend/index.html`):** Ajustados los tonos del isotipo (`psychology`) a morado violeta intenso (`text-purple-700 dark:text-primary`) y el nombre TechMind a `text-purple-950 dark:text-primary-fixed`, resolviendo la falta de contraste en el modo claro.
+- **Hover unificado para Clasificador, Historial y Estado de servicios (`frontend/index.html` + `frontend/app.js`):** Creada la clase CSS `.sidebar-nav-item` que unifica el estilo hover para los 3 botones principales del sidebar con fondo violeta traslúcido, borde suave y elevación idéntica.
+
+---
+
+## [1.5.2] — 2026-08-03 · Optimización de `docker-compose.yml` para OCI Free Tier (1 vCPU · 1 GB RAM · 2 GB Swap)
+
+### Mejorado
+- **Límites de memoria por contenedor (`docker-compose.yml`):** Se agregaron `mem_limit` y `memswap_limit` a los cuatro servicios para prevenir que el OOM Killer del kernel mate procesos silenciosamente cuando la RAM se agota. El presupuesto total queda dentro del límite de 1 GB de RAM real, usando el swap de 2 GB como colchón ante picos de carga:
+
+  | Servicio | `mem_limit` (RAM) | `memswap_limit` (RAM + Swap) |
+  |---|---|---|
+  | `postgres` | 150 MB | 300 MB |
+  | `fastapi` | 220 MB | 440 MB |
+  | `springboot` | 384 MB | 768 MB |
+  | `frontend` | 48 MB | 96 MB |
+  | **Total estimado** | **~982 MB** | **dentro del 1 GB** |
+
+- **Límites de CPU por contenedor (`docker-compose.yml`):** Se agregó la directiva `cpus` a cada servicio para evitar que un solo contenedor monopolice el único vCPU disponible:
+  - `postgres`: `0.25` (mayormente I/O)
+  - `fastapi`: `0.50` (inferencia por request)
+  - `springboot`: `0.50` (API transaccional)
+  - `frontend`: `0.10` (Nginx estático)
+
+- **Tuning de PostgreSQL para bajo consumo de RAM (`docker-compose.yml`):** Se agregó la directiva `command` con parámetros optimizados para entornos de 1 GB:
+  - `shared_buffers=32MB` (reducido desde el default de 128MB)
+  - `work_mem=4MB` (20 conexiones × 4MB = 80MB pico)
+  - `maintenance_work_mem=32MB`
+  - `effective_cache_size=128MB`
+  - `max_connections=20` (suficiente para el pool de Spring Boot)
+  - `wal_buffers=8MB`, `checkpoint_completion_target=0.9`
+
+- **Uvicorn single-worker (`docker-compose.yml`):** Se sobreescribió el `command` del servicio `fastapi` para forzar `--workers 1`, evitando que Uvicorn spawne múltiples workers en una instancia de 1 vCPU. Se agregó `--limit-max-requests 500` para que el worker se reinicie periódicamente y libere posibles memory leaks de las librerías de ML.
+
+- **Healthcheck más tolerante para PostgreSQL:** Se aumentó `start_period` de 0s a 20s para dar más tiempo de arranque a la base de datos en una instancia con I/O lenta (OCI Free Tier usa almacenamiento de bloque compartido).
+
+---
+
+## [1.5.1] — 2026-08-03 · Actualización del Notebook de Data Science (Alineación con Pipeline de Producción + Cross-Validation)
 
 ### Añadido / Mejorado
 - **Ampliación del Dataset de Entrenamiento (`data-science/data/raw/contenidos_tecnicos.csv`):** Dataset expandido de ~221 a **259 registros técnicos balanceados** (+38 registros especializados), resolviendo ambigüedades y reforzando la precisión en las categorías **Mobile** (*SwiftUI, Jetpack Compose, Flutter Dart AOT, React Native Fabric, Kotlin KMP*) y **Cloud** (*AWS VPC, Lambda, S3, CloudFront, Terraform HCL, OCI Autonomous DB, FinOps*).
@@ -16,8 +104,17 @@
 - **Feature Engineering con TF-IDF Sublineal y N-Gramas 1-3 (`data-science/src/expand_and_train.py`):** Configurado `TfidfVectorizer` con `sublinear_tf=True` (escalado logarítmico de término $1 + \log(tf)$) y rango de n-gramas de 1 a 3 para capturar expresiones técnicas compuestas (*"aws lambda serverless"*, *"react native navigation"*).
 - **Nuevos Artefactos `.joblib` (`data-science/models/`):** Generados los archivos binarios `tfidf_vectorizer.joblib` y `modelo_clasificador.joblib` manteniendo 100% la compatibilidad con los contratos de API de FastAPI y Spring Boot.
 - **Incremento en Métricas de Rendimiento:** Alcanzado un **90.38% de Accuracy** en la evaluación holdout (20% test data), logrando un **100% de Precisión/Recall en Mobile** y un **94% de F1-Score en Cloud**.
-
----
+- **Notebook reescrito para reflejar el pipeline de producción actual (`data-science/notebooks/TechMind_DataScience.ipynb`):** El notebook estaba desactualizado respecto a `expand_and_train.py` — mostraba 61 registros, usaba un `TfidfVectorizer` básico (1-2 n-gramas, 1500 features) y un `LogisticRegression` individual. Se reescribió completo (de 64 celdas dispersas a 40 celdas consolidadas y documentadas) para reflejar fielmente el pipeline de producción:
+  - Carga dinámica del CSV mostrando **259 registros** reales.
+  - Concatenación de `titulo + texto` en el preprocesamiento (alineado con la mejora del ensamble).
+  - `TfidfVectorizer` sublineal con n-gramas 1-3 y 6 000 features (idéntico a `expand_and_train.py`).
+  - **Ensamble Calibrado** (`LogisticRegression` + `CalibratedClassifierCV(LinearSVC)` + `ComplementNB`) con soft voting.
+  - Todos los gráficos (distribución de categorías, longitud de textos, confusion matrix) regenerados con los 259 registros actuales.
+  - Compatibilidad total con nbformat 4.5 (campo `id` en cada celda).
+- **Validación Cruzada Estratificada K-Fold (K=5) (`data-science/notebooks/TechMind_DataScience.ipynb`):** Nueva sección 9 que usa el **100% de las muestras** para evaluar el modelo, eliminando la dependencia de un único corte de datos. Implementada con un `Pipeline(TF-IDF → Ensamble)` correcto que re-fitea el vectorizador en cada fold para evitar *data leakage*. Resultados obtenidos:
+  - Accuracy promedio CV: **87.28% ± 4.11%**
+  - Rango: [80.77% – 92.16%]
+  - Gráfico de barras por fold incluido.
 
 ### Corregido
 - **Porcentajes de Confianza con decimales y punto sobrante (`frontend/index.html` + `frontend/app.js`):** Eliminadas las cifras decimales en la "Confianza del Modelo" tanto en el marcador principal (`0%`) como en los registros del historial reciente y la vista detallada (`Math.round(prob * 100)`).
@@ -31,25 +128,6 @@
 ### Añadido
 - **Notificación de alerta cuando faltan campos al clasificar (`frontend/app.js`):** Al presionar el botón de clasificación con campos vacíos, se despliega la alerta con el mensaje exacto `Por favor, llena todos los campos`. Ante errores de conexión o servidor, se mantiene el mensaje `Hubo un error, por favor intenta de nuevo más tarde`.
 - **Navegación al inicio mediante el logo TechMind (`frontend/index.html` + `frontend/app.js`):** El elemento de marca "TechMind" en el sidebar redirige al usuario de vuelta a la vista principal (Home/Clasificador) al hacer clic.
-
----
-
-## [1.5.1] — 2026-08-03 · Actualización del Notebook de Data Science (Alineación con Pipeline de Producción + Cross-Validation)
-
-### Cambiado
-- **Notebook reescrito para reflejar el pipeline de producción actual (`data-science/notebooks/TechMind_DataScience.ipynb`):** El notebook estaba desactualizado respecto a `expand_and_train.py` — mostraba 61 registros, usaba un `TfidfVectorizer` básico (1-2 n-gramas, 1500 features) y un `LogisticRegression` individual. Se reescribió completo (de 64 celdas dispersas a 40 celdas consolidadas y documentadas) para reflejar fielmente el pipeline de producción:
-  - Carga dinámica del CSV mostrando **259 registros** reales.
-  - Concatenación de `titulo + texto` en el preprocesamiento (alineado con la mejora del ensamble).
-  - `TfidfVectorizer` sublineal con n-gramas 1-3 y 6 000 features (idéntico a `expand_and_train.py`).
-  - **Ensamble Calibrado** (`LogisticRegression` + `CalibratedClassifierCV(LinearSVC)` + `ComplementNB`) con soft voting.
-  - Todos los gráficos (distribución de categorías, longitud de textos, confusion matrix) regenerados con los 259 registros actuales.
-  - Compatibilidad total con nbformat 4.5 (campo `id` en cada celda).
-
-### Añadido
-- **Validación Cruzada Estratificada K-Fold (K=5) (`data-science/notebooks/TechMind_DataScience.ipynb`):** Nueva sección 9 que usa el **100% de las muestras** para evaluar el modelo, eliminando la dependencia de un único corte de datos. Implementada con un `Pipeline(TF-IDF → Ensamble)` correcto que re-fitea el vectorizador en cada fold para evitar *data leakage*. Resultados obtenidos:
-  - Accuracy promedio CV: **87.28% ± 4.11%**
-  - Rango: [80.77% – 92.16%]
-  - Gráfico de barras por fold incluido.
 
 ### Decisión de Arquitectura
 - `expand_and_train.py` permanece como **fuente de verdad de producción** (genera los artefactos `.joblib` para la API FastAPI).
