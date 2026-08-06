@@ -1292,7 +1292,7 @@ async function loadAnalyticsDashboard() {
 
                     return `
                         <div class="inline-flex items-center gap-1.5 rounded-xl border ${badgeClass} transition-all hover:scale-105 cursor-default">
-                            <span>#${escapeHtml(item.word)}</span>
+                            <span class="capitalize">#${escapeHtml(item.word)}</span>
                             <span class="text-[10px] opacity-75 bg-surface-container-high px-1.5 py-0.5 rounded-md font-mono">${item.count}</span>
                         </div>
                     `;
