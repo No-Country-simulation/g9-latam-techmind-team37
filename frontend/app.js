@@ -31,6 +31,14 @@ let healthStates = {
     postgres: true
 };
 
+// Autenticación de Administrador
+let adminToken = sessionStorage.getItem('adminToken') || null;
+let adminUser  = sessionStorage.getItem('adminUser') || null;
+
+function isLoggedInAsAdmin() {
+    return adminToken !== null;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Load theme setting
     const savedTheme = localStorage.getItem('theme');
@@ -43,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const toggleIcon = document.getElementById('sidebar-toggle-icon');
         if (toggleIcon) toggleIcon.textContent = 'chevron_right';
     }
+    updateAdminUIState();
     initHealthChecks();
     fetchSystemStats();
     setInterval(fetchSystemStats, 10000);
@@ -408,7 +417,236 @@ function bindEvents() {
     if (modalClose) {
         modalClose.addEventListener('click', toggleJsonModal);
     }
+
+    // Controles del Modal y Popover de Admin Login
+    const adminAuthBtn = document.getElementById('btn-admin-auth');
+    const adminPopover = document.getElementById('admin-user-popover');
+    const adminLogoutBtn = document.getElementById('btn-admin-logout');
+    const closeAdminBtn = document.getElementById('btn-close-admin-modal');
+    const cancelAdminBtn = document.getElementById('btn-cancel-admin-modal');
+    const formAdminLogin = document.getElementById('form-admin-login');
+
+    if (adminAuthBtn) {
+        adminAuthBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isLoggedInAsAdmin()) {
+                toggleAdminPopover();
+            } else {
+                showAdminLoginModal();
+            }
+        });
+    }
+
+    if (adminLogoutBtn) {
+        adminLogoutBtn.addEventListener('click', () => {
+            hideAdminPopover();
+            handleAdminLogout();
+        });
+    }
+
+    if (adminPopover) {
+        adminPopover.addEventListener('click', (e) => e.stopPropagation());
+    }
+
+    if (closeAdminBtn) closeAdminBtn.addEventListener('click', hideAdminLoginModal);
+    if (cancelAdminBtn) cancelAdminBtn.addEventListener('click', hideAdminLoginModal);
+
+    if (formAdminLogin) {
+        formAdminLogin.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const u = document.getElementById('admin-username-input').value.trim();
+            const p = document.getElementById('admin-password-input').value.trim();
+            if (u && p) {
+                handleAdminLogin(u, p);
+            }
+        });
+    }
 }
+
+// ── 2.1. Autenticación y Administración ──────────────────────────────────────
+
+function toggleAdminPopover() {
+    const popover = document.getElementById('admin-user-popover');
+    const chevron = document.getElementById('admin-auth-chevron');
+    if (!popover) return;
+
+    const isOpen = !popover.classList.contains('pointer-events-none');
+    if (isOpen) {
+        hideAdminPopover();
+    } else {
+        popover.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
+        popover.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+    }
+}
+
+function hideAdminPopover() {
+    const popover = document.getElementById('admin-user-popover');
+    const chevron = document.getElementById('admin-auth-chevron');
+    if (popover) {
+        popover.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
+        popover.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+    }
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+}
+
+function showAdminLoginModal() {
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    const input = document.getElementById('admin-username-input');
+    if (input) input.focus();
+}
+
+function hideAdminLoginModal() {
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    const err = document.getElementById('admin-login-error');
+    if (err) err.classList.add('hidden');
+    const uInput = document.getElementById('admin-username-input');
+    const pInput = document.getElementById('admin-password-input');
+    if (uInput) uInput.value = '';
+    if (pInput) pInput.value = '';
+}
+
+async function handleAdminLogin(username, password) {
+    const errorEl = document.getElementById('admin-login-error');
+    const errorTextEl = document.getElementById('admin-login-error-text');
+    if (errorEl) errorEl.classList.add('hidden');
+
+    try {
+        const res = await fetch(`${DS_API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.detail || 'Usuario o contraseña incorrectos');
+        }
+        adminToken = data.token;
+        adminUser = data.username;
+        sessionStorage.setItem('adminToken', adminToken);
+        sessionStorage.setItem('adminUser', adminUser);
+
+        hideAdminLoginModal();
+        updateAdminUIState();
+        showToast('🛡️ Sesión de Administrador iniciada', 'success');
+        loadHistory();
+        loadDetailedHistory();
+    } catch (err) {
+        if (errorEl && errorTextEl) {
+            errorTextEl.textContent = err.message || 'Error de autenticación.';
+            errorEl.classList.remove('hidden');
+        }
+    }
+}
+
+async function handleAdminLogout() {
+    if (adminToken) {
+        try {
+            await fetch(`${DS_API_URL}/auth/logout`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${adminToken}` }
+            });
+        } catch {
+            // Ignorar errores de red en logout
+        }
+    }
+    adminToken = null;
+    adminUser = null;
+    sessionStorage.removeItem('adminToken');
+    sessionStorage.removeItem('adminUser');
+    updateAdminUIState();
+    showToast('Sesión de Administrador cerrada', 'info');
+    loadHistory();
+    const filterCat = document.getElementById('filter-category');
+    const searchHist = document.getElementById('search-history');
+    const cat = filterCat ? filterCat.value : 'all';
+    const q = searchHist ? searchHist.value.trim().toLowerCase() : '';
+    loadDetailedHistory(cat, q);
+}
+
+function updateAdminUIState() {
+    const authBtnText = document.getElementById('admin-auth-text');
+    const authBtnIcon = document.getElementById('admin-auth-icon');
+    const authBtn = document.getElementById('btn-admin-auth');
+    const chevron = document.getElementById('admin-auth-chevron');
+    const popoverUser = document.getElementById('popover-admin-username');
+
+    if (isLoggedInAsAdmin()) {
+        if (authBtnText) authBtnText.textContent = `Admin (${adminUser})`;
+        if (authBtnIcon) authBtnIcon.textContent = 'verified_user';
+        if (chevron) chevron.classList.remove('hidden');
+        if (popoverUser) popoverUser.textContent = adminUser || 'Admin';
+        if (authBtn) {
+            authBtn.classList.remove('bg-surface-container-high');
+            authBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
+            authBtn.title = 'Opciones de Administrador';
+        }
+    } else {
+        if (authBtnText) authBtnText.textContent = 'Admin Login';
+        if (authBtnIcon) authBtnIcon.textContent = 'admin_panel_settings';
+        if (chevron) chevron.classList.add('hidden');
+        hideAdminPopover();
+        if (authBtn) {
+            authBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
+            authBtn.classList.add('bg-surface-container-high');
+            authBtn.title = 'Iniciar Sesión Administrador';
+        }
+    }
+}
+
+async function deletePrediction(id) {
+    if (!isLoggedInAsAdmin()) {
+        showToast('Debe iniciar sesión como Administrador para eliminar registros.', 'warning');
+        return;
+    }
+
+    if (!confirm(`⚠️ ¿Estás seguro de que deseas eliminar permanentemente la consulta ID #${id}?`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`${DS_API_URL}/predicciones/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${adminToken}`
+            }
+        });
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.detail || 'No se pudo eliminar la consulta');
+        }
+
+        showToast(`🗑️ Consulta ID #${id} eliminada correctamente.`, 'success');
+
+        const jsonModal = document.getElementById('json-modal');
+        if (jsonModal && !jsonModal.classList.contains('hidden')) {
+            toggleJsonModal();
+        }
+
+        loadHistory();
+        const filterCat = document.getElementById('filter-category');
+        const searchHist = document.getElementById('search-history');
+        const cat = filterCat ? filterCat.value : 'all';
+        const q = searchHist ? searchHist.value.trim().toLowerCase() : '';
+        loadDetailedHistory(cat, q);
+
+        const analyticsView = document.getElementById('analytics-view-section');
+        if (analyticsView && !analyticsView.classList.contains('hidden')) {
+            loadAnalyticsDashboard();
+        }
+    } catch (err) {
+        showToast(`Error al eliminar: ${err.message}`, 'error');
+    }
+}
+
 
 // ── 3. Clasificación via Spring Boot ────────────────────────────────────────
 
@@ -549,6 +787,13 @@ async function loadHistory() {
                     </div>
                 ` : '';
 
+                const deleteBtnHtml = isLoggedInAsAdmin() ? `
+                    <button type="button" class="btn-delete-entry px-2.5 py-1 rounded-lg border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Eliminar consulta de la base de datos">
+                        <span class="material-symbols-outlined text-xs pointer-events-none">delete</span>
+                        <span class="pointer-events-none font-bold">Borrar</span>
+                    </button>
+                ` : '';
+
                 return `
                     <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0 flex flex-col justify-between">
                         <div>
@@ -564,10 +809,13 @@ async function loadHistory() {
                             <div class="flex items-center gap-1.5">
                                 <span class="font-label-sm text-[11px] text-on-surface-variant font-medium">Confianza: ${probPct}%</span>
                             </div>
-                            <button type="button" class="btn-view-entry-json px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
-                                <span class="material-symbols-outlined text-xs pointer-events-none">code</span>
-                                <span class="pointer-events-none">Ver JSON</span>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                ${deleteBtnHtml}
+                                <button type="button" class="btn-view-entry-json px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
+                                    <span class="material-symbols-outlined text-xs pointer-events-none">code</span>
+                                    <span class="pointer-events-none">Ver JSON</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -655,6 +903,13 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                     </div>
                 ` : '';
 
+                const deleteBtnHtml = isLoggedInAsAdmin() ? `
+                    <button type="button" class="btn-delete-entry px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Eliminar consulta de la base de datos">
+                        <span class="material-symbols-outlined text-sm pointer-events-none">delete</span>
+                        <span class="pointer-events-none font-bold">Borrar</span>
+                    </button>
+                ` : '';
+
                 return `
                     <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
                         <div class="flex-1 min-w-0 space-y-2">
@@ -681,10 +936,13 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                 <span class="block text-xs font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Confianza</span>
                                 <span class="text-xl sm:text-2xl font-black text-primary-fixed">${probPct}%</span>
                             </div>
-                            <button type="button" class="btn-view-entry-json px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
-                                <span class="material-symbols-outlined text-sm pointer-events-none">code</span>
-                                <span class="pointer-events-none">Ver JSON</span>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                ${deleteBtnHtml}
+                                <button type="button" class="btn-view-entry-json px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
+                                    <span class="material-symbols-outlined text-sm pointer-events-none">code</span>
+                                    <span class="pointer-events-none">Ver JSON</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -826,6 +1084,12 @@ document.addEventListener('click', (e) => {
     if (viewItemBtn) {
         const id = viewItemBtn.getAttribute('data-id');
         showHistoryEntryJsonInModal(id);
+    }
+
+    const deleteBtn = e.target.closest('.btn-delete-entry');
+    if (deleteBtn) {
+        const id = deleteBtn.getAttribute('data-id');
+        deletePrediction(id);
     }
 });
 

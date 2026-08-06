@@ -80,6 +80,9 @@ services:
       - PG_USER=techmind_user
       - PG_PASSWORD=techmind_pass
       - MODEL_PATH=./data-science/models
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - JWT_SECRET=${JWT_SECRET:-supersecret_techmind_token_2026}
     # --workers 1       : un solo worker (ideal para 1 vCPU, menor consumo RAM)
     # --limit-max-requests 500: reinicia el worker cada 500 requests (libera leaks de memoria)
     command: >
@@ -115,6 +118,9 @@ services:
       - PG_USER=techmind_user
       - PG_PASSWORD=techmind_pass
       - TECHMIND_DS_API_URL=http://fastapi:8000
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - JWT_SECRET=${JWT_SECRET:-supersecret_techmind_token_2026}
     depends_on:
       postgres:
         condition: service_healthy

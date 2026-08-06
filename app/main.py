@@ -12,19 +12,43 @@ Uso:
     uvicorn app.main:app --reload --port 8000
 """
 
+import hashlib
 import os
 import re
+import secrets
 from contextlib import asynccontextmanager
 
 import joblib
 import numpy as np
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header, Depends
 from pydantic import BaseModel, field_validator
 
-from app.database import init_db, get_predicciones, get_analytics_data
+from app.database import init_db, get_predicciones, get_analytics_data, delete_prediccion
 
 load_dotenv()
+
+# ── Configuración y Estado de Autenticación Admin ─────────────────────────────
+ADMIN_USER = os.getenv("ADMIN_USER", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
+ADMIN_PASSWORD_HASH = hashlib.sha256(ADMIN_PASSWORD.encode()).hexdigest()
+
+ACTIVE_TOKENS = set()
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+def verificar_admin_token(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Token de autorización requerido")
+    token = authorization.split("Bearer ")[1].strip()
+    if token not in ACTIVE_TOKENS:
+        raise HTTPException(status_code=401, detail="Token inválido o sesión expirada")
+    return token
+
 
 # ── Estado global del modelo ──────────────────────────────────────────────────
 vectorizer = None
@@ -211,6 +235,46 @@ def health():
 )
 def listar_predicciones(limit: int = 50):
     return get_predicciones(limit=limit)
+
+
+@app.post(
+    "/auth/login",
+    summary="Login de Administrador",
+    description="Valida las credenciales del administrador y genera un token de sesión.",
+)
+def login(req: LoginRequest):
+    pwd_hash = hashlib.sha256(req.password.encode()).hexdigest()
+    if req.username == ADMIN_USER and (req.password == ADMIN_PASSWORD or pwd_hash == ADMIN_PASSWORD_HASH):
+        token = secrets.token_hex(32)
+        ACTIVE_TOKENS.add(token)
+        return {"status": "ok", "token": token, "username": req.username}
+    raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
+
+
+@app.post(
+    "/auth/logout",
+    summary="Logout de Administrador",
+    description="Invalida el token de sesión del administrador en el servidor.",
+)
+def logout(authorization: str = Header(None)):
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ")[1].strip()
+        ACTIVE_TOKENS.discard(token)
+    return {"status": "ok", "message": "Sesión cerrada correctamente"}
+
+
+@app.delete(
+    "/predicciones/{prediccion_id}",
+    summary="Eliminar una consulta del historial (Solo Admin)",
+    description="Elimina la predicción y su contenido en cascada. Requiere token de administrador.",
+)
+def eliminar_prediccion(prediccion_id: int, token: str = Depends(verificar_admin_token)):
+    exito = delete_prediccion(prediccion_id)
+    if not exito:
+        raise HTTPException(status_code=404, detail=f"No se encontró la consulta ID {prediccion_id}")
+    return {"status": "deleted", "id": prediccion_id}
+
+
 
 
 @app.get(

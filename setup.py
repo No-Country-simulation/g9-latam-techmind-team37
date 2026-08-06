@@ -119,13 +119,67 @@ def install_deps():
 
 def setup_env():
     header(4, "Configurando variables de entorno (.env)")
-    if os.path.exists(".env"):
-        ok("El archivo .env ya existe — omitiendo copia")
-        return
-    if not os.path.exists(".env.example"):
-        fail("No se encontró .env.example en la raíz del proyecto.")
-    shutil.copy(".env.example", ".env")
-    ok(".env creado a partir de .env.example (Configuración local lista)")
+    if not os.path.exists(".env"):
+        if not os.path.exists(".env.example"):
+            fail("No se encontró .env.example en la raíz del proyecto.")
+        shutil.copy(".env.example", ".env")
+
+    with open(".env", "r", encoding="utf-8") as f:
+        env_content = f.read()
+
+    admin_user = "admin"
+    admin_pass = "admin123"
+
+    # Si estamos en terminal interactiva, solicitar credenciales al usuario
+    if sys.stdin.isatty():
+        print("\n  🔐 Configuración de cuenta Administrador:")
+        try:
+            u_input = input("     Ingrese usuario administrador [admin]: ").strip()
+            if u_input:
+                admin_user = u_input
+
+            p_input = input("     Ingrese contraseña administrador [admin123]: ").strip()
+            if p_input:
+                admin_pass = p_input
+        except (KeyboardInterrupt, EOFError):
+            print()
+            pass
+        except Exception:
+            pass
+
+    # Actualizar o insertar ADMIN_USER, ADMIN_PASSWORD y JWT_SECRET en .env
+    lines = env_content.splitlines()
+    updated_user = False
+    updated_pass = False
+    updated_jwt = False
+    new_lines = []
+
+    for line in lines:
+        if line.startswith("ADMIN_USER="):
+            new_lines.append(f"ADMIN_USER={admin_user}")
+            updated_user = True
+        elif line.startswith("ADMIN_PASSWORD="):
+            new_lines.append(f"ADMIN_PASSWORD={admin_pass}")
+            updated_pass = True
+        elif line.startswith("JWT_SECRET="):
+            new_lines.append(line)
+            updated_jwt = True
+        else:
+            new_lines.append(line)
+
+    if not updated_user:
+        new_lines.append(f"ADMIN_USER={admin_user}")
+    if not updated_pass:
+        new_lines.append(f"ADMIN_PASSWORD={admin_pass}")
+    if not updated_jwt:
+        new_lines.append("JWT_SECRET=supersecret_techmind_token_2026")
+
+    with open(".env", "w", encoding="utf-8") as f:
+        f.write("\n".join(new_lines) + "\n")
+
+    ok(f"Credenciales de administrador listas en .env (Usuario: '{admin_user}')")
+
+
 
 
 # ─── Paso 5 — Docker / PostgreSQL ────────────────────────────────────────────
@@ -377,6 +431,9 @@ def main():
     print("║   Hackathon G9 LATAM · Equipo 37                                ║")
     print("╚═════════════════════════════════════════════════════════════════╝")
 
+    # Configurar siempre .env primero para asegurar que existan las credenciales
+    setup_env()
+
     if args.docker:
         run_full_docker()
         return
@@ -392,7 +449,6 @@ def main():
     check_python()
     create_venv()
     install_deps()
-    setup_env()
     start_docker()
     migrate_db()
     start_services()

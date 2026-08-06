@@ -488,11 +488,42 @@
                         para clasificarlos en tiempo real.</p>
                 </div>
             </div>
-            <button id="btn-theme-toggle" type="button"
-                class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg"
-                title="Cambiar tema">
-                <span class="material-symbols-outlined text-2xl" id="theme-toggle-icon">light_mode</span>
-            </button>
+            <div class="relative flex items-center gap-2 shrink-0">
+                <button id="btn-admin-auth" type="button"
+                    class="p-2.5 px-3.5 min-h-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center gap-2 shadow-lg font-label-sm text-xs font-semibold cursor-pointer"
+                    title="Iniciar Sesión Administrador">
+                    <span class="material-symbols-outlined text-xl" id="admin-auth-icon">admin_panel_settings</span>
+                    <span id="admin-auth-text">Admin Login</span>
+                    <span id="admin-auth-chevron" class="material-symbols-outlined text-sm hidden transition-transform duration-200">expand_more</span>
+                </button>
+
+                <!-- Menu Dropdown de Admin Logueado -->
+                <div id="admin-user-popover"
+                    class="absolute top-full right-12 mt-2 w-56 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-200 opacity-0 pointer-events-none transform -translate-y-2 z-50">
+                    <div class="flex items-center gap-2.5 pb-2 border-b medium-border">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 shrink-0">
+                            <span class="material-symbols-outlined text-lg">verified_user</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="font-label-sm text-xs font-bold text-on-surface truncate" id="popover-admin-username">Admin</p>
+                            <p class="font-label-sm text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sesión Activa
+                            </p>
+                        </div>
+                    </div>
+                    <button id="btn-admin-logout" type="button"
+                        class="w-full px-3 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
+                        <span class="material-symbols-outlined text-sm">logout</span>
+                        <span>Cerrar Sesión</span>
+                    </button>
+                </div>
+
+                <button id="btn-theme-toggle" type="button"
+                    class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg"
+                    title="Cambiar tema">
+                    <span class="material-symbols-outlined text-2xl" id="theme-toggle-icon">light_mode</span>
+                </button>
+            </div>
         </header>
 
         <!-- Classifier View Section -->
@@ -792,8 +823,52 @@
 
 
 
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-md p-4 transition-all duration-300 overflow-y-auto">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 sm:p-8 border border-white/10 shadow-2xl relative animate-fade-in my-auto mx-auto shrink-0">
+            <button id="btn-close-admin-modal" type="button"
+                class="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-variant/50 transition-all cursor-pointer">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary-fixed">
+                    <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-md text-xl text-on-surface font-bold">Iniciar Sesión Admin</h3>
+                    <p class="font-body-md text-xs text-on-surface-variant">Acceso a borrado y gestión de consultas</p>
+                </div>
+            </div>
+            
+            <div id="admin-login-error" class="hidden mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-label-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm shrink-0">error</span>
+                <span id="admin-login-error-text">Usuario o contraseña incorrectos.</span>
+            </div>
+
+            <form id="form-admin-login" class="space-y-4" onsubmit="return false;">
+                <div>
+                    <label class="block font-label-sm text-xs text-on-surface-variant mb-1.5 font-semibold">Usuario Administrador</label>
+                    <input id="admin-username-input" type="text" placeholder="Ej. admin" autocomplete="username" class="w-full px-4 py-2.5 rounded-xl tech-input text-sm focus:outline-none font-body-md" required />
+                </div>
+                <div>
+                    <label class="block font-label-sm text-xs text-on-surface-variant mb-1.5 font-semibold">Contraseña</label>
+                    <input id="admin-password-input" type="password" placeholder="••••••••" autocomplete="current-password" class="w-full px-4 py-2.5 rounded-xl tech-input text-sm focus:outline-none font-body-md" required />
+                </div>
+                <div class="pt-2 flex items-center justify-end gap-3">
+                    <button id="btn-cancel-admin-modal" type="button" class="px-4 py-2 rounded-xl border border-white/10 text-on-surface-variant hover:text-on-surface text-xs font-label-sm font-semibold transition-all">Cancelar</button>
+                    <button id="btn-submit-admin-login" type="submit" class="px-5 py-2 rounded-xl bg-primary-container hover:bg-primary-container/80 text-on-primary-container text-xs font-label-sm font-bold shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95">
+                        <span class="material-symbols-outlined text-sm">login</span>
+                        <span>Ingresar</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Script Principal -->
-    <script src="app.js?v=1.5.4"></script>
+    <script src="app.js?v=1.6.0"></script>
+
 </body>
 
 </html>

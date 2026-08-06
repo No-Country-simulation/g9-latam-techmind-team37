@@ -114,6 +114,19 @@ public class PrediccionService {
         prediccionRepository.save(prediccion);
     }
 
+    @Transactional
+    public boolean eliminarPrediccion(Long prediccionId) {
+        return prediccionRepository.findById(prediccionId).map(prediccion -> {
+            Contenido contenido = prediccion.getContenido();
+            prediccionRepository.delete(prediccion);
+            if (contenido != null) {
+                contenidoRepository.delete(contenido);
+            }
+            return true;
+        }).orElse(false);
+    }
+
+
     // ── Parser de la respuesta JSON de FastAPI ────────────────────────────────
 
     /**

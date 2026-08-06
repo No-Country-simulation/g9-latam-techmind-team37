@@ -4,6 +4,34 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.8.0] — 2026-08-06 · Panel de Autenticación Admin, Tokens de Sesión y Eliminación de Consultas
+
+### Añadido
+- **Autenticación y Sesiones Admin en Microservicio FastAPI (`app/main.py`):**
+  - Creado el endpoint `POST /auth/login` que recibe usuario y contraseña, valida credenciales con comparación de hash SHA-256 e inyecta un Token Bearer seguro (`secrets.token_hex(32)`) en `ACTIVE_TOKENS`.
+  - Creado el endpoint `POST /auth/logout` para invalidación inmediata de tokens en el servidor.
+  - Creado el endpoint protegido `DELETE /predicciones/{prediccion_id}` que requiere la cabecera `Authorization: Bearer <token>` para autorizar la eliminación de consultas.
+
+- **Eliminación en Cascada en PostgreSQL (`app/database.py`):**
+  - Implementada la función `delete_prediccion(prediccion_id: int)` que elimina de forma atómica y en cascada la predicción en la tabla `predicciones` y su correspondiente contenido en `contenidos`, incluyendo manejo explícito de `con.rollback()` ante cualquier excepción de base de datos.
+
+- **Paridad en API REST Spring Boot (`backend/api/src/main/java/api/`):**
+  - **Servicio:** Añadido el método `@Transactional public boolean eliminarPrediccion(Long prediccionId)` en `PrediccionService.java`.
+  - **Controlador:** Expuesto el endpoint `@DeleteMapping("/{id}")` en `ContenidoController.java` para dar soporte a solicitudes de eliminación directa en el puerto 8080.
+
+- **Panel de Login Admin, Menú Popover y Gestión Visual en Web UI (`frontend/`):**
+  - **Header:** Botón **Admin Login** en la barra superior con indicador dinámico de estado (`🛡️ Admin (usuario)`).
+  - **Modal de Login Centrado (`index.html` + `app.js`):** Interfaz modal Cyber AI Glassmorphism perfectamente centrada en pantalla para la autenticación de administradores con validación y alertas.
+  - **Menú Desplegable Popover:** Al estar logueado como administrador, un clic sobre el botón abre un menú popover con información del usuario activo y el botón de acción **"🚪 Cerrar Sesión"**.
+  - **Acceso Invitados:** Los usuarios sin autenticar mantienen el uso libre del clasificador e historial pero sin acceso a botones de borrado.
+  - **Botones "🗑️ Borrar":** En las tarjetas e ítems del historial se renderizan condicionalmente los botones de eliminación cuando la sesión de administrador está activa, con alerta de confirmación y refresco en tiempo real del historial y los gráficos del Dashboard de Análisis.
+
+- **Configuración Interactiva e Integración Docker (`setup.py`, `.env.example`, `docker-compose.yml`):**
+  - **Setup Universal:** `setup.py` solicita interactivamente el usuario y contraseña del administrador en la primera ejecución y actualiza automáticamente `.env`.
+  - **Docker Compose:** Propagadas las variables `ADMIN_USER`, `ADMIN_PASSWORD` y `JWT_SECRET` a los servicios de `fastapi` y `springboot`.
+
+---
+
 ## [1.7.0] — 2026-08-04 · Dashboard de Análisis Gráfico y Estadísticas en Tiempo Real (Chart.js + PostgreSQL)
 
 ### Añadido

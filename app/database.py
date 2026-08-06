@@ -81,6 +81,44 @@ def get_predicciones(limit: int = 50):
         return []
 
 
+def delete_prediccion(prediccion_id: int) -> bool:
+    """
+    Elimina en cascada una predicción y su contenido asociado de PostgreSQL por ID.
+    Retorna True si fue eliminada correctamente, False si no se encontró.
+    """
+    try:
+        con = get_connection()
+        cur = con.cursor()
+
+        cur.execute("SELECT contenido_id FROM predicciones WHERE id = %s;", (prediccion_id,))
+        row = cur.fetchone()
+        if not row:
+            cur.close()
+            con.close()
+            return False
+
+        contenido_id = row[0]
+
+        cur.execute("DELETE FROM predicciones WHERE id = %s;", (prediccion_id,))
+        if contenido_id:
+            cur.execute("DELETE FROM contenidos WHERE id = %s;", (contenido_id,))
+
+        con.commit()
+        cur.close()
+        con.close()
+        return True
+    except Exception as exc:
+        print(f"⚠️ Error al eliminar predicción ID {prediccion_id} de PostgreSQL: {exc}")
+        if 'con' in locals() and con:
+            try:
+                con.rollback()
+                con.close()
+            except Exception:
+                pass
+        return False
+
+
+
 def get_analytics_data(tz_offset_minutes: int = 0):
     """
     Agrupa estadísticas visuales de la base de datos PostgreSQL:

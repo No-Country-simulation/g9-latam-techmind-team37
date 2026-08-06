@@ -24,4 +24,14 @@ public class ContenidoController {
         PrediccionResponse response = prediccionService.clasificar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarContenido(@PathVariable Long id) {
+        boolean eliminado = prediccionService.eliminarPrediccion(id);
+        if (eliminado) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
