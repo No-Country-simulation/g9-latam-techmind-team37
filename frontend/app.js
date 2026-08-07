@@ -789,8 +789,8 @@ async function loadHistory() {
 
                 const deleteBtnHtml = isLoggedInAsAdmin() ? `
                     <button type="button" class="btn-delete-entry px-2.5 py-1 rounded-lg border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Eliminar consulta de la base de datos">
-                        <span class="material-symbols-outlined text-xs pointer-events-none">delete</span>
-                        <span class="pointer-events-none font-bold">Borrar</span>
+                        <span class="material-symbols-outlined text-xs pointer-events-none" style="color: var(--led-error-text)">delete</span>
+                        <span class="pointer-events-none font-bold" style="color: var(--led-error-text)">Borrar</span>
                     </button>
                 ` : '';
 
@@ -905,8 +905,8 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
 
                 const deleteBtnHtml = isLoggedInAsAdmin() ? `
                     <button type="button" class="btn-delete-entry px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Eliminar consulta de la base de datos">
-                        <span class="material-symbols-outlined text-sm pointer-events-none">delete</span>
-                        <span class="pointer-events-none font-bold">Borrar</span>
+                        <span class="material-symbols-outlined text-sm pointer-events-none" style="color: var(--led-error-text)">delete</span>
+                        <span class="pointer-events-none font-bold" style="color: var(--led-error-text)">Borrar</span>
                     </button>
                 ` : '';
 
