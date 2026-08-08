@@ -169,7 +169,7 @@ function setServiceStatus(elementId, isOk, text) {
             overallLed.className = 'w-2.5 h-2.5 rounded-full led-pulse';
             overallLed.style.backgroundColor = 'var(--led-ok-bg)';
         } else {
-            overallLed.className = 'w-2.5 h-2.5 rounded-full led-pulse';
+            overallLed.className = 'w-2.5 h-2.5 rounded-full';
             overallLed.style.backgroundColor = 'var(--led-error-bg)';
         }
     }
@@ -329,6 +329,17 @@ function bindEvents() {
     if (statusTrigger && statusPopover) {
         statusTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
+            // Si el sidebar está colapsado en desktop, expandirlo primero
+            if (sidebarCollapsed && window.innerWidth >= 768) {
+                expandSidebar();
+                // Mostrar el popover tras la animación de expansión
+                setTimeout(() => {
+                    statusPopover.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+                    statusPopover.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+                    if (statusChevron) statusChevron.style.transform = 'rotate(180deg)';
+                }, 320);
+                return;
+            }
             const isOpen = !statusPopover.classList.contains('pointer-events-none');
             if (isOpen) {
                 statusPopover.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
@@ -375,6 +386,7 @@ function bindEvents() {
             classifierView.classList.remove('hidden');
             historyView.classList.add('hidden');
             analyticsView.classList.add('hidden');
+            analyticsView.classList.remove('flex');
 
             navClassifier.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
             navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
@@ -391,6 +403,7 @@ function bindEvents() {
             classifierView.classList.add('hidden');
             historyView.classList.remove('hidden');
             analyticsView.classList.add('hidden');
+            analyticsView.classList.remove('flex');
 
             navHistory.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
             navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
@@ -488,17 +501,7 @@ function bindEvents() {
         });
     }
 
-    // JSON Modal Controls (View JSON button and Close button X)
-    const btnViewJson = document.getElementById('btn-view-json');
-    const modalClose = document.getElementById('modal-close');
-    
-    if (btnViewJson) {
-        btnViewJson.addEventListener('click', toggleJsonModal);
-    }
-
-    if (modalClose) {
-        modalClose.addEventListener('click', toggleJsonModal);
-    }
+    // JSON Modal Controls — listeners ya vinculados arriba (líneas 188-193), no duplicar
 
     // Controles del Modal y Popover de Admin Login
     const adminAuthBtn = document.getElementById('btn-admin-auth');
@@ -1319,8 +1322,9 @@ function setLoadingState(isLoading) {
         btn.disabled = false;
         btn.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
-            <div class="relative flex items-center justify-center gap-2">
-                Clasificar con TechMind
+            <div class="relative flex items-center justify-center gap-2.5">
+                <span class="material-symbols-outlined text-lg">science</span>
+                <span>Clasificar con TechMind</span>
             </div>
         `;
     }
