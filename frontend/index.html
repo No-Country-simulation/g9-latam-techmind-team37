@@ -103,6 +103,8 @@
         }
 
         :root {
+            --sidebar-width: 256px;
+            --sidebar-collapsed-width: 64px;
             --background: #e8e2d5;
             --on-background: #231f18;
             --surface: #e8e2d5;
@@ -164,6 +166,53 @@
             --led-error-text: #f87171;
             --json-text: #6ee7b7;
             --json-bg: var(--surface-container-lowest);
+        }
+
+        /* Claude-style sidebar transitions */
+        #sidebar {
+            width: var(--sidebar-width);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.sidebar-collapsed {
+            width: var(--sidebar-collapsed-width);
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        #sidebar.sidebar-collapsed #btn-sidebar-toggle {
+            display: none !important;
+        }
+        #sidebar.sidebar-collapsed .sidebar-brand-text,
+        #sidebar.sidebar-collapsed .sidebar-label,
+        #sidebar.sidebar-collapsed .sidebar-status-text,
+        #sidebar.sidebar-collapsed #status-chevron,
+        #sidebar.sidebar-collapsed #status-popover {
+            display: none !important;
+        }
+        #sidebar.sidebar-collapsed #btn-brand-home {
+            justify-content: center;
+            width: 100%;
+            padding: 0.25rem 0;
+        }
+        #sidebar.sidebar-collapsed .sidebar-nav-item {
+            justify-content: center !important;
+            width: 44px !important;
+            height: 44px !important;
+            margin: 0.5rem auto !important;
+            padding: 0 !important;
+            border-radius: 0.75rem !important;
+        }
+        #sidebar.sidebar-collapsed #btn-status-trigger {
+            justify-content: center !important;
+            width: 44px !important;
+            height: 44px !important;
+            margin: 0.5rem auto !important;
+            padding: 0 !important;
+        }
+        #sidebar.sidebar-collapsed #overall-status-led {
+            margin: 0 auto;
+        }
+        #main-content {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass-panel {
@@ -314,6 +363,15 @@
             .ambient-glow {
                 filter: blur(70px);
             }
+            #main-content {
+                margin-left: 0 !important;
+            }
+            #sidebar {
+                width: var(--sidebar-width) !important;
+            }
+            #btn-sidebar-toggle {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -342,50 +400,56 @@
 
     <!-- Side Navigation Shell -->
     <aside id="sidebar"
-        class="fixed left-0 top-0 h-[100dvh] w-64 max-w-[85vw] border-r subtle-border shadow-2xl bg-surface-container-low z-40 flex flex-col py-6 px-4 transition-transform duration-300 -translate-x-full md:translate-x-0">
-        <div class="mb-8 lg:mb-10 px-3 flex justify-between items-center gap-2">
-            <div id="btn-brand-home" class="min-w-0 cursor-pointer group" title="Ir al inicio">
-                <h1
-                    class="font-headline-md text-purple-950 dark:text-primary-fixed tracking-tight flex items-center gap-3 text-2xl font-extrabold group-hover:opacity-85 transition-opacity">
-                    <span class="material-symbols-outlined text-3xl text-purple-700 dark:text-primary shrink-0"
-                        style="font-variation-settings: 'FILL' 1;">psychology</span>
+        class="fixed left-0 top-0 h-[100dvh] max-w-[85vw] border-r subtle-border shadow-2xl bg-surface-container-low z-40 flex flex-col py-4 px-3 -translate-x-full md:translate-x-0">
+        <!-- Sidebar Header: Brand + Toggle -->
+        <div class="flex items-start justify-between mb-6 px-1 border-b subtle-border pb-4">
+            <div id="btn-brand-home" class="min-w-0 cursor-pointer group flex flex-col items-center text-center flex-1 pr-1" title="Ir al inicio">
+                <h1 class="sidebar-brand-text font-headline-md text-purple-950 dark:text-primary-fixed tracking-tight text-lg sm:text-xl font-extrabold group-hover:opacity-85 transition-opacity leading-tight">
                     TechMind
                 </h1>
-                <p class="font-label-sm text-xs text-on-surface-variant mt-2 opacity-80">Organización inteligente</p>
+                <p class="sidebar-brand-text font-label-sm text-[10px] sm:text-[11px] text-on-surface-variant opacity-80 leading-tight mt-0.5">Organización inteligente</p>
+                <span class="material-symbols-outlined text-3xl text-purple-700 dark:text-primary mt-2 group-hover:scale-110 transition-transform duration-300 shrink-0"
+                    style="font-variation-settings: 'FILL' 1;">psychology</span>
             </div>
-            <!-- Close button only visible on mobile -->
-            <button id="btn-sidebar-close"
-                class="md:hidden shrink-0 p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-surface-variant/50 transition-colors text-on-surface-variant hover:text-on-surface">
-                <span class="material-symbols-outlined text-2xl">close</span>
+            <button id="btn-sidebar-toggle" type="button"
+                class="shrink-0 p-1.5 min-h-[36px] min-w-[36px] rounded-lg hover:bg-surface-variant/50 transition-all text-on-surface-variant hover:text-on-surface flex items-center justify-center cursor-pointer active:scale-90"
+                title="Colapsar sidebar">
+                <span class="material-symbols-outlined text-xl" id="sidebar-toggle-icon">chevron_left</span>
             </button>
         </div>
-        <nav class="flex-1 space-y-3 overflow-y-auto">
+        <nav class="flex-1 space-y-1.5 overflow-y-auto">
             <a id="nav-classifier"
                 class="sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer">
-                <span class="material-symbols-outlined text-xl">category</span>
-                <span class="font-label-sm text-sm font-bold">Clasificador</span>
+                <span class="material-symbols-outlined text-xl shrink-0">category</span>
+                <span class="sidebar-label font-label-sm text-sm font-bold">Clasificador</span>
             </a>
             <a id="nav-history"
                 class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
-                <span
-                    class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">history</span>
-                <span class="font-label-sm text-sm font-semibold">Historial</span>
+                <span class="material-symbols-outlined text-xl shrink-0">history</span>
+                <span class="sidebar-label font-label-sm text-sm font-semibold">Historial</span>
             </a>
             <a id="nav-analytics"
                 class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
-                <span
-                    class="material-symbols-outlined text-xl group-hover:text-primary-fixed transition-colors">analytics</span>
-                <span class="font-label-sm text-sm font-semibold">Análisis</span>
+                <span class="material-symbols-outlined text-xl shrink-0">analytics</span>
+                <span class="sidebar-label font-label-sm text-sm font-semibold">Análisis</span>
             </a>
         </nav>
-        <!-- Server Status Popover trigger inside Sidebar -->
-        <div class="relative mt-auto pt-6 border-t medium-border" style="overflow:visible;">
+        <!-- Sidebar Bottom Controls: Theme Toggle & Service Status -->
+        <div class="relative mt-auto pt-4 border-t medium-border space-y-1" style="overflow:visible;">
+            <!-- Theme Toggle Button in Sidebar -->
+            <a id="btn-theme-toggle"
+                class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer"
+                title="Cambiar tema">
+                <span class="material-symbols-outlined text-xl shrink-0" id="theme-toggle-icon">light_mode</span>
+                <span class="sidebar-label font-label-sm text-sm font-semibold" id="theme-toggle-text">Cambiar tema</span>
+            </a>
+
             <!-- Status Trigger Button -->
             <button id="btn-status-trigger" type="button"
                 class="sidebar-nav-item w-full flex items-center justify-between gap-3 text-on-surface-variant cursor-pointer active:scale-95 focus:outline-none">
                 <div class="flex items-center gap-2.5">
-                    <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                    <span class="font-label-sm text-sm font-semibold">Estado de servicios</span>
+                    <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></div>
+                    <span class="sidebar-label sidebar-status-text font-label-sm text-sm font-semibold">Estado de servicios</span>
                 </div>
                 <span id="status-chevron"
                     class="material-symbols-outlined text-lg transition-transform duration-300">expand_less</span>
@@ -469,60 +533,55 @@
 
     <!-- Main Content Area -->
     <main id="main-content"
-        class="relative z-10 md:ml-64 min-h-[100dvh] flex flex-col p-4 sm:p-6 md:p-8 transition-all duration-300">
+        class="relative z-10 min-h-[100dvh] flex flex-col p-4 sm:p-6 md:p-8" style="margin-left: var(--sidebar-width);">
 
         <!-- Header Section -->
         <header
-            class="flex flex-row items-center justify-between gap-3 sm:gap-6 mb-6 sm:mb-8 pt-4 md:pt-0 border-b subtle-border pb-5 sm:pb-6">
-            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
-                <button id="btn-sidebar-toggle"
-                    class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg"
-                    title="Toggle Sidebar">
-                    <span class="material-symbols-outlined text-2xl" id="sidebar-toggle-icon">chevron_left</span>
+            class="flex flex-row items-center justify-between gap-2 sm:gap-6 mb-6 sm:mb-8 pt-2 sm:pt-4 md:pt-0 border-b subtle-border pb-4 sm:pb-6">
+            <div class="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
+                <!-- Mobile-only hamburger -->
+                <button id="btn-sidebar-mobile"
+                    class="md:hidden shrink-0 p-2 min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg"
+                    title="Abrir menú">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
                 </button>
-                <div class="min-w-0">
-                    <h2
-                        class="font-headline-md text-lg sm:text-2xl md:text-3xl text-on-surface font-bold tracking-tight">
+                <div class="min-w-0 flex-1">
+                    <h2 id="main-header-title"
+                        class="font-headline-md text-base sm:text-2xl md:text-3xl text-on-surface font-bold tracking-tight leading-snug">
                         Clasificación de contenido técnico</h2>
-                    <p class="font-body-md text-xs sm:text-sm md:text-base text-on-surface-variant mt-1">Ingresá textos
+                    <p id="main-header-subtitle" class="font-body-md text-[11px] sm:text-sm md:text-base text-on-surface-variant mt-0.5 sm:mt-1 line-clamp-1 sm:line-clamp-none opacity-85">Ingresá textos
                         para clasificarlos en tiempo real.</p>
                 </div>
             </div>
-            <div class="relative flex items-center gap-2 shrink-0">
+            <div class="relative flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <button id="btn-admin-auth" type="button"
-                    class="p-2.5 px-3.5 min-h-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center gap-2 shadow-lg font-label-sm text-xs font-semibold cursor-pointer"
+                    class="p-2 sm:px-3.5 min-h-[40px] sm:min-h-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/80 hover:border-purple-800/25 transition-all active:scale-95 focus:outline-none flex items-center gap-2 shadow-lg font-label-sm text-xs font-semibold cursor-pointer"
                     title="Iniciar Sesión Administrador">
                     <span class="material-symbols-outlined text-xl" id="admin-auth-icon">admin_panel_settings</span>
-                    <span id="admin-auth-text">Admin Login</span>
+                    <span id="admin-auth-text" class="hidden sm:inline">Admin Login</span>
                     <span id="admin-auth-chevron" class="material-symbols-outlined text-sm hidden transition-transform duration-200">expand_more</span>
                 </button>
 
                 <!-- Menu Dropdown de Admin Logueado -->
                 <div id="admin-user-popover"
-                    class="absolute top-full right-12 mt-2 w-56 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-200 opacity-0 pointer-events-none transform -translate-y-2 z-50">
+                    class="absolute top-full right-0 mt-2 w-56 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-200 opacity-0 pointer-events-none transform -translate-y-2 z-50">
                     <div class="flex items-center gap-2.5 pb-2 border-b medium-border">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 shrink-0">
-                            <span class="material-symbols-outlined text-lg" style="color: var(--json-text)">verified_user</span>
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-700 dark:text-purple-300 shrink-0">
+                            <span class="material-symbols-outlined text-lg text-purple-700 dark:text-purple-300">verified_user</span>
                         </div>
                         <div class="min-w-0 flex-1">
                             <p class="font-label-sm text-xs font-bold text-on-surface truncate" id="popover-admin-username">Admin</p>
-                            <p class="font-label-sm text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sesión Activa
+                            <p class="font-label-sm text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span> Sesión Activa
                             </p>
                         </div>
                     </div>
                     <button id="btn-admin-logout" type="button"
-                        class="w-full px-3 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
-                        <span class="material-symbols-outlined text-sm" style="color: var(--led-error-text)">logout</span>
-                        <span style="color: var(--led-error-text)">Cerrar Sesión</span>
+                        class="w-full px-3 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
+                        <span class="material-symbols-outlined text-sm text-rose-700 dark:text-rose-300">logout</span>
+                        <span class="text-rose-700 dark:text-rose-300 font-bold">Cerrar Sesión</span>
                     </button>
                 </div>
-
-                <button id="btn-theme-toggle" type="button"
-                    class="shrink-0 p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg"
-                    title="Cambiar tema">
-                    <span class="material-symbols-outlined text-2xl" id="theme-toggle-icon">light_mode</span>
-                </button>
             </div>
         </header>
 
@@ -561,15 +620,21 @@
                                     placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."></textarea>
                             </div>
 
-                            <div class="flex justify-center mt-4">
+                            <div class="flex flex-col sm:flex-row justify-center items-center gap-3 mt-4">
                                 <button id="btn-classify" type="button"
                                     class="group relative w-full sm:w-auto px-6 sm:px-10 py-4 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer">
                                     <div
                                         class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300">
                                     </div>
                                     <div class="relative flex items-center justify-center gap-2.5">
+                                        <span class="material-symbols-outlined text-lg">science</span>
                                         <span>Clasificar con TechMind</span>
                                     </div>
+                                </button>
+                                <button id="btn-clear-form" type="button"
+                                    class="w-full sm:w-auto px-6 py-4 rounded-xl font-label-sm text-base font-bold border border-outline-variant/50 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/30 transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center gap-2.5">
+                                    <span class="material-symbols-outlined text-lg">delete_sweep</span>
+                                    <span>Limpiar formulario</span>
                                 </button>
                             </div>
                         </form>
@@ -664,40 +729,30 @@
         <!-- History View Section (Subpage) -->
         <div id="history-view-section" class="hidden flex-1 flex flex-col gap-6">
             <div
-                class="flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-6 pb-6 border-b subtle-border">
-                <div class="min-w-0">
-                    <h2 class="font-headline-md text-2xl sm:text-3xl text-on-surface font-bold tracking-tight">Historial
-                        de consultas</h2>
-                    <p class="font-body-md text-sm sm:text-base text-on-surface-variant mt-1">Revisá y filtrá todas las
-                        predicciones.</p>
+                class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full pb-6 border-b subtle-border">
+                <!-- Search Input -->
+                <div class="relative flex-1 min-w-0">
+                    <span
+                        class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
+                    <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..."
+                        class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all">
                 </div>
-                <!-- Search and Category Filters -->
-                <div
-                    class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 flex-1 md:flex-initial w-full md:w-auto max-w-full md:max-w-xl">
-                    <!-- Search Input -->
-                    <div class="relative flex-1 min-w-0">
-                        <span
-                            class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
-                        <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..."
-                            class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all">
-                    </div>
-                    <!-- Category Filter -->
-                    <div class="flex items-center gap-3 min-w-0">
-                        <label for="filter-category"
-                            class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap shrink-0">Filtrar:</label>
-                        <select id="filter-category"
-                            class="tech-select flex-1 sm:flex-initial min-w-0 rounded-xl px-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all cursor-pointer">
-                            <option value="all">Todas las categorías</option>
-                            <option value="Backend">Backend</option>
-                            <option value="Frontend">Frontend</option>
-                            <option value="Data Science">Data Science</option>
-                            <option value="DevOps">DevOps</option>
-                            <option value="Mobile">Mobile</option>
-                            <option value="Bases de Datos">Bases de Datos</option>
-                            <option value="Seguridad">Seguridad</option>
-                            <option value="Cloud">Cloud</option>
-                        </select>
-                    </div>
+                <!-- Category Filter -->
+                <div class="flex items-center gap-3 min-w-0">
+                    <label for="filter-category"
+                        class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap shrink-0">Filtrar:</label>
+                    <select id="filter-category"
+                        class="tech-select flex-1 sm:flex-initial min-w-0 rounded-xl px-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all cursor-pointer">
+                        <option value="all">Todas las categorías</option>
+                        <option value="Backend">Backend</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="DevOps">DevOps</option>
+                        <option value="Mobile">Mobile</option>
+                        <option value="Bases de Datos">Bases de Datos</option>
+                        <option value="Seguridad">Seguridad</option>
+                        <option value="Cloud">Cloud</option>
+                    </select>
                 </div>
             </div>
 
@@ -708,81 +763,81 @@
         </div>
 
         <!-- Analytics View Section -->
-        <div id="analytics-view-section" class="hidden flex-1 flex flex-col gap-6 lg:gap-8">
+        <div id="analytics-view-section" class="hidden flex-1 flex flex-col gap-5 sm:gap-6 lg:gap-8">
             <!-- KPI Summary Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                 <!-- KPI 1: Total Consultas -->
-                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
-                    <div class="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 shrink-0">
-                        <span class="material-symbols-outlined text-2xl">analytics</span>
+                <div class="glass-panel rounded-2xl p-4 sm:p-5 border subtle-border flex items-center gap-3 sm:gap-4 min-w-0">
+                    <div class="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 shrink-0">
+                        <span class="material-symbols-outlined text-xl sm:text-2xl">analytics</span>
                     </div>
-                    <div>
-                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Total Clasificaciones</p>
-                        <h3 id="kpi-total-queries" class="font-headline-md text-2xl font-bold text-on-surface mt-0.5">--</h3>
+                    <div class="min-w-0">
+                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate">Total Clasificaciones</p>
+                        <h3 id="kpi-total-queries" class="font-headline-md text-xl sm:text-2xl font-bold text-on-surface mt-0.5 truncate">--</h3>
                     </div>
                 </div>
 
                 <!-- KPI 2: Categoría Líder -->
-                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
-                    <div class="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 shrink-0">
-                        <span class="material-symbols-outlined text-2xl">emoji_events</span>
+                <div class="glass-panel rounded-2xl p-4 sm:p-5 border subtle-border flex items-center gap-3 sm:gap-4 min-w-0">
+                    <div class="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 shrink-0">
+                        <span class="material-symbols-outlined text-xl sm:text-2xl">emoji_events</span>
                     </div>
-                    <div>
-                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Categoría Líder</p>
-                        <h3 id="kpi-top-category" class="font-headline-md text-xl font-bold text-on-surface mt-0.5">--</h3>
+                    <div class="min-w-0">
+                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate">Categoría Líder</p>
+                        <h3 id="kpi-top-category" class="font-headline-md text-lg sm:text-xl font-bold text-on-surface mt-0.5 truncate">--</h3>
                     </div>
                 </div>
 
                 <!-- KPI 3: Confianza Promedio -->
-                <div class="glass-panel rounded-2xl p-5 border subtle-border flex items-center gap-4">
-                    <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0">
-                        <span class="material-symbols-outlined text-2xl">verified</span>
+                <div class="glass-panel rounded-2xl p-4 sm:p-5 border subtle-border flex items-center gap-3 sm:gap-4 min-w-0">
+                    <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <span class="material-symbols-outlined text-xl sm:text-2xl">verified</span>
                     </div>
-                    <div>
-                        <p class="font-label-sm text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Confianza Promedio</p>
-                        <h3 id="kpi-avg-confidence" class="font-headline-md text-2xl font-bold text-on-surface mt-0.5">--%</h3>
+                    <div class="min-w-0">
+                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate">Confianza Promedio</p>
+                        <h3 id="kpi-avg-confidence" class="font-headline-md text-xl sm:text-2xl font-bold text-on-surface mt-0.5 truncate">--%</h3>
                     </div>
                 </div>
             </div>
 
             <!-- Charts Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8">
                 <!-- Left Chart: Distribución por Categoría (Doughnut) -->
-                <div class="lg:col-span-5 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
-                            <span class="material-symbols-outlined text-purple-600 dark:text-primary">pie_chart</span>
+                <div class="lg:col-span-5 glass-panel rounded-2xl p-4 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex items-center justify-between mb-3 sm:mb-4">
+                        <h3 class="font-headline-md text-sm sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-purple-600 dark:text-primary text-xl sm:text-2xl">pie_chart</span>
                             Distribución por categoría
                         </h3>
                     </div>
-                    <div class="relative flex-1 min-h-[260px] max-h-[340px] flex items-center justify-center">
+                    <div class="relative flex-1 h-[220px] sm:h-[280px] max-h-[340px] flex items-center justify-center">
                         <canvas id="chart-categories"></canvas>
                     </div>
                 </div>
 
                 <!-- Right Chart: Actividad por Hora del Día (Area Chart) -->
-                <div class="lg:col-span-7 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
-                            <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400">schedule</span>
+                <div class="lg:col-span-7 glass-panel rounded-2xl p-4 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex items-center justify-between mb-3 sm:mb-4">
+                        <h3 class="font-headline-md text-sm sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-xl sm:text-2xl">schedule</span>
                             Actividad por hora del día (24hs)
                         </h3>
                     </div>
-                    <div class="relative flex-1 min-h-[260px] max-h-[340px] flex items-center justify-center">
+                    <div class="relative flex-1 h-[220px] sm:h-[280px] max-h-[340px] flex items-center justify-center">
                         <canvas id="chart-hourly"></canvas>
                     </div>
                 </div>
 
                 <!-- Bottom Full-Width Section: Palabras Clave Más Frecuentes (Interactive Tag Cloud) -->
-                <div class="lg:col-span-12 glass-panel rounded-2xl p-5 sm:p-6 border subtle-border flex flex-col min-w-0">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
-                            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400">label</span>
+                <div class="lg:col-span-12 glass-panel rounded-2xl p-4 sm:p-6 border subtle-border flex flex-col min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 mb-3">
+                        <h3 class="font-headline-md text-sm sm:text-lg font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-xl sm:text-2xl">label</span>
                             Palabras clave más frecuentes
                         </h3>
-                        <span class="font-label-sm text-xs text-on-surface-variant">Top términos clasificados</span>
+                        <span class="font-label-sm text-[11px] sm:text-xs text-on-surface-variant">Top términos clasificados</span>
                     </div>
-                    <div id="keywords-cloud-container" class="flex flex-wrap gap-2.5 items-center justify-start py-2">
+                    <div id="keywords-cloud-container" class="flex flex-wrap gap-2 sm:gap-2.5 items-center justify-start py-2">
                         <!-- Renderizado dinámicamente como badges/pills con frecuencia -->
                     </div>
                 </div>
@@ -832,8 +887,8 @@
                 <span class="material-symbols-outlined">close</span>
             </button>
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary-fixed">
-                    <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+                <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-700 dark:text-purple-300 shrink-0">
+                    <span class="material-symbols-outlined text-2xl text-purple-700 dark:text-purple-300">admin_panel_settings</span>
                 </div>
                 <div>
                     <h3 class="font-headline-md text-xl text-on-surface font-bold">Iniciar sesión admin</h3>

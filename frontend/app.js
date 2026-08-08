@@ -47,10 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         document.documentElement.classList.add('dark');
     }
-    if (window.innerWidth < 768) {
-        const toggleIcon = document.getElementById('sidebar-toggle-icon');
-        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
-    }
+    // Mobile: sidebar starts hidden, no icon init needed
     updateAdminUIState();
     initHealthChecks();
     fetchSystemStats();
@@ -200,78 +197,128 @@ function bindEvents() {
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     const mainContent = document.getElementById('main-content');
 
+    // ── Claude-style Sidebar ──────────────────────────────────────────────────
+
     const closeSidebar = () => {
         if (!sidebar) return;
+        // Mobile: slide out
         sidebar.classList.add('-translate-x-full');
         sidebar.classList.remove('translate-x-0');
-        // Solo en desktop se descarta la clase md: y el margen del contenido.
-        // En mobile se conservan, para que al agrandar la ventana el sidebar
-        // reaparezca alineado con su margen en lugar de dejar un hueco vacío.
-        if (window.innerWidth >= 768) {
-            sidebar.classList.remove('md:translate-x-0');
-            if (mainContent) mainContent.classList.remove('md:ml-64');
-        }
         if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
-        const toggleIcon = document.getElementById('sidebar-toggle-icon');
-        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
     };
 
-    // Al cruzar el breakpoint md (768px) se restablece el estado por defecto
-    // de cada tamaño: visible y fijo en desktop, oculto tras el overlay en mobile.
+    const openSidebarMobile = () => {
+        if (!sidebar) return;
+        sidebar.classList.remove('-translate-x-full', 'sidebar-collapsed');
+        sidebar.classList.add('translate-x-0');
+        if (sidebarOverlay) sidebarOverlay.classList.remove('hidden');
+    };
+
+    let sidebarCollapsed = false;
+
+    const collapseSidebar = () => {
+        if (!sidebar) return;
+        sidebarCollapsed = true;
+        sidebar.classList.add('sidebar-collapsed');
+        if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-collapsed-width)';
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
+        localStorage.setItem('sidebarCollapsed', 'true');
+    };
+
+    const expandSidebar = () => {
+        if (!sidebar) return;
+        sidebarCollapsed = false;
+        sidebar.classList.remove('sidebar-collapsed');
+        if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-width)';
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+        if (toggleIcon) toggleIcon.textContent = 'chevron_left';
+        localStorage.setItem('sidebarCollapsed', 'false');
+    };
+
+    // Desktop: toggle between collapsed (icons only) and expanded
+    const sidebarToggle = document.getElementById('btn-sidebar-toggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            if (window.innerWidth < 768) {
+                // On mobile, clicking the toggle inside sidebar should close it
+                closeSidebar();
+            } else {
+                if (sidebarCollapsed) {
+                    expandSidebar();
+                } else {
+                    collapseSidebar();
+                }
+            }
+        });
+    }
+
+    // Mobile hamburger button
+    const sidebarMobile = document.getElementById('btn-sidebar-mobile');
+    if (sidebarMobile) {
+        sidebarMobile.addEventListener('click', openSidebarMobile);
+    }
+
+    // Overlay click closes sidebar on mobile
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+
+    // Restore saved sidebar state
+    const savedCollapsed = localStorage.getItem('sidebarCollapsed');
+    if (window.innerWidth >= 768) {
+        if (savedCollapsed === 'true') {
+            collapseSidebar();
+        } else {
+            expandSidebar();
+        }
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('md:translate-x-0');
+    } else {
+        // Mobile: hidden by default, remove any desktop margin
+        if (mainContent) mainContent.style.marginLeft = '0';
+    }
+
+    // Sync sidebar state when crossing breakpoints
     let wasDesktop = window.innerWidth >= 768;
     const syncSidebarToBreakpoint = () => {
         if (!sidebar) return;
         const isDesktop = window.innerWidth >= 768;
-        if (isDesktop === wasDesktop) return; // ignora resize de teclado/toolbar móvil
+        if (isDesktop === wasDesktop) return;
         wasDesktop = isDesktop;
 
-        const toggleIcon = document.getElementById('sidebar-toggle-icon');
-        sidebar.classList.add('md:translate-x-0');
-        if (mainContent) mainContent.classList.add('md:ml-64');
-
         if (isDesktop) {
+            // Switching to desktop
             sidebar.classList.remove('-translate-x-full', 'translate-x-0');
-            if (toggleIcon) toggleIcon.textContent = 'chevron_left';
+            sidebar.classList.add('md:translate-x-0');
+            if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+            if (sidebarCollapsed) {
+                sidebar.classList.add('sidebar-collapsed');
+                if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-collapsed-width)';
+            } else {
+                sidebar.classList.remove('sidebar-collapsed');
+                if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-width)';
+            }
         } else {
+            // Switching to mobile
             sidebar.classList.add('-translate-x-full');
-            sidebar.classList.remove('translate-x-0');
-            if (toggleIcon) toggleIcon.textContent = 'chevron_right';
+            sidebar.classList.remove('md:translate-x-0', 'translate-x-0', 'sidebar-collapsed');
+            if (mainContent) mainContent.style.marginLeft = '0';
+            if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
         }
-        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
     };
     window.addEventListener('resize', syncSidebarToBreakpoint);
 
-    // Toggle Sidebar Control
-    const sidebarToggle = document.getElementById('btn-sidebar-toggle');
-    const sidebarClose = document.getElementById('btn-sidebar-close');
-
-    if (sidebarToggle && sidebar && sidebarOverlay && mainContent) {
-        const toggleSidebar = () => {
-            const isOpen = (window.innerWidth >= 768 && sidebar.classList.contains('md:translate-x-0')) ||
-                           (window.innerWidth < 768 && sidebar.classList.contains('translate-x-0'));
-
-            const toggleIcon = document.getElementById('sidebar-toggle-icon');
-
-            if (isOpen) {
-                closeSidebar();
-                if (toggleIcon) toggleIcon.textContent = 'chevron_right';
-            } else {
-                // Open it
-                sidebar.classList.remove('-translate-x-full');
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.add('md:translate-x-0');
-                    mainContent.classList.add('md:ml-64');
-                } else {
-                    sidebar.classList.add('translate-x-0');
-                    sidebarOverlay.classList.remove('hidden');
-                }
-                if (toggleIcon) toggleIcon.textContent = 'chevron_left';
-            }
-        };
-
-        sidebarToggle.addEventListener('click', toggleSidebar);
-        if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
-        sidebarOverlay.addEventListener('click', closeSidebar);
+    // ── Clear Form Button ────────────────────────────────────────────────────
+    const btnClearForm = document.getElementById('btn-clear-form');
+    if (btnClearForm) {
+        btnClearForm.addEventListener('click', () => {
+            const titleInput = document.getElementById('content-title');
+            const bodyInput = document.getElementById('content-body');
+            if (titleInput) titleInput.value = '';
+            if (bodyInput) bodyInput.value = '';
+            if (titleInput) titleInput.focus();
+        });
     }
 
     // Service Status Popover Control
@@ -316,6 +363,14 @@ function bindEvents() {
     const analyticsView = document.getElementById('analytics-view-section');
 
     if (navClassifier && navHistory && navAnalytics && classifierView && historyView && analyticsView) {
+        // Helper to update the main header title and subtitle dynamically
+        const updateMainHeader = (title, subtitle) => {
+            const headerTitle = document.getElementById('main-header-title');
+            const headerSubtitle = document.getElementById('main-header-subtitle');
+            if (headerTitle) headerTitle.textContent = title;
+            if (headerSubtitle) headerSubtitle.textContent = subtitle;
+        };
+
         const showClassifier = () => {
             classifierView.classList.remove('hidden');
             historyView.classList.add('hidden');
@@ -324,6 +379,8 @@ function bindEvents() {
             navClassifier.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
             navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
             navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+
+            updateMainHeader('Clasificación de contenido técnico', 'Ingresá textos para clasificarlos en tiempo real.');
 
             if (window.innerWidth < 768) {
                 closeSidebar();
@@ -338,6 +395,8 @@ function bindEvents() {
             navHistory.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
             navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
             navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+
+            updateMainHeader('Historial de consultas', 'Revisá y filtrá todas las predicciones.');
 
             loadDetailedHistory();
 
@@ -356,6 +415,8 @@ function bindEvents() {
             navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
             navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
+            updateMainHeader('Panel de análisis', 'Visualizá métricas y estadísticas de las clasificaciones.');
+
             loadAnalyticsDashboard();
 
             if (window.innerWidth < 768) {
@@ -363,28 +424,49 @@ function bindEvents() {
             }
         };
 
-        navClassifier.addEventListener('click', showClassifier);
-        navHistory.addEventListener('click', showHistory);
-        navAnalytics.addEventListener('click', showAnalytics);
+        const handleNavClick = (viewFunc) => {
+            if (sidebarCollapsed && window.innerWidth >= 768) {
+                expandSidebar();
+            }
+            viewFunc();
+        };
+
+        navClassifier.addEventListener('click', () => handleNavClick(showClassifier));
+        navHistory.addEventListener('click', () => handleNavClick(showHistory));
+        navAnalytics.addEventListener('click', () => handleNavClick(showAnalytics));
 
         const brandHome = document.getElementById('btn-brand-home');
         if (brandHome) {
-            brandHome.addEventListener('click', showClassifier);
+            brandHome.addEventListener('click', () => handleNavClick(showClassifier));
         }
     }
 
-    // Theme Toggle Control
+    // Theme Toggle Control (Sidebar)
     const themeToggle = document.getElementById('btn-theme-toggle');
     const themeToggleIcon = document.getElementById('theme-toggle-icon');
-    if (themeToggle && themeToggleIcon) {
-        const isDark = document.documentElement.classList.contains('dark');
-        themeToggleIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    const themeToggleText = document.getElementById('theme-toggle-text');
 
-        themeToggle.addEventListener('click', () => {
+    const updateThemeToggleUI = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        if (themeToggleIcon) themeToggleIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+        if (themeToggleText) themeToggleText.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+    };
+
+    if (themeToggle) {
+        updateThemeToggleUI();
+
+        themeToggle.addEventListener('click', (e) => {
+            e.preventDefault();
             document.documentElement.classList.toggle('dark');
             const nowDark = document.documentElement.classList.contains('dark');
-            themeToggleIcon.textContent = nowDark ? 'light_mode' : 'dark_mode';
             localStorage.setItem('theme', nowDark ? 'dark' : 'light');
+            updateThemeToggleUI();
+
+            // Re-render analytics dashboard if charts exist to update slice borders and legend text colors
+            const analyticsView = document.getElementById('analytics-view-section');
+            if (analyticsView && !analyticsView.classList.contains('hidden')) {
+                loadAnalyticsDashboard();
+            }
         });
     }
 
@@ -450,6 +532,25 @@ function bindEvents() {
 
     if (closeAdminBtn) closeAdminBtn.addEventListener('click', hideAdminLoginModal);
     if (cancelAdminBtn) cancelAdminBtn.addEventListener('click', hideAdminLoginModal);
+
+    // Close admin login modal on backdrop click
+    const adminLoginModal = document.getElementById('admin-login-modal');
+    if (adminLoginModal) {
+        adminLoginModal.addEventListener('click', (e) => {
+            if (e.target === adminLoginModal) {
+                hideAdminLoginModal();
+            }
+        });
+    }
+
+    // Close admin user popover on click outside
+    document.addEventListener('click', (e) => {
+        if (adminPopover && !adminPopover.classList.contains('pointer-events-none')) {
+            if (!adminPopover.contains(e.target) && adminAuthBtn && !adminAuthBtn.contains(e.target)) {
+                hideAdminPopover();
+            }
+        }
+    });
 
     if (formAdminLogin) {
         formAdminLogin.addEventListener('submit', (e) => {
@@ -536,7 +637,7 @@ async function handleAdminLogin(username, password) {
 
         hideAdminLoginModal();
         updateAdminUIState();
-        showToast('🛡️ Sesión de Administrador iniciada', 'success');
+        showToast('🛡️ Sesión de Administrador iniciada', 'success', 1800);
         loadHistory();
         loadDetailedHistory();
     } catch (err) {
@@ -563,7 +664,7 @@ async function handleAdminLogout() {
     sessionStorage.removeItem('adminToken');
     sessionStorage.removeItem('adminUser');
     updateAdminUIState();
-    showToast('Sesión de Administrador cerrada', 'info');
+    showToast('Sesión de Administrador cerrada', 'info', 1800);
     loadHistory();
     const filterCat = document.getElementById('filter-category');
     const searchHist = document.getElementById('search-history');
@@ -586,7 +687,7 @@ function updateAdminUIState() {
         if (popoverUser) popoverUser.textContent = adminUser || 'Admin';
         if (authBtn) {
             authBtn.classList.remove('bg-surface-container-high');
-            authBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
+            authBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-950', 'dark:text-emerald-300', 'font-bold');
             authBtn.title = 'Opciones de Administrador';
         }
     } else {
@@ -595,7 +696,7 @@ function updateAdminUIState() {
         if (chevron) chevron.classList.add('hidden');
         hideAdminPopover();
         if (authBtn) {
-            authBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
+            authBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-950', 'dark:text-emerald-300', 'font-bold');
             authBtn.classList.add('bg-surface-container-high');
             authBtn.title = 'Iniciar Sesión Administrador';
         }
@@ -677,9 +778,12 @@ async function handleClassification() {
         }
 
         const data = await response.json();
-        // Redondear probabilidad a 2 decimales
+        // Redondear probabilidad a 2 decimales y asegurar timestamp ISO local
         if (data.probabilidad != null) {
             data.probabilidad = Math.round(data.probabilidad * 100) / 100;
+        }
+        if (!data.created_at) {
+            data.created_at = getLocalISOString();
         }
         lastJsonResponse = data;
         lastInput = { titulo, texto };
@@ -726,8 +830,8 @@ function renderResult(data) {
         </div>
     `;
 
-    // 2. Porcentaje de Confianza (Entero sin decimales)
-    const percentage = Math.round((probabilidad || 0) * 100);
+    // 2. Porcentaje de Confianza (Con 1 decimal)
+    const percentage = Number((probabilidad || 0) * 100).toFixed(1);
     document.getElementById('confidence-score').textContent = `${percentage}%`;
     const bar = document.getElementById('confidence-bar');
     bar.style.width = `${percentage}%`;
@@ -768,13 +872,16 @@ async function loadHistory() {
 
         allHistoryData = await res.json();
 
+        // Pre-populate category counts for filter dropdown
+        updateCategoryFilterCounts(allHistoryData);
+
         if (allHistoryData && allHistoryData.length > 0) {
             // Mostrar los 3 más recientes en el grid de la página
             const recent = allHistoryData.slice(0, 3);
             historyGrid.innerHTML = recent.map(entry => {
                 const config = CATEGORY_CONFIG[entry.categoria] || { colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
-                const probPct = Math.round(prob * 100);
+                const probPct = Number(prob * 100).toFixed(1);
                 const timeLabel = formatTimeString(entry.created_at);
                 const textStr = entry.texto || entry.titulo || '';
                 const isLong = textStr.length > 30;
@@ -839,7 +946,46 @@ async function loadHistory() {
     }
 }
 
-// ── 6. Historial Detallado (Subpágina) ──────────────────────────────────────
+// ── 6a. Actualizar conteo de categorías en el filtro ─────────────────────────
+
+function updateCategoryFilterCounts(data) {
+    const filterSelect = document.getElementById('filter-category');
+    if (!filterSelect || !data) return;
+
+    // Count entries per category
+    const counts = {};
+    data.forEach(entry => {
+        const cat = entry.categoria || 'Sin categoría';
+        counts[cat] = (counts[cat] || 0) + 1;
+    });
+
+    // Map of option values to their base label
+    const categoryLabels = {
+        'all': 'Todas las categorías',
+        'Backend': 'Backend',
+        'Frontend': 'Frontend',
+        'Data Science': 'Data Science',
+        'DevOps': 'DevOps',
+        'Mobile': 'Mobile',
+        'Bases de Datos': 'Bases de Datos',
+        'Seguridad': 'Seguridad',
+        'Cloud': 'Cloud'
+    };
+
+    // Update each option text with the count
+    Array.from(filterSelect.options).forEach(option => {
+        const value = option.value;
+        const baseLabel = categoryLabels[value] || value;
+        if (value === 'all') {
+            option.textContent = `${baseLabel} (${data.length})`;
+        } else {
+            const count = counts[value] || 0;
+            option.textContent = `${baseLabel} (${count})`;
+        }
+    });
+}
+
+// ── 6b. Historial Detallado (Subpágina) ──────────────────────────────────────
 
 async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
     const listContainer = document.getElementById('detailed-history-list');
@@ -857,6 +1003,9 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
         if (!res.ok) throw new Error('No se pudo consultar el historial');
         
         allHistoryData = await res.json();
+
+        // Update category filter options with counts
+        updateCategoryFilterCounts(allHistoryData);
         
         let filteredData = allHistoryData;
         if (categoryFilter !== 'all') {
@@ -875,12 +1024,12 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
             listContainer.innerHTML = filteredData.map(entry => {
                 const config = CATEGORY_CONFIG[entry.categoria] || { icon: 'topic', colorClass: 'text-primary-fixed border-primary/30 bg-primary/10' };
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
-                const probPct = Math.round(prob * 100);
+                const probPct = Number(prob * 100).toFixed(1);
                 
                 let dateStr = 'Fecha no disponible';
                 if (entry.created_at) {
-                    const d = new Date(entry.created_at);
-                    if (!isNaN(d.getTime())) {
+                    const d = parseDate(entry.created_at);
+                    if (d) {
                         dateStr = d.toLocaleString([], { dateStyle: 'short', timeStyle: 'medium' });
                     }
                 }
@@ -977,6 +1126,9 @@ function showHistoryEntryJsonInModal(id) {
         return;
     }
 
+    const localDate = parseDate(entry.created_at);
+    const formattedCreatedAt = localDate ? getLocalISOString(localDate) : entry.created_at;
+
     const fullPayload = {
         entrada: { titulo: entry.titulo, texto: entry.texto },
         resultado: {
@@ -984,7 +1136,7 @@ function showHistoryEntryJsonInModal(id) {
             categoria: entry.categoria,
             probabilidad: entry.probabilidad,
             informaciones_adicionales: entry.keywords,
-            created_at: entry.created_at
+            created_at: formattedCreatedAt
         }
     };
 
@@ -1004,9 +1156,14 @@ function toggleJsonModal() {
     if (modal.classList.contains('hidden')) {
         const jsonPre = document.getElementById('json-content');
         if (lastJsonResponse) {
+            const localDate = parseDate(lastJsonResponse.created_at);
+            const formattedResult = {
+                ...lastJsonResponse,
+                created_at: localDate ? getLocalISOString(localDate) : getLocalISOString()
+            };
             const fullPayload = {
                 entrada: lastInput || { titulo: "", texto: "" },
-                resultado: lastJsonResponse
+                resultado: formattedResult
             };
             jsonPre.textContent = JSON.stringify(fullPayload, null, 2);
         } else {
@@ -1104,16 +1261,45 @@ document.addEventListener('keydown', (e) => {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatTimeString(isoStr) {
-    if (!isoStr) return 'Reciente';
-    try {
-        const cleaned = isoStr.replace(/(\.\d{3})\d+/, '$1');
-        const d = new Date(cleaned);
-        if (isNaN(d.getTime())) return 'Reciente';
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch {
-        return 'Reciente';
+function getLocalISOString(date = new Date()) {
+    if (!date || isNaN(date.getTime())) date = new Date();
+    const tzo = -date.getTimezoneOffset();
+    const dif = tzo >= 0 ? '+' : '-';
+    const pad = (num) => String(Math.floor(Math.abs(num))).padStart(2, '0');
+    return date.getFullYear() +
+        '-' + pad(date.getMonth() + 1) +
+        '-' + pad(date.getDate()) +
+        'T' + pad(date.getHours()) +
+        ':' + pad(date.getMinutes()) +
+        ':' + pad(date.getSeconds()) +
+        dif + pad(tzo / 60) +
+        ':' + pad(tzo % 60);
+}
+
+function parseDate(isoStr) {
+    if (!isoStr) return null;
+    let str = String(isoStr).trim();
+    if (!str) return null;
+
+    if (str.includes(' ') && !str.includes('T')) {
+        str = str.replace(' ', 'T');
     }
+
+    str = str.replace(/(\.\d{3})\d+/, '$1');
+
+    const hasTimezone = /[Zz]$|[+-]\d{2}(:?\d{2})?$/.test(str);
+    if (!hasTimezone) {
+        str += 'Z';
+    }
+
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function formatTimeString(isoStr) {
+    const d = parseDate(isoStr);
+    if (!d) return 'Reciente';
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 function setLoadingState(isLoading) {
@@ -1140,21 +1326,19 @@ function setLoadingState(isLoading) {
     }
 }
 
-function showToast(message, type = 'info') {
+function showToast(message, type = 'info', duration = 2000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
     const toast = document.createElement('div');
     const isError = type === 'error';
-    const bgClass = isError ? 'bg-red-100 dark:bg-rose-950/90 border-red-500/50 text-red-600 dark:text-red-400 font-semibold' :
-        type === 'warning' ? 'bg-amber-100 dark:bg-amber-950/90 border-amber-500/50 text-amber-800 dark:text-amber-200' :
-            'bg-emerald-100 dark:bg-emerald-950/90 border-emerald-500/50 text-emerald-800 dark:text-emerald-200';
+    const bgClass = isError ? 'bg-rose-100 dark:bg-rose-950/90 border-rose-500/50 text-rose-950 dark:text-rose-300 font-bold' :
+        type === 'warning' ? 'bg-amber-100 dark:bg-amber-950/90 border-amber-500/50 text-amber-950 dark:text-amber-200 font-bold' :
+        type === 'info' ? 'bg-purple-100 dark:bg-purple-950/90 border-purple-500/50 text-purple-950 dark:text-purple-200 font-bold' :
+        'bg-emerald-100 dark:bg-emerald-950/90 border-emerald-600/50 text-emerald-950 dark:text-emerald-200 font-bold';
 
     toast.className = `glass-panel px-4 py-3 rounded-xl border ${bgClass} font-label-sm text-sm shadow-xl backdrop-blur-xl transition-all duration-300 transform translate-y-2 opacity-0 flex items-center gap-2 break-words`;
-    if (isError) {
-        toast.style.color = '#dc2626';
-    }
-    toast.innerHTML = `<span class="min-w-0" style="${isError ? 'color: #dc2626 !important;' : ''}">${message}</span>`;
+    toast.innerHTML = `<span class="min-w-0">${message}</span>`;
 
     container.appendChild(toast);
 
@@ -1165,7 +1349,7 @@ function showToast(message, type = 'info') {
     setTimeout(() => {
         toast.classList.add('opacity-0', '-translate-y-2');
         setTimeout(() => toast.remove(), 300);
-    }, 4000);
+    }, duration);
 }
 
 function escapeHtml(str) {
@@ -1193,13 +1377,14 @@ async function loadAnalyticsDashboard() {
 
         if (kpiTotal) kpiTotal.textContent = data.total_count || 0;
         if (kpiTop) kpiTop.textContent = data.top_categoria || 'N/A';
-        if (kpiAvg) kpiAvg.textContent = `${data.avg_prob || 0}%`;
+        if (kpiAvg) kpiAvg.textContent = `${Number(data.avg_prob || 0).toFixed(1)}%`;
 
         if (typeof Chart === 'undefined') return;
 
         const isDark = document.documentElement.classList.contains('dark');
-        const textColor = isDark ? '#cbc3d7' : '#524b3f';
+        const textColor = isDark ? '#cbc3d7' : '#231f18';
         const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+        const sliceBorderColor = isDark ? '#171f33' : '#e8e2d5';
 
         // 2. Chart 1: Doughnut (Distribución por Categoría)
         const ctxCat = document.getElementById('chart-categories');
@@ -1221,7 +1406,7 @@ async function loadAnalyticsDashboard() {
                         data: catValues,
                         backgroundColor: colors.slice(0, catLabels.length),
                         borderWidth: 2,
-                        borderColor: isDark ? '#171f33' : '#e8e2d5'
+                        borderColor: sliceBorderColor
                     }]
                 },
                 options: {
@@ -1230,7 +1415,13 @@ async function loadAnalyticsDashboard() {
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: textColor, font: { family: 'Inter', size: 11 } }
+                            labels: {
+                                color: textColor,
+                                font: { family: 'Inter', size: window.innerWidth < 640 ? 10 : 11 },
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: window.innerWidth < 640 ? 8 : 12
+                            }
                         }
                     }
                 }

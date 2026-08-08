@@ -4,6 +4,44 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [1.9.0] — 2026-08-07 · Rediseño de Sidebar Estilo Claude, UX del Formulario, Responsividad Móvil y Parsing de Horarios UTC
+
+### Añadido
+- **Rediseño de Sidebar Colapsable Estilo Claude (`frontend/index.html` + `frontend/app.js`):**
+  - **Colapso a Icon Rail (64px):** El sidebar ahora se reduce en escritorio a una barra de iconos centrados (44x44px) alineados simétricamente, manteniendo acceso instantáneo al logo, *Clasificador*, *Historial*, *Análisis*, *Cambiar tema* y *Estado de servicios*.
+  - **Controlador Integrado en el Sidebar:** Eliminado el botón flotante del encabezado principal e integrado el chevron de colapso (`<` / `>`) directamente en la cabecera superior derecha del sidebar.
+  - **Reapertura al Hacer Clic en Iconos:** Hacer clic sobre el logo de TechMind o sobre cualquier icono de navegación estando colapsado despliega suavemente el sidebar completo (256px).
+  - **Reorganización del Isotipo de Marca:** El logo principal reorganiza el título **TechMind** y subtítulo **Organización inteligente** en la parte superior, ubicando el icono de cerebro (`psychology`) centrado directamente **debajo de ambos textos**.
+  - **Relocalización del Botón de Cambio de Tema:** Trasladado el botón de tema (claro/oscuro) desde la barra superior hacia la parte inferior del sidebar (justo encima de *Estado de servicios*), integrándose al flujo con etiquetas dinámicas (*Modo claro* / *Modo oscuro*).
+  - **Persistencia de Estado:** El estado colapsado o expandido del sidebar se conserva en `localStorage`.
+
+- **Mejoras en el Formulario y Navegación Dinámica (`frontend/index.html` + `frontend/app.js`):**
+  - **Botón "Limpiar formulario":** Incorporado botón secundario con icono `delete_sweep` junto al botón principal de clasificación para vaciar título y texto con un solo clic.
+  - **Encabezados Dinámicos por Vista:** La barra superior actualiza su título y subtítulo dinámicamente según la subpágina activa (*"Clasificación de contenido técnico"*, *"Historial de consultas"*, *"Panel de análisis"*), eliminando títulos duplicados dentro del contenido.
+  - **Conteo Real en Filtro por Categorías:** Las opciones del desplegable de filtro en Historial ahora muestran el número exacto de consultas por categoría (ej. `Backend (3)`, `Todas las categorías (12)`).
+
+- **Optimización Responsiva para Dispositivos Móviles (`frontend/index.html` + `frontend/app.js`):**
+  - **Botón Hamburger Móvil (`menu`):** Agregado botón de menú desplegable en el header principal para abrir el sidebar como panel overlay en pantallas `< 768px`.
+  - **Botón de Admin Compacto:** El texto "Admin Login" se oculta en móviles pequeños dejando solo el icono `admin_panel_settings`, evitando el salto de línea del título principal.
+  - **Pestaña de Análisis Adaptativa:** Tarjetas KPI, rejilla de gráficos de Chart.js y nube de palabras clave escalan sus paddings y tamaños de fuente para visualización perfecta en teléfonos.
+
+- **Panel de Autenticación y Cierre por Clic Externo (`frontend/index.html` + `frontend/app.js`):**
+  - **Alineación Simétrica del Popover:** Corregida la posición del menú flotante de Admin (`right-0`) alineándolo perfectamente bajo el botón superior.
+  - **Cierre por Clic Fuera (Backdrop & Outside Click):** El menú desplegable de usuario y el modal de inicio de sesión se cierran automáticamente al hacer clic en cualquier área externa.
+  - **Duración de Notificaciones (Toasts):** Reducido el tiempo de despliegue de las alertas flotantes de login/logout a 1.8 segundos.
+  - **Identidad Visual del Escudo:** Los contenedores del icono de escudo en el popover y en el modal adoptan un tono morado/violeta (`bg-purple-500/20 text-purple-700 dark:text-purple-300`).
+
+- **Precisión de Confianza, Gráficos y Parsing de Horarios UTC (`frontend/app.js`):**
+  - **Porcentaje de Confianza con 1 Decimal:** Formateada la cifra de confianza a 1 decimal (ej. `39.5%`) en los resultados del clasificador, tarjetas del historial y KPIs de análisis.
+  - **Bordes Limpios y Leyenda Circular en Chart.js:** Actualizada la leyenda del gráfico de dona con estilo de punto circular (`usePointStyle: true, pointStyle: 'circle'`), eliminando bordes negros rígidos. El gráfico se re-renderiza automáticamente al alternar entre modo claro y oscuro.
+  - **Conversión de Marcas de Tiempo UTC a Hora Local (`parseDate`):** Implementada la función `parseDate(isoStr)` que parsea marcas de tiempo de PostgreSQL (`created_at`) en UTC y las convierte de forma nativa a la hora local del navegador (ej. UTC-5 en Colombia).
+
+### Corregido / Mejorado
+- **Contraste de Colores Verdes en Modo Claro (`frontend/index.html` + `frontend/app.js`):** Reemplazados los tonos verdes claros por `text-emerald-950 font-bold` sobre el botón de Admin activo y en notificaciones Toast para garantizar legibilidad perfecta sobre fondo claro.
+- **Hover Morado en Botones Secundarios (`frontend/index.html`):** Los botones "Admin Login" y "Limpiar formulario" incorporan un fondo morado suave traslúcido (`hover:bg-purple-900/10`) al pasar el cursor en modo claro.
+
+---
+
 ## [1.8.0] — 2026-08-06 · Panel de Autenticación Admin, Tokens de Sesión y Eliminación de Consultas
 
 ### Añadido
