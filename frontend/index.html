@@ -407,7 +407,7 @@
                 <h1 class="sidebar-brand-text font-headline-md text-purple-950 dark:text-primary-fixed tracking-tight text-lg sm:text-xl font-extrabold group-hover:opacity-85 transition-opacity leading-tight">
                     TechMind
                 </h1>
-                <p class="sidebar-brand-text font-label-sm text-[10px] sm:text-[11px] text-on-surface-variant opacity-80 leading-tight mt-0.5">Organización inteligente</p>
+                <p class="sidebar-brand-text font-label-sm text-[10px] sm:text-[11px] text-on-surface-variant opacity-80 leading-tight mt-0.5" data-i18n="brand_subtitle">Organización inteligente</p>
                 <span class="material-symbols-outlined text-3xl text-purple-700 dark:text-primary mt-2 group-hover:scale-110 transition-transform duration-300 shrink-0"
                     style="font-variation-settings: 'FILL' 1;">psychology</span>
             </div>
@@ -421,17 +421,17 @@
             <a id="nav-classifier"
                 class="sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">category</span>
-                <span class="sidebar-label font-label-sm text-sm font-bold">Clasificador</span>
+                <span class="sidebar-label font-label-sm text-sm font-bold" data-i18n="nav_classifier">Clasificador</span>
             </a>
             <a id="nav-history"
                 class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">history</span>
-                <span class="sidebar-label font-label-sm text-sm font-semibold">Historial</span>
+                <span class="sidebar-label font-label-sm text-sm font-semibold" data-i18n="nav_history">Historial</span>
             </a>
             <a id="nav-analytics"
                 class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">analytics</span>
-                <span class="sidebar-label font-label-sm text-sm font-semibold">Análisis</span>
+                <span class="sidebar-label font-label-sm text-sm font-semibold" data-i18n="nav_analytics">Análisis</span>
             </a>
         </nav>
         <!-- Sidebar Bottom Controls: Theme Toggle & Service Status -->
@@ -449,7 +449,7 @@
                 class="sidebar-nav-item w-full flex items-center justify-between gap-3 text-on-surface-variant cursor-pointer active:scale-95 focus:outline-none">
                 <div class="flex items-center gap-2.5">
                     <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></div>
-                    <span class="sidebar-label sidebar-status-text font-label-sm text-sm font-semibold">Estado de servicios</span>
+                    <span class="sidebar-label sidebar-status-text font-label-sm text-sm font-semibold" data-i18n="service_status">Estado de servicios</span>
                 </div>
                 <span id="status-chevron"
                     class="material-symbols-outlined text-lg transition-transform duration-300">expand_less</span>
@@ -460,7 +460,7 @@
                 class="absolute bottom-full left-0 right-0 mb-3 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2 z-50">
                 
                 <!-- Microservicios -->
-                <div class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant">Microservicios</div>
+                <div class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant" data-i18n="microservices">Microservicios</div>
                 <div id="status-springboot" class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
                     <span class="font-label-sm text-[11px] font-medium" style="color: var(--led-error-text);">Spring Boot :8080</span>
@@ -478,7 +478,7 @@
 
                 <!-- Métricas del Servidor OCI -->
                 <div class="flex items-center justify-between">
-                    <span class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant">Servidor OCI</span>
+                    <span class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant" data-i18n="oci_server">Servidor OCI</span>
                     <span class="font-label-sm text-[10px] text-tertiary-container dark:text-tertiary font-medium flex items-center gap-1">
                         <span class="material-symbols-outlined text-[12px]">schedule</span> Uptime: <span id="sys-uptime-val" class="font-semibold">--</span>
                     </span>
@@ -501,7 +501,7 @@
                 <div class="space-y-1">
                     <div class="flex justify-between items-center text-[11px] font-label-sm">
                         <span class="text-on-surface-variant flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[13px]">developer_board</span> RAM Usada
+                            <span class="material-symbols-outlined text-[13px]">developer_board</span> <span data-i18n="ram_used">RAM Usada</span>
                         </span>
                         <span id="sys-ram-val" class="font-semibold text-on-surface">-- / -- MB</span>
                     </div>
@@ -554,6 +554,13 @@
                 </div>
             </div>
             <div class="relative flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <!-- Language Toggle Button -->
+                <button id="btn-lang-toggle" type="button"
+                    class="p-2 sm:px-3 min-h-[40px] sm:min-h-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center gap-1.5 shadow-lg font-label-sm text-xs font-semibold cursor-pointer"
+                    title="Change language / Cambiar idioma">
+                    <span class="material-symbols-outlined text-xl">translate</span>
+                    <span id="lang-toggle-text" class="hidden sm:inline">EN</span>
+                </button>
                 <button id="btn-admin-auth" type="button"
                     class="p-2 sm:px-3.5 min-h-[40px] sm:min-h-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/80 hover:border-purple-800/25 transition-all active:scale-95 focus:outline-none flex items-center gap-2 shadow-lg font-label-sm text-xs font-semibold cursor-pointer"
                     title="Iniciar Sesión Administrador">
@@ -572,14 +579,14 @@
                         <div class="min-w-0 flex-1">
                             <p class="font-label-sm text-xs font-bold text-on-surface truncate" id="popover-admin-username">Admin</p>
                             <p class="font-label-sm text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span> Sesión Activa
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span> <span data-i18n="active_session">Sesión Activa</span>
                             </p>
                         </div>
                     </div>
                     <button id="btn-admin-logout" type="button"
                         class="w-full px-3 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
                         <span class="material-symbols-outlined text-sm text-rose-700 dark:text-rose-300">logout</span>
-                        <span class="text-rose-700 dark:text-rose-300 font-bold">Cerrar Sesión</span>
+                        <span class="text-rose-700 dark:text-rose-300 font-bold" data-i18n="logout">Cerrar Sesión</span>
                     </button>
                 </div>
             </div>
@@ -599,25 +606,27 @@
                             class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                         </div>
 
-                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface mb-6 font-bold">
+                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface mb-6 font-bold" data-i18n="form_title">
                             Ingresar contenido técnico
                         </h3>
 
                         <form class="flex flex-col gap-6 flex-1" onsubmit="return false;">
                             <div class="space-y-2">
                                 <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
-                                    for="content-title">Título del documento o artículo</label>
+                                    for="content-title" data-i18n="label_title">Título del documento o artículo</label>
                                 <input id="content-title" type="text"
                                     class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all"
-                                    placeholder="ej. orquestación avanzada de contenedores con Kubernetes" />
+                                    placeholder="ej. orquestación avanzada de contenedores con Kubernetes"
+                                    data-i18n-placeholder="placeholder_title" />
                             </div>
 
                             <div class="space-y-2 flex-1 flex flex-col">
                                 <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
-                                    for="content-body">Contenido técnico (texto crudo, markdown o resumen)</label>
+                                    for="content-body" data-i18n="label_body">Contenido técnico (texto crudo, markdown o resumen)</label>
                                 <textarea id="content-body"
                                     class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed"
-                                    placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."></textarea>
+                                    placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."
+                                    data-i18n-placeholder="placeholder_body"></textarea>
                             </div>
 
                             <div class="flex flex-col sm:flex-row justify-center items-center gap-3 mt-4">
@@ -628,13 +637,13 @@
                                     </div>
                                     <div class="relative flex items-center justify-center gap-2.5">
                                         <span class="material-symbols-outlined text-lg">science</span>
-                                        <span>Clasificar con TechMind</span>
+                                        <span data-i18n="btn_classify">Clasificar con TechMind</span>
                                     </div>
                                 </button>
                                 <button id="btn-clear-form" type="button"
                                     class="w-full sm:w-auto px-6 py-4 rounded-xl font-label-sm text-base font-bold border border-outline-variant/50 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/30 transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center gap-2.5">
                                     <span class="material-symbols-outlined text-lg">delete_sweep</span>
-                                    <span>Limpiar formulario</span>
+                                    <span data-i18n="btn_clear">Limpiar formulario</span>
                                 </button>
                             </div>
                         </form>
@@ -647,7 +656,7 @@
                         class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col relative border-t-4 border-t-primary-fixed transition-all duration-500">
 
                         <h3
-                            class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold text-center mt-2 mb-6">
+                            class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold text-center mt-2 mb-6" data-i18n="results_title">
                             Resultado del análisis
                         </h3>
 
@@ -655,12 +664,12 @@
                         <div class="mb-8 text-center px-3 py-5 sm:py-6 rounded-xl border subtle-border"
                             style="background-color: var(--surface-container);">
                             <p
-                                class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 uppercase tracking-widest font-semibold">
+                                class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 uppercase tracking-widest font-semibold" data-i18n="predicted_category">
                                 Categoría predicha</p>
                             <div id="category-badge-container">
                                 <div
                                     class="inline-flex max-w-full items-center gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-base sm:text-lg font-bold bg-primary/10 border-primary/30 text-primary-fixed">
-                                    <span>Esperando análisis...</span>
+                                    <span data-i18n="waiting">Esperando análisis...</span>
                                 </div>
                             </div>
                         </div>
@@ -669,8 +678,7 @@
                         <div class="mb-8 space-y-3">
                             <div class="flex flex-wrap justify-between items-end gap-x-3 gap-y-1">
                                 <span
-                                    class="font-label-sm text-xs sm:text-sm text-on-surface-variant font-medium min-w-0">Confianza
-                                    del Modelo</span>
+                                    class="font-label-sm text-xs sm:text-sm text-on-surface-variant font-medium min-w-0" data-i18n="confidence">Confianza del Modelo</span>
                                 <span id="confidence-score"
                                     class="font-label-sm text-base text-primary-fixed font-bold shrink-0">0%</span>
                             </div>
@@ -685,11 +693,10 @@
                         <!-- Keyword Tags -->
                         <div class="mb-8 flex-1 min-w-0">
                             <p
-                                class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 font-semibold uppercase tracking-wider">
+                                class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 font-semibold uppercase tracking-wider" data-i18n="keywords_title">
                                 Palabras clave extraídas</p>
                             <div id="keywords-list" class="flex flex-wrap gap-2">
-                                <span class="text-on-surface-variant text-sm sm:text-base italic opacity-60">Las
-                                    entidades detectadas aparecerán aquí...</span>
+                                <span class="text-on-surface-variant text-sm sm:text-base italic opacity-60" data-i18n="keywords_placeholder">Las entidades detectadas aparecerán aquí...</span>
                             </div>
                         </div>
 
@@ -699,7 +706,7 @@
                                 class="w-full py-3.5 rounded-xl border border-primary/20 bg-primary/5 text-primary-fixed font-label-sm text-sm font-semibold hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 group cursor-pointer">
                                 <span
                                     class="material-symbols-outlined text-lg group-hover:rotate-180 transition-transform duration-500">code</span>
-                                <span>Ver JSON</span>
+                                <span data-i18n="btn_view_json">Ver JSON</span>
                             </button>
                         </div>
                     </div>
@@ -711,16 +718,14 @@
             <section id="history-section" class="mt-auto pt-8 border-t medium-border">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div class="min-w-0">
-                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold">Contenidos
-                            clasificados recientemente</h3>
+                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold" data-i18n="recent_title">Contenidos clasificados recientemente</h3>
                     </div>
                 </div>
 
                 <div id="history-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     <div class="col-span-full py-8 text-center glass-panel rounded-xl">
                         <span class="material-symbols-outlined text-4xl text-outline mb-2 animate-spin">refresh</span>
-                        <p class="text-on-surface-variant text-sm font-label-sm">Cargando publicaciones guardadas desde
-                            PostgreSQL...</p>
+                        <p class="text-on-surface-variant text-sm font-label-sm" data-i18n="loading_history_grid">Cargando publicaciones guardadas desde PostgreSQL...</p>
                     </div>
                 </div>
             </section>
@@ -735,12 +740,13 @@
                     <span
                         class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
                     <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..."
+                        data-i18n-placeholder="search_placeholder"
                         class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all">
                 </div>
                 <!-- Category Filter -->
                 <div class="flex items-center gap-3 min-w-0">
                     <label for="filter-category"
-                        class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap shrink-0">Filtrar:</label>
+                        class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap shrink-0" data-i18n="filter_label">Filtrar:</label>
                     <select id="filter-category"
                         class="tech-select flex-1 sm:flex-initial min-w-0 rounded-xl px-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all cursor-pointer">
                         <option value="all">Todas las categorías</option>
@@ -772,7 +778,7 @@
                         <span class="material-symbols-outlined text-xl sm:text-2xl">analytics</span>
                     </div>
                     <div class="min-w-0">
-                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate">Total Clasificaciones</p>
+                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate" data-i18n="total_classifications">Total Clasificaciones</p>
                         <h3 id="kpi-total-queries" class="font-headline-md text-xl sm:text-2xl font-bold text-on-surface mt-0.5 truncate">--</h3>
                     </div>
                 </div>
@@ -783,7 +789,7 @@
                         <span class="material-symbols-outlined text-xl sm:text-2xl">emoji_events</span>
                     </div>
                     <div class="min-w-0">
-                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate">Categoría Líder</p>
+                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate" data-i18n="top_category">Categoría Líder</p>
                         <h3 id="kpi-top-category" class="font-headline-md text-lg sm:text-xl font-bold text-on-surface mt-0.5 truncate">--</h3>
                     </div>
                 </div>
@@ -794,7 +800,7 @@
                         <span class="material-symbols-outlined text-xl sm:text-2xl">verified</span>
                     </div>
                     <div class="min-w-0">
-                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate">Confianza Promedio</p>
+                        <p class="font-label-sm text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider font-semibold truncate" data-i18n="avg_confidence">Confianza Promedio</p>
                         <h3 id="kpi-avg-confidence" class="font-headline-md text-xl sm:text-2xl font-bold text-on-surface mt-0.5 truncate">--%</h3>
                     </div>
                 </div>
@@ -807,7 +813,7 @@
                     <div class="flex items-center justify-between mb-3 sm:mb-4">
                         <h3 class="font-headline-md text-sm sm:text-lg font-bold text-on-surface flex items-center gap-2">
                             <span class="material-symbols-outlined text-purple-600 dark:text-primary text-xl sm:text-2xl">pie_chart</span>
-                            Distribución por categoría
+                            <span data-i18n="dist_by_category">Distribución por categoría</span>
                         </h3>
                     </div>
                     <div class="relative flex-1 h-[220px] sm:h-[280px] max-h-[340px] flex items-center justify-center">
@@ -820,7 +826,7 @@
                     <div class="flex items-center justify-between mb-3 sm:mb-4">
                         <h3 class="font-headline-md text-sm sm:text-lg font-bold text-on-surface flex items-center gap-2">
                             <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-xl sm:text-2xl">schedule</span>
-                            Actividad por hora del día (24hs)
+                            <span data-i18n="activity_by_hour">Actividad por hora del día (24hs)</span>
                         </h3>
                     </div>
                     <div class="relative flex-1 h-[220px] sm:h-[280px] max-h-[340px] flex items-center justify-center">
@@ -833,9 +839,9 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 mb-3">
                         <h3 class="font-headline-md text-sm sm:text-lg font-bold text-on-surface flex items-center gap-2">
                             <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-xl sm:text-2xl">label</span>
-                            Palabras clave más frecuentes
+                            <span data-i18n="top_keywords">Palabras clave más frecuentes</span>
                         </h3>
-                        <span class="font-label-sm text-[11px] sm:text-xs text-on-surface-variant">Top términos clasificados</span>
+                        <span class="font-label-sm text-[11px] sm:text-xs text-on-surface-variant" data-i18n="top_terms">Top términos clasificados</span>
                     </div>
                     <div id="keywords-cloud-container" class="flex flex-wrap gap-2 sm:gap-2.5 items-center justify-start py-2">
                         <!-- Renderizado dinámicamente como badges/pills con frecuencia -->
@@ -855,7 +861,7 @@
                 <h4
                     class="font-headline-md text-base sm:text-xl text-primary-fixed font-bold flex items-center gap-2 min-w-0">
                     <span class="material-symbols-outlined shrink-0">code</span>
-                    Resultado del análisis en JSON
+                    <span data-i18n="json_modal_title">Resultado del análisis en JSON</span>
                 </h4>
                 <button id="modal-close" type="button"
                     class="shrink-0 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-colors p-1.5 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center cursor-pointer"
@@ -891,8 +897,8 @@
                     <span class="material-symbols-outlined text-2xl text-purple-700 dark:text-purple-300">admin_panel_settings</span>
                 </div>
                 <div>
-                    <h3 class="font-headline-md text-xl text-on-surface font-bold">Iniciar sesión admin</h3>
-                    <p class="font-body-md text-xs text-on-surface-variant">Acceso a borrado y gestión de consultas</p>
+                    <h3 class="font-headline-md text-xl text-on-surface font-bold" data-i18n="admin_title">Iniciar sesión admin</h3>
+                    <p class="font-body-md text-xs text-on-surface-variant" data-i18n="admin_subtitle">Acceso a borrado y gestión de consultas</p>
                 </div>
             </div>
             
@@ -903,18 +909,18 @@
 
             <form id="form-admin-login" class="space-y-4" onsubmit="return false;">
                 <div>
-                    <label class="block font-label-sm text-xs text-on-surface-variant mb-1.5 font-semibold">Usuario administrador</label>
-                    <input id="admin-username-input" type="text" placeholder="Ej. admin" autocomplete="username" class="w-full px-4 py-2.5 rounded-xl tech-input text-sm focus:outline-none font-body-md" required />
+                    <label class="block font-label-sm text-xs text-on-surface-variant mb-1.5 font-semibold" data-i18n="admin_user_label">Usuario administrador</label>
+                    <input id="admin-username-input" type="text" placeholder="Ej. admin" data-i18n-placeholder="admin_user_placeholder" autocomplete="username" class="w-full px-4 py-2.5 rounded-xl tech-input text-sm focus:outline-none font-body-md" required />
                 </div>
                 <div>
-                    <label class="block font-label-sm text-xs text-on-surface-variant mb-1.5 font-semibold">Contraseña</label>
+                    <label class="block font-label-sm text-xs text-on-surface-variant mb-1.5 font-semibold" data-i18n="admin_pass_label">Contraseña</label>
                     <input id="admin-password-input" type="password" placeholder="••••••••" autocomplete="current-password" class="w-full px-4 py-2.5 rounded-xl tech-input text-sm focus:outline-none font-body-md" required />
                 </div>
                 <div class="pt-2 flex items-center justify-end gap-3">
-                    <button id="btn-cancel-admin-modal" type="button" class="px-4 py-2 rounded-xl border border-white/10 text-on-surface-variant hover:text-on-surface text-xs font-label-sm font-semibold transition-all">Cancelar</button>
+                    <button id="btn-cancel-admin-modal" type="button" class="px-4 py-2 rounded-xl border border-white/10 text-on-surface-variant hover:text-on-surface text-xs font-label-sm font-semibold transition-all" data-i18n="admin_cancel">Cancelar</button>
                     <button id="btn-submit-admin-login" type="submit" class="px-5 py-2 rounded-xl bg-primary-container hover:bg-primary-container/80 text-on-primary-container text-xs font-label-sm font-bold shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95">
                         <span class="material-symbols-outlined text-sm">login</span>
-                        <span>Ingresar</span>
+                        <span data-i18n="admin_submit">Ingresar</span>
                     </button>
                 </div>
             </form>

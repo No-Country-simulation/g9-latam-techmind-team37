@@ -22,6 +22,137 @@ const CATEGORY_CONFIG = {
     'Cloud': { icon: 'cloud_queue', colorClass: 'text-sky-700 dark:text-sky-400 border-sky-500/40 bg-sky-500/10' }
 };
 
+// ── Internacionalización (i18n) ─────────────────────────────────────────────
+const TRANSLATIONS = {
+    es: {
+        brand_subtitle: 'Organización inteligente', nav_classifier: 'Clasificador',
+        nav_history: 'Historial', nav_analytics: 'Análisis',
+        theme_dark: 'Modo oscuro', theme_light: 'Modo claro',
+        service_status: 'Estado de servicios', microservices: 'Microservicios',
+        oci_server: 'Servidor OCI', ram_used: 'RAM Usada', free: 'Libre:',
+        header_classifier_title: 'Clasificación de contenido técnico',
+        header_classifier_subtitle: 'Ingresá textos para clasificarlos en tiempo real.',
+        header_history_title: 'Historial de consultas',
+        header_history_subtitle: 'Revisá y filtrá todas las predicciones.',
+        header_analytics_title: 'Panel de análisis',
+        header_analytics_subtitle: 'Visualizá métricas y estadísticas de las clasificaciones.',
+        form_title: 'Ingresar contenido técnico', label_title: 'Título del documento o artículo',
+        placeholder_title: 'ej. orquestación avanzada de contenedores con Kubernetes',
+        label_body: 'Contenido técnico (texto crudo, markdown o resumen)',
+        placeholder_body: 'Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave...',
+        btn_classify: 'Clasificar con TechMind', btn_clear: 'Limpiar formulario',
+        results_title: 'Resultado del análisis', predicted_category: 'Categoría predicha',
+        waiting: 'Esperando análisis...', confidence: 'Confianza del Modelo',
+        keywords_title: 'Palabras clave extraídas',
+        keywords_placeholder: 'Las entidades detectadas aparecerán aquí...',
+        btn_view_json: 'Ver JSON', recent_title: 'Contenidos clasificados recientemente',
+        loading_history_grid: 'Cargando publicaciones guardadas desde PostgreSQL...',
+        loading_detailed: 'Cargando historial detallado ...',
+        no_data: 'No hay publicaciones guardadas en la base de datos aún.',
+        no_results: 'No se encontraron registros para la categoría seleccionada.',
+        confidence_label: 'Confianza:', delete_btn: 'Borrar', see_more: 'Ver más', see_less: 'Ver menos',
+        search_placeholder: 'Buscar por título o palabra clave...',
+        filter_label: 'Filtrar:', all_categories: 'Todas las categorías',
+        total_classifications: 'Total Clasificaciones', top_category: 'Categoría Líder',
+        avg_confidence: 'Confianza Promedio', dist_by_category: 'Distribución por categoría',
+        activity_by_hour: 'Actividad por hora del día (24hs)',
+        top_keywords: 'Palabras clave más frecuentes', top_terms: 'Top términos clasificados',
+        json_modal_title: 'Resultado del análisis en JSON',
+        copy_json: 'Copiar JSON', copied: '¡Copiado!',
+        admin_login: 'Iniciar sesión', admin_options: 'Opciones de Administrador',
+        admin_title: 'Iniciar sesión admin',
+        admin_subtitle: 'Acceso a borrado y gestión de consultas',
+        admin_user_label: 'Usuario administrador', admin_user_placeholder: 'Ej. admin',
+        admin_pass_label: 'Contraseña', admin_cancel: 'Cancelar', admin_submit: 'Ingresar',
+        active_session: 'Sesión Activa', logout: 'Cerrar Sesión',
+        toast_fill_fields: 'Por favor, llena todos los campos',
+        toast_classified: 'Contenido clasificado y guardado',
+        toast_error: 'Hubo un error, por favor intenta de nuevo más tarde',
+        toast_admin_login_ok: '🛡️ Sesión de Administrador iniciada',
+        toast_admin_logout: 'Sesión de Administrador cerrada',
+        toast_deleted: '🗑️ Consulta ID #{id} eliminada correctamente.',
+        toast_delete_error: 'Error al eliminar:',
+        toast_not_admin: 'Debe iniciar sesión como Administrador para eliminar registros.',
+        toast_copied: '📋 JSON copiado al portapapeles con éxito',
+        toast_copy_error: '⚠️ No se pudo copiar el contenido',
+        toast_not_found: '⚠️ No se encontró la información de la consulta',
+        error_db: 'Error al conectar con la base de datos.',
+        no_keywords: 'Sin palabras clave', no_description: 'Sin descripción disponible',
+        no_terms: 'Sin términos clave destacados', date_not_available: 'Fecha no disponible',
+        no_keywords_data: 'Sin datos de palabras clave',
+        confirm_delete: '⚠️ ¿Estás seguro de que deseas eliminar permanentemente la consulta ID #{id}?',
+        no_session_json: '{\n  "mensaje": "Aún no se ha realizado ninguna clasificación en esta sesión."\n}',
+        queries_label: 'Consultas',
+    },
+    en: {
+        brand_subtitle: 'Intelligent organization', nav_classifier: 'Classifier',
+        nav_history: 'History', nav_analytics: 'Analytics',
+        theme_dark: 'Dark mode', theme_light: 'Light mode',
+        service_status: 'Service status', microservices: 'Microservices',
+        oci_server: 'OCI Server', ram_used: 'RAM Used', free: 'Free:',
+        header_classifier_title: 'Technical content classification',
+        header_classifier_subtitle: 'Enter texts to classify them in real time.',
+        header_history_title: 'Query history',
+        header_history_subtitle: 'Review and filter all predictions.',
+        header_analytics_title: 'Analytics dashboard',
+        header_analytics_subtitle: 'View metrics and statistics from classifications.',
+        form_title: 'Enter technical content', label_title: 'Document or article title',
+        placeholder_title: 'e.g. advanced container orchestration with Kubernetes',
+        label_body: 'Technical content (raw text, markdown or summary)',
+        placeholder_body: 'Paste the technical text or summary here so the model can determine the category and extract key concepts...',
+        btn_classify: 'Classify with TechMind', btn_clear: 'Clear form',
+        results_title: 'Analysis result', predicted_category: 'Predicted category',
+        waiting: 'Waiting for analysis...', confidence: 'Model Confidence',
+        keywords_title: 'Extracted keywords',
+        keywords_placeholder: 'Detected entities will appear here...',
+        btn_view_json: 'View JSON', recent_title: 'Recently classified content',
+        loading_history_grid: 'Loading saved publications from PostgreSQL...',
+        loading_detailed: 'Loading detailed history...',
+        no_data: 'No publications saved in the database yet.',
+        no_results: 'No records found for the selected category.',
+        confidence_label: 'Confidence:', delete_btn: 'Delete', see_more: 'See more', see_less: 'See less',
+        search_placeholder: 'Search by title or keyword...',
+        filter_label: 'Filter:', all_categories: 'All categories',
+        total_classifications: 'Total Classifications', top_category: 'Top Category',
+        avg_confidence: 'Avg. Confidence', dist_by_category: 'Distribution by category',
+        activity_by_hour: 'Activity by hour of day (24h)',
+        top_keywords: 'Most frequent keywords', top_terms: 'Top classified terms',
+        json_modal_title: 'Analysis result in JSON',
+        copy_json: 'Copy JSON', copied: 'Copied!',
+        admin_login: 'Admin Login', admin_options: 'Admin Options',
+        admin_title: 'Admin login',
+        admin_subtitle: 'Access to deletion and query management',
+        admin_user_label: 'Admin username', admin_user_placeholder: 'e.g. admin',
+        admin_pass_label: 'Password', admin_cancel: 'Cancel', admin_submit: 'Login',
+        active_session: 'Active Session', logout: 'Logout',
+        toast_fill_fields: 'Please fill in all fields',
+        toast_classified: 'Content classified and saved',
+        toast_error: 'An error occurred, please try again later',
+        toast_admin_login_ok: '🛡️ Administrator session started',
+        toast_admin_logout: 'Administrator session closed',
+        toast_deleted: '🗑️ Query ID #{id} deleted successfully.',
+        toast_delete_error: 'Error deleting:',
+        toast_not_admin: 'You must log in as Administrator to delete records.',
+        toast_copied: '📋 JSON copied to clipboard',
+        toast_copy_error: '⚠️ Could not copy content',
+        toast_not_found: '⚠️ Query information not found',
+        error_db: 'Error connecting to database.',
+        no_keywords: 'No keywords', no_description: 'No description available',
+        no_terms: 'No key terms detected', date_not_available: 'Date not available',
+        no_keywords_data: 'No keyword data',
+        confirm_delete: '⚠️ Are you sure you want to permanently delete query ID #{id}?',
+        no_session_json: '{\n  "message": "No classification has been performed in this session yet."\n}',
+        queries_label: 'Queries',
+    }
+};
+
+let currentLang = localStorage.getItem('lang') || 'es';
+function t(key) {
+    const lang = TRANSLATIONS[currentLang];
+    return (lang && lang[key] !== undefined) ? lang[key] : (TRANSLATIONS.es[key] !== undefined ? TRANSLATIONS.es[key] : key);
+}
+let currentView = 'classifier';
+
 let lastJsonResponse = null;
 let lastInput = null;
 let allHistoryData = [];
@@ -49,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Mobile: sidebar starts hidden, no icon init needed
     updateAdminUIState();
+    applyTranslations();
     initHealthChecks();
     fetchSystemStats();
     setInterval(fetchSystemStats, 10000);
@@ -114,7 +246,7 @@ async function fetchSystemStats() {
 
         if (ramValEl) ramValEl.textContent = `${data.ram_used_mb} / ${data.ram_total_mb} MB`;
         if (ramPctEl) ramPctEl.textContent = `${data.ram_percent}%`;
-        if (ramFreeEl) ramFreeEl.textContent = `Libre: ${data.ram_free_mb} MB`;
+        if (ramFreeEl) ramFreeEl.textContent = `${t('free')} ${data.ram_free_mb} MB`;
         if (ramBarEl) {
             ramBarEl.style.width = `${Math.min(100, data.ram_percent)}%`;
             if (data.ram_percent > 90) {
@@ -392,7 +524,8 @@ function bindEvents() {
             navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
             navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
-            updateMainHeader('Clasificación de contenido técnico', 'Ingresá textos para clasificarlos en tiempo real.');
+            currentView = 'classifier';
+            updateMainHeader(t('header_classifier_title'), t('header_classifier_subtitle'));
 
             if (window.innerWidth < 768) {
                 closeSidebar();
@@ -409,7 +542,8 @@ function bindEvents() {
             navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
             navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
-            updateMainHeader('Historial de consultas', 'Revisá y filtrá todas las predicciones.');
+            currentView = 'history';
+            updateMainHeader(t('header_history_title'), t('header_history_subtitle'));
 
             loadDetailedHistory();
 
@@ -428,7 +562,8 @@ function bindEvents() {
             navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
             navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
 
-            updateMainHeader('Panel de análisis', 'Visualizá métricas y estadísticas de las clasificaciones.');
+            currentView = 'analytics';
+            updateMainHeader(t('header_analytics_title'), t('header_analytics_subtitle'));
 
             loadAnalyticsDashboard();
 
@@ -454,16 +589,8 @@ function bindEvents() {
         }
     }
 
-    // Theme Toggle Control (Sidebar)
+    // Theme Toggle Control (Sidebar) — updateThemeToggleUI is a global function
     const themeToggle = document.getElementById('btn-theme-toggle');
-    const themeToggleIcon = document.getElementById('theme-toggle-icon');
-    const themeToggleText = document.getElementById('theme-toggle-text');
-
-    const updateThemeToggleUI = () => {
-        const isDark = document.documentElement.classList.contains('dark');
-        if (themeToggleIcon) themeToggleIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
-        if (themeToggleText) themeToggleText.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
-    };
 
     if (themeToggle) {
         updateThemeToggleUI();
@@ -476,10 +603,26 @@ function bindEvents() {
             updateThemeToggleUI();
 
             // Re-render analytics dashboard if charts exist to update slice borders and legend text colors
-            const analyticsView = document.getElementById('analytics-view-section');
-            if (analyticsView && !analyticsView.classList.contains('hidden')) {
+            const analyticsViewEl = document.getElementById('analytics-view-section');
+            if (analyticsViewEl && !analyticsViewEl.classList.contains('hidden')) {
                 loadAnalyticsDashboard();
             }
+        });
+    }
+
+    // Language Toggle Control
+    const langToggle = document.getElementById('btn-lang-toggle');
+    if (langToggle) {
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            localStorage.setItem('lang', currentLang);
+            applyTranslations();
+            // Refresh dynamic content that's currently visible
+            loadHistory();
+            const histViewEl = document.getElementById('history-view-section');
+            const anlViewEl = document.getElementById('analytics-view-section');
+            if (histViewEl && !histViewEl.classList.contains('hidden')) loadDetailedHistory();
+            if (anlViewEl && !anlViewEl.classList.contains('hidden')) loadAnalyticsDashboard();
         });
     }
 
@@ -640,7 +783,7 @@ async function handleAdminLogin(username, password) {
 
         hideAdminLoginModal();
         updateAdminUIState();
-        showToast('🛡️ Sesión de Administrador iniciada', 'success', 1800);
+        showToast(t('toast_admin_login_ok'), 'success', 1800);
         loadHistory();
         loadDetailedHistory();
     } catch (err) {
@@ -667,7 +810,7 @@ async function handleAdminLogout() {
     sessionStorage.removeItem('adminToken');
     sessionStorage.removeItem('adminUser');
     updateAdminUIState();
-    showToast('Sesión de Administrador cerrada', 'info', 1800);
+    showToast(t('toast_admin_logout'), 'info', 1800);
     loadHistory();
     const filterCat = document.getElementById('filter-category');
     const searchHist = document.getElementById('search-history');
@@ -694,7 +837,7 @@ function updateAdminUIState() {
             authBtn.title = 'Opciones de Administrador';
         }
     } else {
-        if (authBtnText) authBtnText.textContent = 'Admin Login';
+        if (authBtnText) authBtnText.textContent = t('admin_login');
         if (authBtnIcon) authBtnIcon.textContent = 'admin_panel_settings';
         if (chevron) chevron.classList.add('hidden');
         hideAdminPopover();
@@ -708,11 +851,11 @@ function updateAdminUIState() {
 
 async function deletePrediction(id) {
     if (!isLoggedInAsAdmin()) {
-        showToast('Debe iniciar sesión como Administrador para eliminar registros.', 'warning');
+        showToast(t('toast_not_admin'), 'warning');
         return;
     }
 
-    if (!confirm(`⚠️ ¿Estás seguro de que deseas eliminar permanentemente la consulta ID #${id}?`)) {
+    if (!confirm(t('confirm_delete').replace('{id}', id))) {
         return;
     }
 
@@ -728,7 +871,7 @@ async function deletePrediction(id) {
             throw new Error(data.detail || 'No se pudo eliminar la consulta');
         }
 
-        showToast(`🗑️ Consulta ID #${id} eliminada correctamente.`, 'success');
+        showToast(t('toast_deleted').replace('{id}', id), 'success');
 
         const jsonModal = document.getElementById('json-modal');
         if (jsonModal && !jsonModal.classList.contains('hidden')) {
@@ -747,7 +890,7 @@ async function deletePrediction(id) {
             loadAnalyticsDashboard();
         }
     } catch (err) {
-        showToast(`Error al eliminar: ${err.message}`, 'error');
+        showToast(`${t('toast_delete_error')} ${err.message}`, 'error');
     }
 }
 
@@ -762,7 +905,7 @@ async function handleClassification() {
     const texto = bodyInput.value.trim();
 
     if (!titulo || !texto) {
-        showToast('Por favor, llena todos los campos', 'warning');
+        showToast(t('toast_fill_fields'), 'warning');
         return;
     }
 
@@ -807,11 +950,11 @@ async function handleClassification() {
             }
         }, 600);
 
-        showToast('Contenido clasificado y guardado', 'success');
+        showToast(t('toast_classified'), 'success');
 
     } catch (err) {
         console.error('Error al clasificar:', err);
-        showToast('Hubo un error, por favor intenta de nuevo más tarde', 'error');
+        showToast(t('toast_error'), 'error');
     } finally {
         setLoadingState(false);
     }
@@ -852,7 +995,7 @@ function renderResult(data) {
             `;
         }).join('');
     } else {
-        keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm italic">Sin términos clave destacados</span>`;
+        keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm italic">${t('no_terms')}</span>`;
     }
 
     // Efecto visual
@@ -890,17 +1033,17 @@ async function loadHistory() {
                 const isLong = textStr.length > 30;
                 const expandBtnHtml = isLong ? `
                     <div class="flex justify-end mt-1.5">
-                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="Expandir o contraer descripción">
-                            <span>Ver más</span>
+                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="${t('see_more')}">
+                            <span>${t('see_more')}</span>
                             <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
                         </button>
                     </div>
                 ` : '';
 
                 const deleteBtnHtml = isLoggedInAsAdmin() ? `
-                    <button type="button" class="btn-delete-entry px-2.5 py-1 rounded-lg border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Eliminar consulta de la base de datos">
+                    <button type="button" class="btn-delete-entry px-2.5 py-1 rounded-lg border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="${t('delete_btn')}">
                         <span class="material-symbols-outlined text-xs pointer-events-none" style="color: var(--led-error-text)">delete</span>
-                        <span class="pointer-events-none font-bold" style="color: var(--led-error-text)">Borrar</span>
+                        <span class="pointer-events-none font-bold" style="color: var(--led-error-text)">${t('delete_btn')}</span>
                     </button>
                 ` : '';
 
@@ -917,13 +1060,13 @@ async function loadHistory() {
                         </div>
                         <div class="mt-4 flex flex-wrap items-center justify-between opacity-90 pt-2.5 border-t border-black/5 dark:border-white/5 gap-2">
                             <div class="flex items-center gap-1.5">
-                                <span class="font-label-sm text-[11px] text-on-surface-variant font-medium">Confianza: ${probPct}%</span>
+                                <span class="font-label-sm text-[11px] text-on-surface-variant font-medium">${t('confidence_label')} ${probPct}%</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 ${deleteBtnHtml}
-                                <button type="button" class="btn-view-entry-json px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
+                                <button type="button" class="btn-view-entry-json px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="${t('btn_view_json')}">
                                     <span class="material-symbols-outlined text-xs pointer-events-none">code</span>
-                                    <span class="pointer-events-none">Ver JSON</span>
+                                    <span class="pointer-events-none">${t('btn_view_json')}</span>
                                 </button>
                             </div>
                         </div>
@@ -933,7 +1076,7 @@ async function loadHistory() {
         } else {
             historyGrid.innerHTML = `
                 <div class="col-span-full py-8 text-center glass-panel rounded-xl">
-                    <p class="text-on-surface-variant text-sm font-label-sm">No hay publicaciones guardadas en la base de datos aún.</p>
+                    <p class="text-on-surface-variant text-sm font-label-sm">${t('no_data')}</p>
                 </div>
             `;
         }
@@ -942,8 +1085,8 @@ async function loadHistory() {
         historyGrid.innerHTML = `
             <div class="col-span-full py-8 text-center glass-panel rounded-xl border border-rose-500/30 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-950/20">
                 <span class="material-symbols-outlined text-4xl text-rose-600 dark:text-rose-400 mb-2">error</span>
-                <p class="text-rose-700 dark:text-rose-200 text-sm font-semibold">Error al conectar con la base de datos.</p>
-                <p class="text-rose-600/80 dark:text-rose-400/80 text-xs mt-1 font-label-sm">${err.message || 'No se pudo consultar PostgreSQL.'}</p>
+                <p class="text-rose-700 dark:text-rose-200 text-sm font-semibold">${t('error_db')}</p>
+                <p class="text-rose-600/80 dark:text-rose-400/80 text-xs mt-1 font-label-sm">${err.message || ''}</p>
             </div>
         `;
     }
@@ -964,7 +1107,7 @@ function updateCategoryFilterCounts(data) {
 
     // Map of option values to their base label
     const categoryLabels = {
-        'all': 'Todas las categorías',
+        'all': t('all_categories'),
         'Backend': 'Backend',
         'Frontend': 'Frontend',
         'Data Science': 'Data Science',
@@ -998,7 +1141,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
         listContainer.innerHTML = `
             <div class="py-8 text-center glass-panel rounded-xl">
                 <span class="material-symbols-outlined text-4xl text-outline mb-2 animate-spin">refresh</span>
-                <p class="text-on-surface-variant text-sm font-label-sm">Cargando historial detallado ...</p>
+                <p class="text-on-surface-variant text-sm font-label-sm">${t('loading_detailed')}</p>
             </div>
         `;
 
@@ -1029,7 +1172,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                 const prob = entry.probabilidad != null ? Number(entry.probabilidad) : 0;
                 const probPct = Number(prob * 100).toFixed(1);
                 
-                let dateStr = 'Fecha no disponible';
+                let dateStr = t('date_not_available');
                 if (entry.created_at) {
                     const d = parseDate(entry.created_at);
                     if (d) {
@@ -1048,17 +1191,17 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                 const isLong = textStr.length > 30;
                 const expandBtnHtml = isLong ? `
                     <div class="flex justify-end mt-1.5">
-                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="Expandir o contraer descripción">
-                            <span>Ver más</span>
+                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="${t('see_more')}">
+                            <span>${t('see_more')}</span>
                             <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
                         </button>
                     </div>
                 ` : '';
 
                 const deleteBtnHtml = isLoggedInAsAdmin() ? `
-                    <button type="button" class="btn-delete-entry px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Eliminar consulta de la base de datos">
+                    <button type="button" class="btn-delete-entry px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="${t('delete_btn')}">
                         <span class="material-symbols-outlined text-sm pointer-events-none" style="color: var(--led-error-text)">delete</span>
-                        <span class="pointer-events-none font-bold" style="color: var(--led-error-text)">Borrar</span>
+                        <span class="pointer-events-none font-bold" style="color: var(--led-error-text)">${t('delete_btn')}</span>
                     </button>
                 ` : '';
 
@@ -1080,7 +1223,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                             <p class="history-card-body text-on-surface-variant text-sm line-clamp-2 opacity-80 leading-relaxed transition-all">${escapeHtml(textStr || 'Sin descripción disponible')}</p>
                             ${expandBtnHtml}
                             <div class="flex flex-wrap gap-1.5 pt-1">
-                                ${keywordsPills || '<span class="text-xs text-on-surface-variant italic opacity-60">Sin palabras clave</span>'}
+                                ${keywordsPills || `<span class="text-xs text-on-surface-variant italic opacity-60">${t('no_keywords')}</span>`}
                             </div>
                         </div>
                         <div class="flex flex-row md:flex-col items-center md:items-end justify-between gap-3 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[140px] shrink-0">
@@ -1090,9 +1233,9 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                             </div>
                             <div class="flex items-center gap-2">
                                 ${deleteBtnHtml}
-                                <button type="button" class="btn-view-entry-json px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="Ver JSON de esta consulta">
+                                <button type="button" class="btn-view-entry-json px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="${t('btn_view_json')}">
                                     <span class="material-symbols-outlined text-sm pointer-events-none">code</span>
-                                    <span class="pointer-events-none">Ver JSON</span>
+                                    <span class="pointer-events-none">${t('btn_view_json')}</span>
                                 </button>
                             </div>
                         </div>
@@ -1103,7 +1246,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
             listContainer.innerHTML = `
                 <div class="py-12 text-center glass-panel rounded-xl border border-black/5 dark:border-white/5">
                     <span class="material-symbols-outlined text-5xl text-outline mb-3 opacity-60">filter_list_off</span>
-                    <p class="text-on-surface-variant text-base font-semibold">No se encontraron registros para la categoría seleccionada.</p>
+                    <p class="text-on-surface-variant text-base font-semibold">${t('no_results')}</p>
                 </div>
             `;
         }
@@ -1112,7 +1255,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
         listContainer.innerHTML = `
             <div class="py-12 text-center glass-panel rounded-xl border border-rose-500/30 dark:border-rose-500/20 bg-rose-500/10 dark:bg-rose-950/20">
                 <span class="material-symbols-outlined text-5xl text-rose-600 dark:text-rose-400 mb-3">error</span>
-                <p class="text-rose-700 dark:text-rose-200 text-base font-semibold">Error al conectar con la base de datos.</p>
+                <p class="text-rose-700 dark:text-rose-200 text-base font-semibold">${t('error_db')}</p>
                 <p class="text-rose-600/80 dark:text-rose-400/80 text-xs mt-1 font-label-sm">${err.message}</p>
             </div>
         `;
@@ -1125,7 +1268,7 @@ function showHistoryEntryJsonInModal(id) {
     if (!id) return;
     const entry = allHistoryData.find(item => String(item.id) === String(id));
     if (!entry) {
-        showToast('⚠️ No se encontró la información de la consulta', 'warning');
+        showToast(t('toast_not_found'), 'warning');
         return;
     }
 
@@ -1170,7 +1313,7 @@ function toggleJsonModal() {
             };
             jsonPre.textContent = JSON.stringify(fullPayload, null, 2);
         } else {
-            jsonPre.textContent = '{\n  "mensaje": "Aún no se ha realizado ninguna clasificación en esta sesión."\n}';
+            jsonPre.textContent = t('no_session_json');
         }
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -1191,21 +1334,21 @@ function copyJsonToClipboard() {
             const originalText = copyText.textContent;
             const originalIcon = copyBtn.querySelector('.material-symbols-outlined').textContent;
             
-            copyText.textContent = '¡Copiado!';
+            copyText.textContent = t('copied');
             copyBtn.querySelector('.material-symbols-outlined').textContent = 'check';
             copyBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
             
-            showToast('📋 JSON copiado al portapapeles con éxito', 'info');
+            showToast(t('toast_copied'), 'info');
 
             setTimeout(() => {
-                copyText.textContent = originalText;
-                copyBtn.querySelector('.material-symbols-outlined').textContent = originalIcon;
+                copyText.textContent = t('copy_json');
+                copyBtn.querySelector('.material-symbols-outlined').textContent = 'content_copy';
                 copyBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
             }, 2000);
         }
     }).catch(err => {
         console.error('Error al copiar JSON:', err);
-        showToast('⚠️ No se pudo copiar el contenido', 'error');
+        showToast(t('toast_copy_error'), 'error');
     });
 }
 
@@ -1445,7 +1588,7 @@ async function loadAnalyticsDashboard() {
                 data: {
                     labels: hourLabels,
                     datasets: [{
-                        label: 'Consultas',
+                        label: t('queries_label'),
                         data: hourValues,
                         borderColor: '#38bdf8',
                         backgroundColor: 'rgba(56, 189, 248, 0.15)',
@@ -1474,7 +1617,7 @@ async function loadAnalyticsDashboard() {
         if (kwContainer) {
             const kwList = data.top_keywords || [];
             if (kwList.length === 0) {
-                kwContainer.innerHTML = '<span class="font-label-sm text-xs text-on-surface-variant opacity-60">Sin datos de palabras clave</span>';
+                kwContainer.innerHTML = `<span class="font-label-sm text-xs text-on-surface-variant opacity-60">${t('no_keywords_data')}</span>`;
             } else {
                 const maxCount = Math.max(...kwList.map(k => k.count), 1);
                 kwContainer.innerHTML = kwList.map(item => {
@@ -1498,4 +1641,66 @@ async function loadAnalyticsDashboard() {
     } catch (e) {
         console.error('Error cargando analytics:', e);
     }
+}
+
+// ── Internacionalización: helpers globales ────────────────────────────────────
+
+function updateThemeToggleUI() {
+    const icon = document.getElementById('theme-toggle-icon');
+    const text = document.getElementById('theme-toggle-text');
+    const isDark = document.documentElement.classList.contains('dark');
+    if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    if (text) text.textContent = isDark ? t('theme_light') : t('theme_dark');
+}
+
+function applyTranslations() {
+    document.documentElement.lang = currentLang;
+
+    // Actualizar todos los elementos estáticos con data-i18n / data-i18n-placeholder
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+
+    // Indicador del botón de idioma (muestra el idioma al que se puede cambiar)
+    const langText = document.getElementById('lang-toggle-text');
+    if (langText) langText.textContent = currentLang === 'es' ? 'EN' : 'ES';
+
+    // Elementos cuyo texto es gestionado dinámicamente
+    updateThemeToggleUI();
+    updateAdminUIState();
+
+    // Actualizar el header según la vista activa
+    const headerTitle = document.getElementById('main-header-title');
+    const headerSubtitle = document.getElementById('main-header-subtitle');
+    const viewHeaders = {
+        classifier: { title: t('header_classifier_title'), subtitle: t('header_classifier_subtitle') },
+        history:    { title: t('header_history_title'),    subtitle: t('header_history_subtitle') },
+        analytics:  { title: t('header_analytics_title'),  subtitle: t('header_analytics_subtitle') }
+    };
+    const h = viewHeaders[currentView] || viewHeaders.classifier;
+    if (headerTitle) headerTitle.textContent = h.title;
+    if (headerSubtitle) headerSubtitle.textContent = h.subtitle;
+
+    // Restaurar estado inicial de la tarjeta de resultados si no hay clasificación activa
+    if (!lastJsonResponse) {
+        const categoryBadge = document.getElementById('category-badge-container');
+        if (categoryBadge) {
+            categoryBadge.innerHTML = `
+                <div class="inline-flex max-w-full items-center gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-base sm:text-lg font-bold bg-primary/10 border-primary/30 text-primary-fixed">
+                    <span>${t('waiting')}</span>
+                </div>
+            `;
+        }
+        const keywordsList = document.getElementById('keywords-list');
+        if (keywordsList) {
+            keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm sm:text-base italic opacity-60">${t('keywords_placeholder')}</span>`;
+        }
+    }
+
+    // Actualizar el texto del botón de copiar JSON
+    const copyBtnText = document.getElementById('copy-btn-text');
+    if (copyBtnText) copyBtnText.textContent = t('copy_json');
 }

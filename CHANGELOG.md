@@ -4,6 +4,43 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [2.0.0] — 2026-08-08 · Corrección de Bugs Frontend y Sistema de Internacionalización (ES / EN)
+
+### Corregido
+
+- **Listeners duplicados en modal "Ver JSON" (`frontend/app.js`):** El botón `#btn-view-json` y el botón de cierre `#modal-close` tenían sus event listeners registrados dos veces dentro de `bindEvents()` (líneas 182–193 y 492–501), haciendo que `toggleJsonModal()` se ejecutara dos veces por clic y el modal se abriera y cerrara instantáneamente. Eliminado el bloque duplicado.
+
+- **Ícono `science` desaparecía tras la primera clasificación (`frontend/app.js`):** `setLoadingState(false)` reconstruía el botón "Clasificar con TechMind" sin incluir el `<span class="material-symbols-outlined">science</span>` del HTML original. El botón quedaba sin ícono después de cada uso. Corregido incluyendo el icono en el `innerHTML` de restauración.
+
+- **LED del indicador de estado pulsaba en verde aunque hubiera servicios caídos (`frontend/app.js`):** La clase `led-pulse` (animación de glow verde) se asignaba al LED general en todos los estados, incluyendo el de error. Ahora `led-pulse` solo se aplica cuando *todos* los servicios están operativos.
+
+- **Vista Analytics no removía la clase `flex` al cambiar de sección (`frontend/app.js`):** `showClassifier()` y `showHistory()` agregaban `hidden` a la vista de Analytics pero no removían `flex`, generando un conflicto de layout al navegar de vuelta. Agregado `analyticsView.classList.remove('flex')` en ambas funciones.
+
+- **Botón de admin en español decía "Admin Login" (`frontend/app.js`):** Cambiado el texto del botón en estado deslogueado a `"Iniciar sesión"` en la clave `es` de `TRANSLATIONS` y en `updateAdminUIState()`, que ahora usa `t('admin_login')` en lugar del string hardcodeado.
+
+### Añadido
+
+- **Apertura del sidebar al hacer clic en el LED de "Estado de servicios" (`frontend/app.js`):** El indicador de microservicios en el sidebar colapsado ahora tiene el mismo comportamiento que los íconos de navegación: al hacer clic sobre él estando el sidebar colapsado, se expande automáticamente (con la animación CSS de 320 ms) y luego despliega el popover de estado. Si el sidebar ya está expandido, el popover se abre/cierra de forma normal.
+
+- **Sistema de Internacionalización completo ES / EN (`frontend/index.html` + `frontend/app.js`):**
+  - **Botón de idioma `🌐`:** Añadido botón compacto con icono `translate` (Material Symbols) junto al botón de Admin en el encabezado principal. Muestra el idioma al que se puede cambiar (`EN` / `ES`) y en pantallas pequeñas solo muestra el icono. La preferencia se persiste en `localStorage`.
+  - **Diccionario `TRANSLATIONS` con 67 claves** en español e inglés, cubriendo la totalidad del texto visible de la UI:
+    - Sidebar: navegación, estado de servicios, OCI Server, RAM Usada, toggle de tema.
+    - Formulario: título, etiquetas, placeholders, botones.
+    - Tarjeta de resultados: título, "Categoría predicha", "Esperando análisis...", "Confianza del Modelo", "Palabras clave extraídas".
+    - Historial reciente y vista detallada: encabezados, buscador, filtro, botones "Ver más / Ver menos", "Borrar", "Ver JSON".
+    - Analytics: KPI labels, títulos de gráficos, dataset label del line chart.
+    - Modal JSON y modal de login admin: todos los textos estáticos.
+    - Toasts, mensajes de error, confirmaciones de borrado y estados vacíos.
+  - **Función `t(key)`:** Helper global que resuelve la clave en el idioma activo con fallback al español.
+  - **Función `applyTranslations()`:** Actualiza en una sola pasada todos los elementos con `data-i18n` / `data-i18n-placeholder`, el header dinámico según la vista activa (`currentView`), el botón del toggle de tema y el estado inicial de la tarjeta de resultados cuando no hay clasificación en curso.
+  - **Variable `currentView`:** Registra la vista activa (`'classifier'` / `'history'` / `'analytics'`) para que el header del encabezado se traduzca correctamente al cambiar de idioma desde cualquier sección.
+  - **Atributos `data-i18n` y `data-i18n-placeholder`** agregados a ∼35 elementos estáticos en el HTML (sidebar, formulario, resultados, historial, analytics, modales).
+  - **`updateThemeToggleUI()`** extraída como función global (antes era un `const` local dentro de `bindEvents()`), permitiendo que `applyTranslations()` la invoque directamente y que el toggle de tema muestre `"Dark mode"` / `"Light mode"` al cambiar al inglés.
+  - Al cambiar de idioma, el contenido dinámico visible (tarjetas del historial, gráficos de Analytics) se refresca automáticamente con los textos del nuevo idioma.
+
+---
+
 ## [1.9.0] — 2026-08-07 · Rediseño de Sidebar Estilo Claude, UX del Formulario, Responsividad Móvil y Parsing de Horarios UTC
 
 ### Añadido
@@ -401,4 +438,4 @@ Postman → Spring Boot (8080) → FastAPI (8000) → PostgreSQL (5432)
 
 ---
 
-*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-08-02.*
+*Mantenido por el equipo completo — TechMind G9 LATAM Team 37. Última actualización: 2026-08-08.*
