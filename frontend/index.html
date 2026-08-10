@@ -103,7 +103,16 @@
         }
 
         :root {
-            --sidebar-width: 256px;
+            /* Ancho original del sidebar (borde izquierdo fijo en 0) */
+            --sidebar-base-width: 256px;
+            /* Corre SOLO el lado derecho: borde derecho del sidebar, botón de colapsar
+               y lado derecho de los botones laterales (los ensancha). */
+            --sidebar-shift: 53px;
+            /* Corre AMBOS lados a la vez: mueve los lados izquierdos de los botones
+               y arrastra con ellos los lados derechos y el borde del sidebar,
+               sin cambiar el ancho de los botones. */
+            --sidebar-left-shift: 0px;
+            --sidebar-width: calc(var(--sidebar-base-width) + var(--sidebar-shift) + var(--sidebar-left-shift));
             --sidebar-collapsed-width: 64px;
             --background: #e8e2d5;
             --on-background: #231f18;
@@ -168,19 +177,95 @@
             --json-bg: var(--surface-container-lowest);
         }
 
-        /* Claude-style sidebar transitions */
+        /* Transición de iluminación (tema) perfectamente sincronizada en toda la página y el sidebar */
+        *, *::before, *::after {
+            transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity;
+            transition-duration: 0.3s;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Preservar la animación de ancho y transform del sidebar en 0.3s */
         #sidebar {
             width: var(--sidebar-width);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* px-3 base (0.75rem) + corrimiento de los lados izquierdos */
+            padding-left: calc(0.75rem + var(--sidebar-left-shift));
+            padding-right: 0.75rem;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #sidebar.sidebar-collapsed {
             width: var(--sidebar-collapsed-width);
             padding-left: 0.5rem;
             padding-right: 0.5rem;
         }
-        #sidebar.sidebar-collapsed #btn-sidebar-toggle {
-            display: none !important;
+        .sidebar-header {
+            height: 104px !important;
+            min-height: 104px !important;
         }
+        .sidebar-brand-text {
+            white-space: nowrap !important;
+        }
+        #btn-brand-home {
+            overflow: hidden !important;
+        }
+        /* ── Toggles del sidebar: sin caja de botón, solo el símbolo ───────────── */
+        #btn-sidebar-toggle,
+        #btn-sidebar-mobile {
+            width: auto !important;
+            height: auto !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            padding: 0 !important;
+            background: none !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            line-height: 1 !important;
+            transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Hover de iluminación: solo cambia el color del símbolo, sin escalarlo */
+        #btn-sidebar-toggle:hover,
+        #btn-sidebar-mobile:hover {
+            color: #4c1d95 !important;
+        }
+        .dark #btn-sidebar-toggle:hover,
+        .dark #btn-sidebar-mobile:hover {
+            color: #e9ddff !important;
+        }
+        #btn-sidebar-toggle:hover #sidebar-toggle-icon,
+        #btn-sidebar-mobile:hover #sidebar-mobile-icon {
+            color: inherit !important;
+        }
+
+        /* El toggle expandido (cerrar) se alinea al mismo centro vertical que el del
+           rail colapsado (abrir): el botón del rail se centra en la caja de contenido,
+           que descuenta el padding-bottom (pb-4 = 1rem) del header.
+           El offset derecho conserva la posición que tenía el símbolo dentro de la
+           antigua caja de 44px, para no pegarlo al borde del sidebar. */
+        #sidebar #btn-sidebar-toggle {
+            top: calc((100% - 1rem) / 2);
+            right: calc((44px - 20px) / 2);
+        }
+        #sidebar #btn-sidebar-mobile {
+            top: calc((100% - 1rem) / 2);
+            right: calc((44px - 24px) / 2);
+        }
+        #sidebar.sidebar-collapsed .sidebar-header {
+            justify-content: center;
+            align-items: center;
+        }
+        /* En el rail colapsado el símbolo se centra sin caja */
+        #sidebar.sidebar-collapsed #btn-sidebar-toggle,
+        #sidebar.sidebar-collapsed #btn-sidebar-mobile {
+            margin: auto !important;
+            position: static !important;
+            transform: none !important;
+        }
+        #sidebar.sidebar-collapsed #btn-brand-home,
         #sidebar.sidebar-collapsed .sidebar-brand-text,
         #sidebar.sidebar-collapsed .sidebar-label,
         #sidebar.sidebar-collapsed .sidebar-status-text,
@@ -188,28 +273,48 @@
         #sidebar.sidebar-collapsed #status-popover {
             display: none !important;
         }
-        #sidebar.sidebar-collapsed #btn-brand-home {
-            justify-content: center;
-            width: 100%;
-            padding: 0.25rem 0;
-        }
         #sidebar.sidebar-collapsed .sidebar-nav-item {
             justify-content: center !important;
             width: 44px !important;
             height: 44px !important;
-            margin: 0.5rem auto !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            margin-top: 0 !important;
             padding: 0 !important;
             border-radius: 0.75rem !important;
+        }
+        #sidebar.sidebar-collapsed nav > .sidebar-nav-item + .sidebar-nav-item {
+            margin-top: 0.375rem !important;
         }
         #sidebar.sidebar-collapsed #btn-status-trigger {
             justify-content: center !important;
             width: 44px !important;
             height: 44px !important;
-            margin: 0.5rem auto !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            margin-top: 0.25rem !important;
             padding: 0 !important;
+        }
+        /* El símbolo de iluminación no tiene caja de botón: ocupa solo el icono,
+           tanto en el sidebar expandido como en el rail colapsado */
+        #sidebar.sidebar-collapsed #btn-theme-toggle {
+            margin-left: auto !important;
+            margin-right: auto !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        #sidebar.sidebar-collapsed div.relative.mt-auto {
+            flex-direction: column !important;
         }
         #sidebar.sidebar-collapsed #overall-status-led {
             margin: 0 auto;
+        }
+        /* El `space-y-1` del contenedor anula el `mb-3` del popover (mayor
+           especificidad), y sin ese margen el panel de estado queda pegado a la línea
+           divisoria que está sobre el símbolo de iluminación: la línea se ve cruzando
+           sus esquinas redondeadas. Se restituye la separación. */
+        #status-popover {
+            margin-bottom: 0.75rem !important;
         }
         #main-content {
             transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -303,17 +408,63 @@
             }
         }
 
-        /* Sidebar buttons hover unificado para Clasificador, Historial y Estado de servicios */
+        /* Base de botones de navegación */
+        .sidebar-nav-item {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent !important;
+        }
+
+        /* ── Símbolo de iluminación: sin caja de botón ────────────────────────── */
+        #btn-theme-toggle {
+            display: inline-flex !important;
+            width: auto !important;
+            height: auto !important;
+            padding: 0 !important;
+            background: none !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            line-height: 1 !important;
+            transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* El hover solo se activa con el puntero sobre el símbolo, y queda fijo
+           al hacer click (mientras el símbolo conserve el foco) */
+        #btn-theme-toggle:hover,
+        #btn-theme-toggle.theme-symbol-active {
+            color: #4c1d95 !important;
+            transform: scale(1.15);
+        }
+        .dark #btn-theme-toggle:hover,
+        .dark #btn-theme-toggle.theme-symbol-active {
+            color: #e9ddff !important;
+        }
+        #btn-theme-toggle:hover #theme-toggle-icon,
+        #btn-theme-toggle.theme-symbol-active #theme-toggle-icon {
+            color: inherit !important;
+        }
+
         .sidebar-nav-item {
             display: flex;
             align-items: center;
-            padding: 0.875rem 1rem;
+            height: 44px;
+            padding: 0 1rem;
             border-radius: 0.75rem;
             font-family: var(--font-label-sm, inherit);
             font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent;
+        }
+
+        /* Fuerza a que 'Estado de servicios' quede en una sola línea horizontal y centrado */
+        #btn-status-trigger {
+            justify-content: center !important;
+            padding-left: 0.625rem !important;
+            padding-right: 0.625rem !important;
+        }
+        .sidebar-status-text {
+            white-space: nowrap !important;
+            font-size: 0.8125rem !important;
+            text-align: center !important;
         }
 
         /* Estado Activo (no hovered) */
@@ -324,20 +475,20 @@
             border-color: transparent !important;
         }
 
-        /* Hover unificado en Modo Claro (aplica a todos) */
+        /* Hover unificado en Modo Claro (nav items) */
         .sidebar-nav-item:hover {
             background-color: rgba(92, 62, 145, 0.12) !important;
             color: #4c1d95 !important;
-            border-color: rgba(92, 62, 145, 0.25) !important;
-            box-shadow: 0 2px 10px rgba(92, 62, 145, 0.08) !important;
+            border-color: rgba(92, 62, 145, 0.35) !important;
+            box-shadow: 0 2px 10px rgba(92, 62, 145, 0.1) !important;
         }
 
-        /* Hover unificado en Modo Oscuro (aplica a todos) */
+        /* Hover unificado en Modo Oscuro (nav items) */
         .dark .sidebar-nav-item:hover {
             background-color: rgba(160, 120, 255, 0.18) !important;
             color: #e9ddff !important;
-            border-color: rgba(208, 188, 255, 0.3) !important;
-            box-shadow: 0 2px 12px rgba(160, 120, 255, 0.15) !important;
+            border-color: rgba(208, 188, 255, 0.4) !important;
+            box-shadow: 0 2px 12px rgba(160, 120, 255, 0.2) !important;
         }
 
         /* Fuerza que los iconos, textos y chevrons internos hereden el color en hover */
@@ -363,14 +514,34 @@
             .ambient-glow {
                 filter: blur(70px);
             }
+            /* En móvil el sidebar se comporta igual que en escritorio: rail visible
+               siempre, y al expandirse se superpone al contenido (con overlay). */
             #main-content {
-                margin-left: 0 !important;
+                margin-left: var(--sidebar-collapsed-width);
             }
             #sidebar {
-                width: var(--sidebar-width) !important;
+                transform: none !important;
             }
-            #btn-sidebar-toggle {
-                display: none;
+            /* Solo se ve el toggle móvil; el chevron de escritorio queda oculto */
+            #sidebar #btn-sidebar-toggle,
+            #sidebar.sidebar-collapsed #btn-sidebar-toggle {
+                display: none !important;
+            }
+            #sidebar #btn-sidebar-mobile,
+            #sidebar.sidebar-collapsed #btn-sidebar-mobile {
+                display: flex !important;
+            }
+        }
+
+        /* Pantallas grandes (por encima del umbral de tablet): símbolo de abrir/cerrar
+           más grande. El offset derecho se recalcula con el nuevo tamaño para que el
+           símbolo conserve su posición. */
+        @media (min-width: 1025px) {
+            #sidebar #btn-sidebar-toggle #sidebar-toggle-icon {
+                font-size: 3rem !important;
+            }
+            #sidebar #btn-sidebar-toggle {
+                right: calc((44px - 3rem) / 2);
             }
         }
     </style>
@@ -400,21 +571,27 @@
 
     <!-- Side Navigation Shell -->
     <aside id="sidebar"
-        class="fixed left-0 top-0 h-[100dvh] max-w-[85vw] border-r subtle-border shadow-2xl bg-surface-container-low z-40 flex flex-col py-4 px-3 -translate-x-full md:translate-x-0">
+        class="fixed left-0 top-0 h-[100dvh] max-w-[85vw] border-r subtle-border shadow-2xl bg-surface-container-low z-40 flex flex-col py-4 px-3 translate-x-0 md:translate-x-0">
         <!-- Sidebar Header: Brand + Toggle -->
-        <div class="flex items-start justify-between mb-6 px-1 border-b subtle-border pb-4">
-            <div id="btn-brand-home" class="min-w-0 cursor-pointer group flex flex-col items-center text-center flex-1 pr-1" title="Ir al inicio">
-                <h1 class="sidebar-brand-text font-headline-md text-purple-950 dark:text-primary-fixed tracking-tight text-lg sm:text-xl font-extrabold group-hover:opacity-85 transition-opacity leading-tight">
+        <div class="sidebar-header relative flex items-center justify-center mb-6 pl-1 pr-0 border-b subtle-border pb-4">
+            <div id="btn-brand-home" class="min-w-0 cursor-pointer group flex flex-col items-center text-center w-full overflow-hidden" title="Ir al inicio">
+                <h1 class="sidebar-brand-text font-headline-md text-purple-950 dark:text-primary-fixed tracking-tight text-lg sm:text-xl font-extrabold group-hover:opacity-85 transition-opacity leading-tight whitespace-nowrap">
                     TechMind
                 </h1>
-                <p class="sidebar-brand-text font-label-sm text-[10px] sm:text-[11px] text-on-surface-variant opacity-80 leading-tight mt-0.5" data-i18n="brand_subtitle">Organización inteligente</p>
+                <p class="sidebar-brand-text font-label-sm text-[10px] sm:text-[11px] text-on-surface-variant opacity-80 leading-tight mt-0.5 whitespace-nowrap" data-i18n="brand_subtitle">Organización inteligente</p>
                 <span class="material-symbols-outlined text-3xl text-purple-700 dark:text-primary mt-2 group-hover:scale-110 transition-transform duration-300 shrink-0"
                     style="font-variation-settings: 'FILL' 1;">psychology</span>
             </div>
             <button id="btn-sidebar-toggle" type="button"
-                class="shrink-0 p-1.5 min-h-[36px] min-w-[36px] rounded-lg hover:bg-surface-variant/50 transition-all text-on-surface-variant hover:text-on-surface flex items-center justify-center cursor-pointer active:scale-90"
+                class="absolute top-1/2 -translate-y-1/2 shrink-0 text-on-surface-variant flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none"
                 title="Colapsar sidebar">
                 <span class="material-symbols-outlined text-xl" id="sidebar-toggle-icon">chevron_left</span>
+            </button>
+            <!-- Toggle para móvil: mismas dimensiones y posición que el de escritorio, icono propio -->
+            <button id="btn-sidebar-mobile" type="button"
+                class="md:hidden absolute top-1/2 -translate-y-1/2 shrink-0 text-on-surface-variant flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none"
+                title="Abrir menú">
+                <span class="material-symbols-outlined text-2xl" id="sidebar-mobile-icon">menu</span>
             </button>
         </div>
         <nav class="flex-1 space-y-1.5 overflow-y-auto">
@@ -435,24 +612,23 @@
             </a>
         </nav>
         <!-- Sidebar Bottom Controls: Theme Toggle & Service Status -->
-        <div class="relative mt-auto pt-4 border-t medium-border space-y-1" style="overflow:visible;">
-            <!-- Theme Toggle Button in Sidebar -->
-            <a id="btn-theme-toggle"
-                class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer"
-                title="Cambiar tema">
-                <span class="material-symbols-outlined text-xl shrink-0" id="theme-toggle-icon">light_mode</span>
-                <span class="sidebar-label font-label-sm text-sm font-semibold" id="theme-toggle-text">Cambiar tema</span>
-            </a>
+        <div class="relative mt-auto pt-4 border-t medium-border flex flex-col space-y-1" style="overflow:visible;">
+            <!-- Theme Toggle: sin caja de botón, solo el símbolo (el hover vive en el icono) -->
+            <button id="btn-theme-toggle" type="button"
+                class="p-0 text-on-surface-variant transition-all flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none mx-auto my-1 shrink-0"
+                title="Cambiar tema" aria-label="Cambiar tema">
+                <span class="material-symbols-outlined text-xl leading-none flex items-center justify-center" id="theme-toggle-icon">light_mode</span>
+            </button>
 
             <!-- Status Trigger Button -->
             <button id="btn-status-trigger" type="button"
-                class="sidebar-nav-item w-full flex items-center justify-between gap-3 text-on-surface-variant cursor-pointer active:scale-95 focus:outline-none">
-                <div class="flex items-center gap-2.5">
+                class="sidebar-nav-item w-full flex items-center justify-center gap-2 px-3 py-3 text-on-surface-variant cursor-pointer active:scale-95 focus:outline-none">
+                <div class="flex items-center justify-center gap-2">
                     <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></div>
-                    <span class="sidebar-label sidebar-status-text font-label-sm text-sm font-semibold" data-i18n="service_status">Estado de servicios</span>
+                    <span class="sidebar-label sidebar-status-text font-label-sm text-xs sm:text-sm font-semibold whitespace-nowrap text-center" data-i18n="service_status">Estado de servicios</span>
+                    <span id="status-chevron"
+                        class="material-symbols-outlined text-lg transition-transform duration-300 shrink-0">expand_less</span>
                 </div>
-                <span id="status-chevron"
-                    class="material-symbols-outlined text-lg transition-transform duration-300">expand_less</span>
             </button>
 
             <!-- Status Popover Dropdown -->
@@ -539,12 +715,7 @@
         <header
             class="flex flex-row items-center justify-between gap-2 sm:gap-6 mb-6 sm:mb-8 pt-2 sm:pt-4 md:pt-0 border-b subtle-border pb-4 sm:pb-6">
             <div class="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
-                <!-- Mobile-only hamburger -->
-                <button id="btn-sidebar-mobile"
-                    class="md:hidden shrink-0 p-2 min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/80 transition-all active:scale-95 focus:outline-none flex items-center justify-center shadow-lg"
-                    title="Abrir menú">
-                    <span class="material-symbols-outlined text-2xl">menu</span>
-                </button>
+                <!-- El toggle móvil vive ahora dentro del sidebar (#btn-sidebar-mobile) -->
                 <div class="min-w-0 flex-1">
                     <h2 id="main-header-title"
                         class="font-headline-md text-base sm:text-2xl md:text-3xl text-on-surface font-bold tracking-tight leading-snug">

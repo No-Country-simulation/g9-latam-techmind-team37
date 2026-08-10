@@ -141,6 +141,8 @@ services:
     cpus: "0.10"
     ports:
       - "5173:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
     depends_on:
       - springboot
     profiles:

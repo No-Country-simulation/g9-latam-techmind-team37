@@ -331,19 +331,64 @@ function bindEvents() {
 
     // ── Claude-style Sidebar ──────────────────────────────────────────────────
 
-    const closeSidebar = () => {
-        if (!sidebar) return;
-        // Mobile: slide out
-        sidebar.classList.add('-translate-x-full');
-        sidebar.classList.remove('translate-x-0');
-        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+    const isMobileView = () => window.innerWidth < 768;
+    // Móviles y tablets: hasta 1024px (iPad en horizontal incluido) o pantalla táctil
+    const isTabletOrMobileView = () =>
+        window.innerWidth <= 1024 ||
+        (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+
+    // Abre/cierra el popover de "Estado de servicios" (lookup diferido: el nodo se
+    // resuelve al invocar, para poder usarlo desde la lógica del sidebar)
+    const setStatusPopoverOpen = (open) => {
+        const popover = document.getElementById('status-popover');
+        const chevron = document.getElementById('status-chevron');
+        if (!popover) return;
+        if (open) {
+            popover.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+            popover.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        } else {
+            popover.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+            popover.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
     };
 
-    const openSidebarMobile = () => {
-        if (!sidebar) return;
-        sidebar.classList.remove('-translate-x-full', 'sidebar-collapsed');
-        sidebar.classList.add('translate-x-0');
-        if (sidebarOverlay) sidebarOverlay.classList.remove('hidden');
+    const isStatusPopoverOpen = () => {
+        const popover = document.getElementById('status-popover');
+        return !!popover && !popover.classList.contains('pointer-events-none');
+    };
+
+    // La expansión del sidebar dura 0.3s; el popover se abre al terminar
+    const SIDEBAR_ANIM_MS = 320;
+
+    // Iconos de los toggles según estado. En móviles y tablets, cerrar es una X;
+    // en escritorio se mantienen los chevrons.
+    const updateSidebarToggleIcons = (collapsed) => {
+        const touchLayout = isTabletOrMobileView();
+        const desktopIcon = document.getElementById('sidebar-toggle-icon');
+        const mobileIcon = document.getElementById('sidebar-mobile-icon');
+        const desktopBtn = document.getElementById('btn-sidebar-toggle');
+        const mobileBtn = document.getElementById('btn-sidebar-mobile');
+
+        if (desktopIcon) {
+            desktopIcon.textContent = collapsed
+                ? 'chevron_right'
+                : (touchLayout ? 'close' : 'chevron_left');
+        }
+        if (mobileIcon) {
+            mobileIcon.textContent = collapsed ? 'menu' : 'close';
+        }
+
+        const openTitle = 'Expandir sidebar';
+        const closeTitle = 'Cerrar sidebar';
+        if (desktopBtn) desktopBtn.setAttribute('title', collapsed ? openTitle : (touchLayout ? closeTitle : 'Colapsar sidebar'));
+        if (mobileBtn) mobileBtn.setAttribute('title', collapsed ? 'Abrir menú' : closeTitle);
+    };
+
+    // La preferencia solo se guarda desde escritorio: en móvil siempre se arranca colapsado
+    const persistCollapsed = (value) => {
+        if (!isMobileView()) localStorage.setItem('sidebarCollapsed', value);
     };
 
     let sidebarCollapsed = false;
@@ -353,42 +398,54 @@ function bindEvents() {
         sidebarCollapsed = true;
         sidebar.classList.add('sidebar-collapsed');
         if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-collapsed-width)';
-        const toggleIcon = document.getElementById('sidebar-toggle-icon');
-        if (toggleIcon) toggleIcon.textContent = 'chevron_right';
-        localStorage.setItem('sidebarCollapsed', 'true');
+        updateSidebarToggleIcons(true);
+        // El overlay solo acompaña al sidebar expandido en móvil
+        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+        // Al colapsar, el panel de estado se cierra con el sidebar
+        setStatusPopoverOpen(false);
+        persistCollapsed('true');
     };
 
     const expandSidebar = () => {
         if (!sidebar) return;
         sidebarCollapsed = false;
         sidebar.classList.remove('sidebar-collapsed');
-        if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-width)';
-        const toggleIcon = document.getElementById('sidebar-toggle-icon');
-        if (toggleIcon) toggleIcon.textContent = 'chevron_left';
-        localStorage.setItem('sidebarCollapsed', 'false');
+        // En móvil el sidebar expandido se superpone al contenido en vez de empujarlo
+        if (mainContent) {
+            mainContent.style.marginLeft = isMobileView()
+                ? 'var(--sidebar-collapsed-width)'
+                : 'var(--sidebar-width)';
+        }
+        updateSidebarToggleIcons(false);
+        if (sidebarOverlay) sidebarOverlay.classList.toggle('hidden', !isMobileView());
+        persistCollapsed('false');
     };
 
-    // Desktop: toggle between collapsed (icons only) and expanded
+    const toggleSidebar = () => {
+        if (sidebarCollapsed) {
+            expandSidebar();
+            // En móviles y tablets, "Estado de servicios" se activa junto con el sidebar.
+            // El timeout deja pasar el cierre global por click y la animación de expansión.
+            if (isTabletOrMobileView()) {
+                setTimeout(() => setStatusPopoverOpen(true), SIDEBAR_ANIM_MS);
+            }
+        } else {
+            collapseSidebar();
+        }
+    };
+
+    // Se conserva el nombre: cerrar en móvil ahora significa volver al rail colapsado
+    const closeSidebar = () => collapseSidebar();
+
+    // Toggle de escritorio (chevron) y toggle de móvil (menu): mismo comportamiento
     const sidebarToggle = document.getElementById('btn-sidebar-toggle');
     if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-            if (window.innerWidth < 768) {
-                // On mobile, clicking the toggle inside sidebar should close it
-                closeSidebar();
-            } else {
-                if (sidebarCollapsed) {
-                    expandSidebar();
-                } else {
-                    collapseSidebar();
-                }
-            }
-        });
+        sidebarToggle.addEventListener('click', toggleSidebar);
     }
 
-    // Mobile hamburger button
     const sidebarMobile = document.getElementById('btn-sidebar-mobile');
     if (sidebarMobile) {
-        sidebarMobile.addEventListener('click', openSidebarMobile);
+        sidebarMobile.addEventListener('click', toggleSidebar);
     }
 
     // Overlay click closes sidebar on mobile
@@ -398,45 +455,40 @@ function bindEvents() {
 
     // Restore saved sidebar state
     const savedCollapsed = localStorage.getItem('sidebarCollapsed');
-    if (window.innerWidth >= 768) {
-        if (savedCollapsed === 'true') {
-            collapseSidebar();
-        } else {
-            expandSidebar();
-        }
-        sidebar.classList.remove('-translate-x-full');
-        sidebar.classList.add('md:translate-x-0');
+    sidebar.classList.remove('-translate-x-full');
+    sidebar.classList.add('translate-x-0', 'md:translate-x-0');
+    if (isMobileView()) {
+        // Móvil: rail visible siempre, colapsado por defecto
+        collapseSidebar();
+    } else if (savedCollapsed === 'true') {
+        collapseSidebar();
     } else {
-        // Mobile: hidden by default, remove any desktop margin
-        if (mainContent) mainContent.style.marginLeft = '0';
+        expandSidebar();
     }
 
     // Sync sidebar state when crossing breakpoints
     let wasDesktop = window.innerWidth >= 768;
     const syncSidebarToBreakpoint = () => {
         if (!sidebar) return;
+        // El símbolo de cerrar (X vs chevron) depende del umbral de tablet, no del de md
+        updateSidebarToggleIcons(sidebarCollapsed);
         const isDesktop = window.innerWidth >= 768;
         if (isDesktop === wasDesktop) return;
         wasDesktop = isDesktop;
 
+        // El sidebar queda siempre visible; solo cambia si empuja o se superpone
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('translate-x-0', 'md:translate-x-0');
+
         if (isDesktop) {
-            // Switching to desktop
-            sidebar.classList.remove('-translate-x-full', 'translate-x-0');
-            sidebar.classList.add('md:translate-x-0');
-            if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
             if (sidebarCollapsed) {
-                sidebar.classList.add('sidebar-collapsed');
-                if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-collapsed-width)';
+                collapseSidebar();
             } else {
-                sidebar.classList.remove('sidebar-collapsed');
-                if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-width)';
+                expandSidebar();
             }
         } else {
-            // Switching to mobile
-            sidebar.classList.add('-translate-x-full');
-            sidebar.classList.remove('md:translate-x-0', 'translate-x-0', 'sidebar-collapsed');
-            if (mainContent) mainContent.style.marginLeft = '0';
-            if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+            // Switching to mobile: vuelve al rail colapsado
+            collapseSidebar();
         }
     };
     window.addEventListener('resize', syncSidebarToBreakpoint);
@@ -461,35 +513,18 @@ function bindEvents() {
     if (statusTrigger && statusPopover) {
         statusTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Si el sidebar está colapsado en desktop, expandirlo primero
-            if (sidebarCollapsed && window.innerWidth >= 768) {
+            // Si el sidebar está colapsado, expandirlo primero
+            if (sidebarCollapsed) {
                 expandSidebar();
                 // Mostrar el popover tras la animación de expansión
-                setTimeout(() => {
-                    statusPopover.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
-                    statusPopover.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
-                    if (statusChevron) statusChevron.style.transform = 'rotate(180deg)';
-                }, 320);
+                setTimeout(() => setStatusPopoverOpen(true), SIDEBAR_ANIM_MS);
                 return;
             }
-            const isOpen = !statusPopover.classList.contains('pointer-events-none');
-            if (isOpen) {
-                statusPopover.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
-                statusPopover.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
-                if (statusChevron) statusChevron.style.transform = 'rotate(0deg)';
-            } else {
-                statusPopover.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
-                statusPopover.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
-                if (statusChevron) statusChevron.style.transform = 'rotate(180deg)';
-            }
+            setStatusPopoverOpen(!isStatusPopoverOpen());
         });
 
         // Close popover when clicking anywhere else
-        document.addEventListener('click', () => {
-            statusPopover.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
-            statusPopover.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
-            if (statusChevron) statusChevron.style.transform = 'rotate(0deg)';
-        });
+        document.addEventListener('click', () => setStatusPopoverOpen(false));
 
         // Prevent closing when clicking inside the popover
         statusPopover.addEventListener('click', (e) => {
@@ -602,12 +637,20 @@ function bindEvents() {
             localStorage.setItem('theme', nowDark ? 'dark' : 'light');
             updateThemeToggleUI();
 
+            // El hover del símbolo queda activado tras el click
+            themeToggle.classList.add('theme-symbol-active');
+
             // Re-render analytics dashboard if charts exist to update slice borders and legend text colors
             const analyticsViewEl = document.getElementById('analytics-view-section');
             if (analyticsViewEl && !analyticsViewEl.classList.contains('hidden')) {
                 loadAnalyticsDashboard();
             }
         });
+
+        // Se desactiva al salir el puntero del símbolo o al perder el foco
+        const clearThemeSymbolActive = () => themeToggle.classList.remove('theme-symbol-active');
+        themeToggle.addEventListener('mouseleave', clearThemeSymbolActive);
+        themeToggle.addEventListener('blur', clearThemeSymbolActive);
     }
 
     // Language Toggle Control
@@ -1647,10 +1690,8 @@ async function loadAnalyticsDashboard() {
 
 function updateThemeToggleUI() {
     const icon = document.getElementById('theme-toggle-icon');
-    const text = document.getElementById('theme-toggle-text');
     const isDark = document.documentElement.classList.contains('dark');
     if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
-    if (text) text.textContent = isDark ? t('theme_light') : t('theme_dark');
 }
 
 function applyTranslations() {
