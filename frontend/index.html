@@ -522,6 +522,15 @@
             #sidebar {
                 transform: none !important;
             }
+            /* Admin popover: no debe desbordar la pantalla en móvil */
+            #admin-user-popover {
+                position: fixed !important;
+                top: auto !important;
+                right: 8px !important;
+                left: auto !important;
+                width: calc(100vw - 16px) !important;
+                max-width: 280px !important;
+            }
             /* Solo se ve el toggle móvil; el chevron de escritorio queda oculto */
             #sidebar #btn-sidebar-toggle,
             #sidebar.sidebar-collapsed #btn-sidebar-toggle {
@@ -732,33 +741,38 @@
                     <span class="material-symbols-outlined text-xl">translate</span>
                     <span id="lang-toggle-text" class="hidden sm:inline">EN</span>
                 </button>
-                <button id="btn-admin-auth" type="button"
-                    class="p-2 sm:px-3.5 min-h-[40px] sm:min-h-[44px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/80 hover:border-purple-800/25 transition-all active:scale-95 focus:outline-none flex items-center gap-2 shadow-lg font-label-sm text-xs font-semibold cursor-pointer"
-                    title="Iniciar Sesión Administrador">
-                    <span class="material-symbols-outlined text-xl" id="admin-auth-icon">admin_panel_settings</span>
-                    <span id="admin-auth-text" class="hidden sm:inline">Admin Login</span>
-                    <span id="admin-auth-chevron" class="material-symbols-outlined text-sm hidden transition-transform duration-200">expand_more</span>
-                </button>
-
-                <!-- Menu Dropdown de Admin Logueado -->
-                <div id="admin-user-popover"
-                    class="absolute top-full right-0 mt-2 w-56 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-200 opacity-0 pointer-events-none transform -translate-y-2 z-50">
-                    <div class="flex items-center gap-2.5 pb-2 border-b medium-border">
-                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-700 dark:text-purple-300 shrink-0">
-                            <span class="material-symbols-outlined text-lg text-purple-700 dark:text-purple-300">verified_user</span>
+                <!-- Admin Button + Dropdown Container -->
+                <div class="relative">
+                    <button id="btn-admin-auth" type="button"
+                        class="p-2 sm:px-3.5 min-h-[40px] sm:min-h-[44px] sm:min-w-[160px] rounded-xl bg-surface-container-high border subtle-border text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/80 hover:border-purple-800/25 transition-all active:scale-95 focus:outline-none flex items-center justify-center sm:justify-between gap-1.5 sm:gap-2 shadow-lg font-label-sm text-xs font-semibold cursor-pointer"
+                        title="Iniciar Sesión Administrador">
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <span class="material-symbols-outlined text-lg sm:text-xl shrink-0" id="admin-auth-icon">admin_panel_settings</span>
+                            <span id="admin-auth-text" class="hidden sm:inline truncate">Admin Login</span>
                         </div>
-                        <div class="min-w-0 flex-1">
-                            <p class="font-label-sm text-xs font-bold text-on-surface truncate" id="popover-admin-username">Admin</p>
-                            <p class="font-label-sm text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span> <span data-i18n="active_session">Sesión Activa</span>
-                            </p>
-                        </div>
-                    </div>
-                    <button id="btn-admin-logout" type="button"
-                        class="w-full px-3 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
-                        <span class="material-symbols-outlined text-sm text-rose-700 dark:text-rose-300">logout</span>
-                        <span class="text-rose-700 dark:text-rose-300 font-bold" data-i18n="logout">Cerrar Sesión</span>
+                        <span id="admin-auth-chevron" class="material-symbols-outlined text-sm hidden transition-transform duration-200 shrink-0">expand_more</span>
                     </button>
+
+                    <!-- Menu Dropdown de Admin Logueado -->
+                    <div id="admin-user-popover"
+                        class="absolute top-full left-0 right-0 mt-2 w-full bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-200 opacity-0 pointer-events-none transform -translate-y-2 z-50">
+                        <div class="flex items-center gap-2.5 pb-2 border-b medium-border">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-700 dark:text-purple-300 shrink-0">
+                                <span class="material-symbols-outlined text-lg text-purple-700 dark:text-purple-300">verified_user</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="font-label-sm text-xs font-bold text-on-surface truncate" id="popover-admin-username">Admin</p>
+                                <p class="font-label-sm text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span> <span data-i18n="active_session">Sesión Activa</span>
+                                </p>
+                            </div>
+                        </div>
+                        <button id="btn-admin-logout" type="button"
+                            class="w-full px-3 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-label-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm">
+                            <span class="material-symbols-outlined text-sm text-rose-700 dark:text-rose-300">logout</span>
+                            <span class="text-rose-700 dark:text-rose-300 font-bold" data-i18n="logout">Cerrar Sesión</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -802,18 +816,16 @@
 
                             <div class="flex flex-col sm:flex-row justify-center items-center gap-3 mt-4">
                                 <button id="btn-classify" type="button"
-                                    class="group relative w-full sm:w-auto px-6 sm:px-10 py-4 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer">
+                                    class="group relative w-full sm:w-auto min-w-[200px] px-8 sm:px-10 py-3.5 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer flex items-center justify-center text-center">
                                     <div
                                         class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300">
                                     </div>
-                                    <div class="relative flex items-center justify-center gap-2.5">
-                                        <span class="material-symbols-outlined text-lg">science</span>
+                                    <div class="relative flex items-center justify-center text-center w-full">
                                         <span data-i18n="btn_classify">Clasificar con TechMind</span>
                                     </div>
                                 </button>
                                 <button id="btn-clear-form" type="button"
-                                    class="w-full sm:w-auto px-6 py-4 rounded-xl font-label-sm text-base font-bold border border-outline-variant/50 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/30 transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center gap-2.5">
-                                    <span class="material-symbols-outlined text-lg">delete_sweep</span>
+                                    class="w-full sm:w-auto min-w-[200px] px-8 sm:px-10 py-3.5 rounded-xl font-label-sm text-base font-bold border border-outline-variant/50 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/30 transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center text-center">
                                     <span data-i18n="btn_clear">Limpiar formulario</span>
                                 </button>
                             </div>

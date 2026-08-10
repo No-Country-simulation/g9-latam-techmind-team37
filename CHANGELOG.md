@@ -4,6 +4,30 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [2.1.0] — 2026-08-10 · Ajustes de Simetría, Botones del Formulario, Admin Dropdown y Responsividad Móvil
+
+### Corregido
+
+- **Botones "Clasificar" y "Limpiar formulario" desalineados y con íconos innecesarios (`frontend/index.html` + `frontend/app.js`):**
+  - Eliminados los íconos `science` y `delete_sweep` de ambos botones del formulario de clasificación para un aspecto más limpio y profesional.
+  - Centrado perfecto del texto en ambos botones con `flex items-center justify-center text-center`, dimensiones simétricas (`min-w-[200px]`, `px-8 py-3.5`) y estilos uniformes.
+  - Actualizada la función `setLoadingState()` en `app.js` para que no reinserte íconos dinámicamente al restaurar el botón tras una clasificación. El estado de carga ahora muestra solo texto "Analizando..." centrado.
+
+- **Botón Admin con dimensiones inconsistentes y dropdown desalineado (`frontend/index.html`):**
+  - Reestructurado el botón `#btn-admin-auth` y su dropdown `#admin-user-popover` dentro de un contenedor `div.relative` compartido.
+  - El botón Admin en móvil muestra solo el ícono (sin `min-width` forzado), y en `sm:` muestra el texto completo con `sm:min-w-[160px]`.
+  - El dropdown ahora usa `w-full left-0 right-0` para heredar exactamente el ancho del botón padre, logrando simetría perfecta en los bordes izquierdo y derecho.
+
+- **Dropdown de Admin desbordaba la pantalla en móvil (`frontend/index.html`):**
+  - Añadida regla CSS en `@media (max-width: 767px)` que convierte el popover a `position: fixed` con `right: 8px`, `width: calc(100vw - 16px)` y `max-width: 280px`, evitando overflow en pantallas pequeñas.
+
+- **Tarjetas de historial detallado no eran responsive en móvil (`frontend/app.js`):**
+  - Panel de "Confianza + Ver JSON" en la vista de historial detallado (`loadDetailedHistory`): en móvil ahora se dispone como fila horizontal (`flex-row`) con `justify-between` (Confianza a la izquierda, botones a la derecha). En `md:` se mantiene como columna vertical centrada con borde separador a la izquierda.
+  - Tarjetas del grid de historial reciente (`loadHistory`): botón "Ver más" reposicionado de `justify-end` a `justify-start` para alinearse con el flujo de lectura del contenido.
+
+- **Botón "Ver más / Ver menos" con texto hardcodeado (`frontend/app.js`):**
+  - El handler de click del botón `btn-toggle-expand` ahora usa `t('see_more')` y `t('see_less')` del sistema de internacionalización en lugar de strings fijos "Ver más" / "Ver menos", respetando el idioma activo.
+
 ## [2.0.0] — 2026-08-08 · Corrección de Bugs Frontend y Sistema de Internacionalización (ES / EN)
 
 ### Corregido

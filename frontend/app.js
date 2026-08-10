@@ -1075,7 +1075,7 @@ async function loadHistory() {
                 const textStr = entry.texto || entry.titulo || '';
                 const isLong = textStr.length > 30;
                 const expandBtnHtml = isLong ? `
-                    <div class="flex justify-end mt-1.5">
+                    <div class="flex justify-start items-center mt-1.5 mb-1">
                         <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="${t('see_more')}">
                             <span>${t('see_more')}</span>
                             <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
@@ -1233,7 +1233,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                 const textStr = entry.texto || entry.titulo || '';
                 const isLong = textStr.length > 30;
                 const expandBtnHtml = isLong ? `
-                    <div class="flex justify-end mt-1.5">
+                    <div class="flex justify-start items-center mt-1.5 mb-1">
                         <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="${t('see_more')}">
                             <span>${t('see_more')}</span>
                             <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
@@ -1249,34 +1249,36 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                 ` : '';
 
                 return `
-                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
-                        <div class="flex-1 min-w-0 space-y-2">
-                            <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-                                <span class="px-3 py-1 rounded-full text-xs font-label-sm border font-semibold ${config.colorClass} flex items-center gap-1.5 shadow-sm">
-                                    <span class="material-symbols-outlined text-sm">${config.icon}</span>
-                                    ${escapeHtml(entry.categoria || 'Sin categoría')}
-                                </span>
-                                <span class="text-xs font-mono text-outline opacity-60">ID #${entry.id}</span>
-                                <span class="text-xs text-on-surface-variant font-medium flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-sm opacity-60">schedule</span>
-                                    ${dateStr}
-                                </span>
+                    <div class="p-4 sm:p-5 rounded-2xl glass-panel border border-black/5 dark:border-white/5 hover:border-primary/20 transition-all flex flex-col md:flex-row md:items-stretch justify-between gap-4 md:gap-5 group hover:shadow-lg hover:shadow-primary/5 duration-300">
+                        <div class="flex-1 min-w-0 space-y-2 flex flex-col justify-between">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 mb-1.5">
+                                    <span class="px-3 py-1 rounded-full text-xs font-label-sm border font-semibold ${config.colorClass} flex items-center gap-1.5 shadow-sm">
+                                        <span class="material-symbols-outlined text-sm">${config.icon}</span>
+                                        ${escapeHtml(entry.categoria || 'Sin categoría')}
+                                    </span>
+                                    <span class="text-xs font-mono text-outline opacity-60">ID #${entry.id}</span>
+                                    <span class="text-xs text-on-surface-variant font-medium flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm opacity-60">schedule</span>
+                                        ${dateStr}
+                                    </span>
+                                </div>
+                                <h5 class="text-on-surface font-bold text-base sm:text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
+                                <p class="history-card-body text-on-surface-variant text-sm line-clamp-2 opacity-80 leading-relaxed transition-all mt-1">${escapeHtml(textStr || 'Sin descripción disponible')}</p>
+                                ${expandBtnHtml}
                             </div>
-                            <h5 class="text-on-surface font-bold text-base sm:text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
-                            <p class="history-card-body text-on-surface-variant text-sm line-clamp-2 opacity-80 leading-relaxed transition-all">${escapeHtml(textStr || 'Sin descripción disponible')}</p>
-                            ${expandBtnHtml}
-                            <div class="flex flex-wrap gap-1.5 pt-1">
+                            <div class="flex flex-wrap gap-1.5 pt-2">
                                 ${keywordsPills || `<span class="text-xs text-on-surface-variant italic opacity-60">${t('no_keywords')}</span>`}
                             </div>
                         </div>
-                        <div class="flex flex-row md:flex-col items-center md:items-end justify-between gap-3 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-5 md:min-w-[140px] shrink-0">
-                            <div class="text-left md:text-right">
-                                <span class="block text-xs font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Confianza</span>
-                                <span class="text-xl sm:text-2xl font-black text-primary-fixed">${probPct}%</span>
+                        <div class="flex flex-row md:flex-col items-center justify-between md:justify-center gap-3 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-6 md:min-w-[150px] shrink-0 md:self-stretch">
+                            <div class="flex flex-col items-start md:items-center text-left md:text-center shrink-0">
+                                <span class="block text-[11px] font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Confianza</span>
+                                <span class="text-xl md:text-3xl font-black text-primary-fixed leading-tight">${probPct}%</span>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex flex-row md:flex-col items-center gap-2 shrink-0">
                                 ${deleteBtnHtml}
-                                <button type="button" class="btn-view-entry-json px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-xs font-label-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="${t('btn_view_json')}">
+                                <button type="button" class="btn-view-entry-json px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/15 hover:bg-primary/25 text-primary-fixed text-xs font-label-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-sm whitespace-nowrap" data-id="${entry.id}" title="${t('btn_view_json')}">
                                     <span class="material-symbols-outlined text-sm pointer-events-none">code</span>
                                     <span class="pointer-events-none">${t('btn_view_json')}</span>
                                 </button>
@@ -1417,11 +1419,11 @@ document.addEventListener('click', (e) => {
             if (isExpanded) {
                 p.classList.remove('line-clamp-none');
                 p.classList.add('line-clamp-2');
-                expandBtn.innerHTML = `<span>Ver más</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>`;
+                expandBtn.innerHTML = `<span>${t('see_more')}</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>`;
             } else {
                 p.classList.remove('line-clamp-2');
                 p.classList.add('line-clamp-none');
-                expandBtn.innerHTML = `<span>Ver menos</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_less</span>`;
+                expandBtn.innerHTML = `<span>${t('see_less')}</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_less</span>`;
             }
         }
     }
@@ -1499,18 +1501,16 @@ function setLoadingState(isLoading) {
         btn.disabled = true;
         btn.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container opacity-80"></div>
-            <div class="relative flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined text-lg animate-spin">refresh</span>
-                Analizando...
+            <div class="relative flex items-center justify-center text-center w-full">
+                <span>Analizando...</span>
             </div>
         `;
     } else {
         btn.disabled = false;
         btn.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
-            <div class="relative flex items-center justify-center gap-2.5">
-                <span class="material-symbols-outlined text-lg">science</span>
-                <span>Clasificar con TechMind</span>
+            <div class="relative flex items-center justify-center text-center w-full">
+                <span data-i18n="btn_classify">${t('btn_classify')}</span>
             </div>
         `;
     }
