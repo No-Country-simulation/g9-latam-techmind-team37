@@ -3,10 +3,11 @@ app/main.py
 Microservicio FastAPI — TechMind · Ciencia de Datos
 
 Endpoints:
-    POST /predecir   — inferencia (consumido internamente por Spring Boot)
-    GET  /health     — health check
-    GET  /categorias — lista las 8 categorías disponibles
-    GET  /docs       — documentación Swagger (automática)
+    POST /predecir       — inferencia (consumido internamente por Spring Boot)
+    POST /extraer-texto  — extracción de texto desde PDF o DOCX (consumido por el Frontend)
+    GET  /health         — health check
+    GET  /categorias     — lista las 8 categorías disponibles
+    GET  /docs           — documentación Swagger (automática)
 
 Uso:
     uvicorn app.main:app --reload --port 8000
@@ -21,10 +22,17 @@ from contextlib import asynccontextmanager
 import joblib
 import numpy as np
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Header, Depends
+from fastapi import FastAPI, HTTPException, Header, Depends, UploadFile, File
 from pydantic import BaseModel, field_validator
 
 from app.database import init_db, get_predicciones, get_analytics_data, delete_prediccion
+from app.documento_extractor import (
+    extraer_pdf,
+    extraer_docx,
+    MAX_PAGES_PDF,
+    MAX_WORDS_DOCX,
+    MAX_CHARS_TEXTO,
+)
 
 load_dotenv()
 
@@ -286,6 +294,126 @@ def categorias():
     if modelo is None:
         raise HTTPException(status_code=503, detail="Modelo no cargado")
     return {"categorias": sorted(modelo.classes_.tolist())}
+
+
+# ── Constante de tamaño máximo de archivo (5 MB) ─────────────────────────────
+MAX_FILE_BYTES: int = 5 * 1024 * 1024  # 5 MB
+
+# Tipos MIME aceptados para PDF y DOCX
+MIME_PDF = "application/pdf"
+MIME_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+
+class ExtraerTextoResponse(BaseModel):
+    titulo: str
+    texto: str
+    paginas_procesadas: int
+    formato: str          # "pdf" | "docx"
+    texto_truncado: bool
+    advertencia: str
+
+
+@app.post(
+    "/extraer-texto",
+    response_model=ExtraerTextoResponse,
+    summary="Extraer texto de un archivo PDF o DOCX",
+    description=f"""
+Recibe un archivo **PDF** o **DOCX** y devuelve su texto extraído listo para editar y clasificar.
+
+**Límites de protección (OCI Free Tier):**
+- Tamaño máximo: **5 MB**
+- PDF: máximo **{MAX_PAGES_PDF} páginas**
+- DOCX: máximo **~{MAX_WORDS_DOCX} palabras** (~15 páginas)
+- Caracteres máximos devueltos: **{MAX_CHARS_TEXTO}**
+
+Este endpoint **no realiza inferencia ML** — solo extrae texto.
+El usuario puede editar el resultado antes de clasificar con `POST /predecir` (vía Spring Boot).
+""",
+)
+async def extraer_texto(file: UploadFile = File(...)):
+    # ── 1. Sanitizar y validar nombre de archivo ──────────────────────────────
+    # Eliminar caracteres de path traversal del filename antes de cualquier uso
+    raw_filename = file.filename or "documento"
+    filename = re.sub(r'[\\/]', '_', raw_filename).strip()  # quitar / y \
+    filename = filename.lstrip('.')                           # quitar puntos iniciales (e.g. ..)
+    if not filename:
+        filename = "documento"
+
+    # La extensión es el único gate obligatorio. Se evalúa ANTES de leer bytes.
+    extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+
+    if extension not in ("pdf", "docx"):
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"Tipo de archivo no soportado: '{filename}'. "
+                "Solo se aceptan archivos PDF (.pdf) o Word (.docx)."
+            ),
+        )
+
+    es_pdf = extension == "pdf"
+    # es_docx = extension == "docx"  (implícito: si no es pdf y pasó el gate, es docx)
+
+    # Verificación secundaria del Content-Type (match exacto, no substring)
+    # Ignora parámetros como charset= o boundary= que los browsers a veces agregan
+    content_type = (file.content_type or "").lower().split(";")[0].strip()
+    if es_pdf and content_type and content_type != MIME_PDF:
+        # Content-Type contradice la extensión → rechazar para evitar spoofing
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "El tipo de contenido del archivo no coincide con la extensión .pdf. "
+                "Verificá que el archivo no haya sido renombrado."
+            ),
+        )
+    if not es_pdf and content_type and content_type != MIME_DOCX:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "El tipo de contenido del archivo no coincide con la extensión .docx. "
+                "Verificá que el archivo no haya sido renombrado."
+            ),
+        )
+
+    # ── 2. Leer bytes y validar tamaño ────────────────────────────────────────
+    file_bytes = await file.read()
+    size_bytes = len(file_bytes)
+
+    if size_bytes == 0:
+        raise HTTPException(status_code=422, detail="El archivo está vacío.")
+
+    if size_bytes > MAX_FILE_BYTES:
+        size_mb = round(size_bytes / (1024 * 1024), 1)
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"El archivo pesa {size_mb} MB y supera el límite de 5 MB. "
+                "Probá con un documento más corto o extraé las páginas relevantes."
+            ),
+        )
+
+    # ── 3. Extraer texto según formato ────────────────────────────────────────
+    try:
+        if es_pdf:
+            resultado = extraer_pdf(file_bytes, filename=filename, max_pages=MAX_PAGES_PDF)
+        else:
+            resultado = extraer_docx(file_bytes, filename=filename, max_words=MAX_WORDS_DOCX)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=f"No se pudo procesar el archivo: {exc}",
+        )
+
+    return ExtraerTextoResponse(
+        titulo=resultado.titulo,
+        texto=resultado.texto,
+        paginas_procesadas=resultado.paginas_procesadas,
+        formato=resultado.formato,
+        texto_truncado=resultado.texto_truncado,
+        advertencia=resultado.advertencia,
+    )
 
 
 # ── Módulo de Métricas de Servidor OCI ───────────────────────────────────────

@@ -25,6 +25,7 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 - 📂 La **categoría temática** del contenido (`Backend`, `Frontend`, `Data Science`, `DevOps`, `Mobile`, `Bases de Datos`, `Seguridad`, `Cloud`)
 - 📊 El nivel de **confianza / probabilidad** de la predicción
 - 🔑 Las **palabras clave** (keywords) más relevantes extraídas automáticamente mediante vectores TF-IDF
+- 📄 **Importación de documentos PDF y DOCX** con extracción automática de texto, inferencia de título y previsualización editable antes de clasificar
 - 📜 Un **historial persistente** accesible desde la interfaz web con todas las clasificaciones registradas
 
 ---
@@ -85,6 +86,7 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
   - **Ensamble Calibrado (`VotingClassifier` Soft Voting)**: combina `LogisticRegression`, `CalibratedClassifierCV(LinearSVC)` y `ComplementNB` para máxima precisión y estimación de confianza.
   - **Validación Cruzada Estratificada (K=5)** en desarrollo/notebook (87.28% CV Accuracy, 90.38% Holdout).
 - **Pandas & NumPy**: Procesamiento, augmentación de datos y limpieza del dataset técnico.
+- **Ingesta y Parsing de Documentos**: `pdfplumber` (PDFs hasta 15 pág.), `python-docx` (DOCX hasta 4.500 palabras) y `python-multipart` (manejo seguro de streams).
 - **Joblib**: Serialización y des-serialización de modelos entrenados.
 
 ### 🎨 Front-End (Web UI)
@@ -120,7 +122,8 @@ TechMind es una plataforma web inteligente para la **organización y clasificaci
 g9-latam-techmind-team37/
 │
 ├── app/                                   # Microservicio FastAPI (Python)
-│   ├── main.py                            # API REST: /predecir, /health, /predicciones
+│   ├── main.py                            # API REST: /predecir, /extraer-texto, /health, /analytics
+│   ├── documento_extractor.py             # Ingesta y parsing seguro de documentos PDF y DOCX
 │   ├── database.py                        # Consulta a PostgreSQL para el historial
 │   └── Dockerfile                         # Imagen Docker de FastAPI
 │

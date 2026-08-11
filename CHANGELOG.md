@@ -4,6 +4,45 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [2.2.0] — 2026-08-11 · Importación de Documentos (PDF/DOCX), Seguridad de Archivos y Optimización del Sidebar
+
+### Añadido
+
+- **Módulo de Extracción de Documentos PDF y DOCX (`app/documento_extractor.py`):**
+  - Módulo independiente para extracción de texto desde archivos `.pdf` (vía `pdfplumber`, limitado a 15 páginas máximo) y `.docx` (vía `python-docx`, limitado a 4.500 palabras equivalentes a 15 páginas).
+  - Truncado automático de texto a 20.000 caracteres como protección de RAM para OCI Free Tier (límite de 220 MB de memoria en FastAPI).
+  - Inferencia inteligente de título en cascada (metadatos del documento → primer encabezado/título de pág. 1 → nombre de archivo sanitizado).
+  - Manejo robusto de errores con mensajes descriptivos en español (archivos corruptos, PDF encriptado, archivos vacíos o con menos de 10 palabras).
+
+- **Endpoint REST `POST /extraer-texto` en FastAPI (`app/main.py`):**
+  - Endpoint asíncrono que recibe un `UploadFile` (PDF/DOCX de hasta 5 MB) y retorna `{titulo, texto, paginas_procesadas, formato, texto_truncado, advertencia}`.
+  - Endpoint stateless sin inferencia ML directa: extrae el contenido y lo devuelve a la UI para que el usuario pueda revisarlo y editarlo antes de clasificar.
+
+- **Importación de Documentos y Previsualización Editable en UI (`frontend/index.html` + `frontend/app.js`):**
+  - Añadido botón "Importar PDF / DOCX" debajo del área de texto con selector de archivo nativo `<input type="file" accept=".pdf,.docx">`.
+  - Función `handleFileUpload()` que valida la extensión y tamaño (≤ 5 MB) en el navegador antes de enviar la petición.
+  - Muestra spinner "Extrayendo texto…" en el botón durante la petición y puebla automáticamente los campos "Título" y "Contenido" del formulario al finalizar, dejando el cursor en el título para fácil edición.
+  - Badge verde de confirmación con ícono `check_circle` que indica el archivo importado y las páginas procesadas, con desvanecimiento automático (fade-out) a los 5 segundos.
+  - Limpieza automática del badge e input de archivo al hacer clic en "Limpiar formulario".
+  - Añadidas 7 claves i18n nuevas en español e inglés dentro del diccionario `TRANSLATIONS` (`btn_import_doc`, `extracting_text`, `file_too_large`, `invalid_file_type`, `text_extracted_badge`, `text_extracted_badge_warning`, `toast_extract_error`).
+
+### Corregido
+
+- **Seguridad en Subida de Archivos (Sanitización y Validación Rigurosa en `app/main.py` y `app/documento_extractor.py`):**
+  - **Gate Obligatorio de Extensión:** La extensión `.pdf` / `.docx` se valida *antes* de leer el contenido en bytes, evitando consumo innecesario de memoria en el servidor.
+  - **Validación Estricta de Content-Type:** Cambiado de substring match permisivo (`in`) a comparación exacta descartando parámetros de cabecera (e.g. `; charset=`), bloqueando nombres spoofeadas o Content-Types alterados (`application/pdf-evil`).
+  - **Sanitización de Path Traversal:** Sanitización del `filename` en dos capas (endpoint + helper de extracción) eliminando caracteres `/`, `\` y puntos iniciales (`..`) mediante expresiones regulares para prevenir Directory Traversal.
+
+- **Crash del Contenedor Docker de FastAPI por Falta de `python-multipart` (`data-science/requirements.txt`):**
+  - Agregada la dependencia `python-multipart>=0.0.9` en `requirements.txt`. FastAPI requiere esta librería para procesar peticiones `multipart/form-data` (`UploadFile`); su ausencia provocaba un error de arranque en el contenedor.
+
+- **Límites Preventivos Multipart en Backend Spring Boot (`backend/api/src/main/resources/application.properties`):**
+  - Agregadas las propiedades `spring.servlet.multipart.max-file-size=5MB` y `spring.servlet.multipart.max-request-size=6MB` como protección adicional del servidor Java.
+
+- **Optimización de Velocidad y Respuesta del Sidebar (`frontend/index.html` + `frontend/app.js`):**
+  - Reducida la duración de las transiciones CSS del sidebar (`width`, `padding-left`, `transform`, `background-color`, `border-color`, `color`) y del margen del contenedor `#main-content` de `0.3s` a `0.15s` (`150ms`).
+  - Actualizada la constante JS `SIDEBAR_ANIM_MS` de `320ms` a `150ms`, logrando que la interfaz responda al instante al expandir/colapsar el menú de navegación.
+
 ## [2.1.0] — 2026-08-10 · Ajustes de Simetría, Botones del Formulario, Admin Dropdown y Responsividad Móvil
 
 ### Corregido

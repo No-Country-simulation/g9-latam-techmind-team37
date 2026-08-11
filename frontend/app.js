@@ -83,6 +83,14 @@ const TRANSLATIONS = {
         confirm_delete: '⚠️ ¿Estás seguro de que deseas eliminar permanentemente la consulta ID #{id}?',
         no_session_json: '{\n  "mensaje": "Aún no se ha realizado ninguna clasificación en esta sesión."\n}',
         queries_label: 'Consultas',
+        // ── Importá documento ─────────────────────────────────────────────────────────
+        btn_import_doc: 'Importar PDF / DOCX',
+        extracting_text: 'Extrayendo texto…',
+        file_too_large: 'El archivo supera el límite de 5 MB.',
+        invalid_file_type: 'Solo se aceptan archivos .pdf o .docx.',
+        text_extracted_badge: '📄 Texto extraído de «{name}» — {pages} página(s). Podés editarlo antes de clasificar.',
+        text_extracted_badge_warning: '📄 «{name}» — {warning}. Podés editarlo antes de clasificar.',
+        toast_extract_error: 'No se pudo extraer el texto del archivo.',
     },
     en: {
         brand_subtitle: 'Intelligent organization', nav_classifier: 'Classifier',
@@ -143,6 +151,14 @@ const TRANSLATIONS = {
         confirm_delete: '⚠️ Are you sure you want to permanently delete query ID #{id}?',
         no_session_json: '{\n  "message": "No classification has been performed in this session yet."\n}',
         queries_label: 'Queries',
+        // ── Document import ───────────────────────────────────────────────────────────
+        btn_import_doc: 'Import PDF / DOCX',
+        extracting_text: 'Extracting text…',
+        file_too_large: 'The file exceeds the 5 MB limit.',
+        invalid_file_type: 'Only .pdf or .docx files are accepted.',
+        text_extracted_badge: '📄 Text extracted from «{name}» — {pages} page(s). You can edit it before classifying.',
+        text_extracted_badge_warning: '📄 «{name}» — {warning}. You can edit it before classifying.',
+        toast_extract_error: 'Could not extract text from the file.',
     }
 };
 
@@ -309,6 +325,147 @@ function setServiceStatus(elementId, isOk, text) {
 
 // ── 2. Event Listeners ──────────────────────────────────────────────────────
 
+// ── Importar PDF / DOCX — funciones de soporte ───────────────────────────────
+
+/**
+ * Oculta el badge de extracción de archivo y limpia su texto.
+ */
+function hideFileExtractBadge() {
+    const badge = document.getElementById('file-extract-badge');
+    if (badge) {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+        const badgeText = document.getElementById('file-extract-badge-text');
+        if (badgeText) badgeText.textContent = '';
+    }
+}
+
+/**
+ * Muestra el badge de extracción exitosa con la información del archivo.
+ * @param {string} filename - Nombre original del archivo.
+ * @param {number} pages    - Número de páginas/bloques procesados.
+ * @param {string} warning  - Advertencia de truncado (puede ser vacía).
+ */
+function showFileExtractBadge(filename, pages, warning) {
+    const badge = document.getElementById('file-extract-badge');
+    const badgeText = document.getElementById('file-extract-badge-text');
+    if (!badge || !badgeText) return;
+
+    let msg;
+    if (warning) {
+        msg = t('text_extracted_badge_warning')
+            .replace('{name}', filename)
+            .replace('{warning}', warning);
+    } else {
+        msg = t('text_extracted_badge')
+            .replace('{name}', filename)
+            .replace('{pages}', pages);
+    }
+
+    badgeText.textContent = msg;
+    badge.classList.remove('hidden');
+    badge.classList.add('flex');
+
+    // Auto-ocultar el badge luego de 5 segundos con fade-out suave
+    clearTimeout(badge._hideTimeout);
+    badge.style.transition = 'opacity 0.4s ease';
+    badge.style.opacity = '1';
+    badge._hideTimeout = setTimeout(() => {
+        badge.style.opacity = '0';
+        setTimeout(() => hideFileExtractBadge(), 420);
+    }, 5000);
+}
+
+/**
+ * Handler principal del flujo de importación de documentos PDF / DOCX.
+ * Fase 1: Validación en browser → Extracción de texto (FastAPI /extraer-texto)
+ *          → Poblar campos del formulario → Mostrar badge.
+ * Fase 2: El usuario edita si lo desea y luego clic en "Clasificar" (flujo normal).
+ *
+ * @param {File} file - Objeto File del input nativo.
+ */
+async function handleFileUpload(file) {
+    const ALLOWED_EXTENSIONS = ['pdf', 'docx'];
+    const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
+
+    const btnImport = document.getElementById('btn-import-doc');
+    const titleInput = document.getElementById('content-title');
+    const bodyInput = document.getElementById('content-body');
+
+    // ── 1. Validación en browser (respuesta inmediata sin llegar al servidor) ──
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        showToast(t('invalid_file_type'), 'error');
+        return;
+    }
+
+    if (file.size > MAX_FILE_BYTES) {
+        showToast(t('file_too_large'), 'error');
+        return;
+    }
+
+    // ── 2. Estado de carga ────────────────────────────────────────────────────
+    hideFileExtractBadge();
+    const originalBtnContent = btnImport ? btnImport.innerHTML : '';
+    if (btnImport) {
+        btnImport.disabled = true;
+        btnImport.innerHTML = `
+            <span class="material-symbols-outlined text-base leading-none animate-spin">progress_activity</span>
+            <span>${t('extracting_text')}</span>
+        `;
+    }
+
+    // ── 3. Llamada a FastAPI /extraer-texto ───────────────────────────────────
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch(`${DS_API_URL}/extraer-texto`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!res.ok) {
+            let errorMsg = t('toast_extract_error');
+            try {
+                const errData = await res.json();
+                if (errData && errData.detail) errorMsg = errData.detail;
+            } catch (_) { /* ignorar errores de parseo */ }
+            showToast(errorMsg, 'error');
+            return;
+        }
+
+        const data = await res.json();
+
+        // ── 4. Poblar los campos del formulario ───────────────────────────────
+        if (titleInput) {
+            titleInput.value = data.titulo || '';
+            // Disparar evento input para que cualquier listener de validación lo detecte
+            titleInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (bodyInput) {
+            bodyInput.value = data.texto || '';
+            bodyInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        // ── 5. Mostrar badge de confirmación ──────────────────────────────────
+        showFileExtractBadge(file.name, data.paginas_procesadas, data.advertencia || '');
+
+        // Enfocar el campo de título para que el usuario pueda editar
+        if (titleInput) titleInput.focus();
+
+    } catch (err) {
+        console.error('[TechMind] Error al extraer texto del archivo:', err);
+        showToast(t('toast_extract_error'), 'error');
+    } finally {
+        // Restaurar el botón de importar
+        if (btnImport) {
+            btnImport.disabled = false;
+            btnImport.innerHTML = originalBtnContent;
+        }
+    }
+}
+
 function bindEvents() {
     const classifyBtn = document.getElementById('btn-classify');
     const jsonBtn = document.getElementById('btn-view-json');
@@ -360,7 +517,7 @@ function bindEvents() {
     };
 
     // La expansión del sidebar dura 0.3s; el popover se abre al terminar
-    const SIDEBAR_ANIM_MS = 320;
+    const SIDEBAR_ANIM_MS = 150;
 
     // Iconos de los toggles según estado. En móviles y tablets, cerrar es una X;
     // en escritorio se mantienen los chevrons.
@@ -502,6 +659,28 @@ function bindEvents() {
             if (titleInput) titleInput.value = '';
             if (bodyInput) bodyInput.value = '';
             if (titleInput) titleInput.focus();
+            // Ocultar badge de archivo importado al limpiar el formulario
+            hideFileExtractBadge();
+            // Resetear el file input para permitir subir el mismo archivo de nuevo
+            const fileInput = document.getElementById('file-upload-input');
+            if (fileInput) fileInput.value = '';
+        });
+    }
+
+    // ── Import PDF / DOCX ────────────────────────────────────────────────────
+    const btnImportDoc = document.getElementById('btn-import-doc');
+    const fileUploadInput = document.getElementById('file-upload-input');
+
+    // Clic en el botón → dispara el selector de archivos nativo
+    if (btnImportDoc && fileUploadInput) {
+        btnImportDoc.addEventListener('click', () => fileUploadInput.click());
+
+        fileUploadInput.addEventListener('change', async (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            await handleFileUpload(file);
+            // Resetear el input para permitir seleccionar el mismo archivo otra vez
+            fileUploadInput.value = '';
         });
     }
 

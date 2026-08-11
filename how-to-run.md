@@ -314,6 +314,24 @@ Respuesta esperada:
 
 ---
 
+### `POST http://localhost:8000/extraer-texto`
+
+**Request:** `multipart/form-data` con campo `file` (`.pdf` o `.docx`, máx. 5 MB)
+
+**Response 200 OK:**
+```json
+{
+  "titulo": "Título inferido del documento",
+  "texto": "Texto completo extraído...",
+  "paginas_procesadas": 3,
+  "formato": "pdf",
+  "texto_truncado": false,
+  "advertencia": ""
+}
+```
+
+---
+
 ## 🛑 Errores comunes y soluciones
 
 | Error que ves | Causa | Solución |

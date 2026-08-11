@@ -190,12 +190,12 @@
             /* px-3 base (0.75rem) + corrimiento de los lados izquierdos */
             padding-left: calc(0.75rem + var(--sidebar-left-shift));
             padding-right: 0.75rem;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-left 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #sidebar.sidebar-collapsed {
             width: var(--sidebar-collapsed-width);
@@ -317,7 +317,7 @@
             margin-bottom: 0.75rem !important;
         }
         #main-content {
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: margin-left 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass-panel {
@@ -812,6 +812,29 @@
                                     class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed"
                                     placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."
                                     data-i18n-placeholder="placeholder_body"></textarea>
+                            </div>
+
+                            <!-- ── Importar PDF / DOCX ─────────────────────── -->
+                            <input
+                                type="file"
+                                id="file-upload-input"
+                                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                hidden
+                                aria-hidden="true" />
+
+                            <div class="flex flex-col items-start gap-2">
+                                <button id="btn-import-doc" type="button"
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-label-sm text-sm font-semibold border border-dashed border-outline-variant/70 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/40 transition-all duration-200 active:scale-95 cursor-pointer">
+                                    <span class="material-symbols-outlined text-base leading-none">upload_file</span>
+                                    <span data-i18n="btn_import_doc">Importar PDF / DOCX</span>
+                                </button>
+
+                                <!-- Badge visible solo tras una extracción exitosa -->
+                                <div id="file-extract-badge"
+                                    class="hidden items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 w-full">
+                                    <span class="material-symbols-outlined text-sm leading-none flex-shrink-0">check_circle</span>
+                                    <span id="file-extract-badge-text"></span>
+                                </div>
                             </div>
 
                             <div class="flex flex-col sm:flex-row justify-center items-center gap-3 mt-4">
