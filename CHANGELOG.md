@@ -4,6 +4,16 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [2.2.2] — 2026-08-11 · Rate Limiting de Importación de Documentos para Invitados
+
+### Añadido
+
+- **Control de Frecuencia (Rate Limiting) para Importación de Documentos (`frontend/app.js`):**
+  - **Límite para Invitados:** Implementado el gestor `DocImportRateLimit` basado en `localStorage` (`techmind_import_rl`) que restringe a usuarios no autenticados a un máximo de **5 importaciones de archivos PDF/DOCX cada 8 horas**.
+  - **Acceso Ilimitado para Administradores:** Si el usuario tiene una sesión activa de Administrador (`isLoggedInAsAdmin()`), el sistema omite el check y permite importaciones ilimitadas.
+  - **Feedback y Autorestablecimiento:** Cuando un usuario invitado alcanza el límite, el sistema bloquea la petición a `/extraer-texto` y muestra un aviso Toast extendido (4 segundos de duración) con el tiempo exacto restante formateado (ej. *"Límite alcanzado: ya importaste 5 documentos. Probá de nuevo en 6h 42m. Iniciá sesión como Admin para no tener límites."*). El contador se reinicia automáticamente una vez cumplidas las 8 horas.
+  - **i18n:** Agregadas las claves correspondientes en los diccionarios de español e inglés.
+
 ## [2.2.1] — 2026-08-11 · Patch: Traducción del Filtro de Categorías en Historial
 
 ### Corregido

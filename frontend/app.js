@@ -91,6 +91,8 @@ const TRANSLATIONS = {
         text_extracted_badge: '📄 Texto extraído de «{name}» — {pages} página(s). Podés editarlo antes de clasificar.',
         text_extracted_badge_warning: '📄 «{name}» — {warning}. Podés editarlo antes de clasificar.',
         toast_extract_error: 'No se pudo extraer el texto del archivo.',
+        // ── Rate limit importación de documentos ─────────────────────────────────
+        import_limit_reached: 'Límite alcanzado: ya importaste 5 documentos. Probá de nuevo en {time}. Iniciá sesión como Admin para no tener límites.',
         // ── Etiquetas de categorías del filtro ──────────────────────────────────────────
         cat_bases_de_datos: 'Bases de Datos',
         cat_seguridad: 'Seguridad',
@@ -162,6 +164,8 @@ const TRANSLATIONS = {
         text_extracted_badge: '📄 Text extracted from «{name}» — {pages} page(s). You can edit it before classifying.',
         text_extracted_badge_warning: '📄 «{name}» — {warning}. You can edit it before classifying.',
         toast_extract_error: 'Could not extract text from the file.',
+        // ── Document import rate limit ────────────────────────────────────────
+        import_limit_reached: 'Limit reached: you have imported 5 documents. Try again in {time}. Log in as Admin for unlimited imports.',
         // ── Category filter labels ────────────────────────────────────────────────────
         cat_bases_de_datos: 'Databases',
         cat_seguridad: 'Security',
@@ -331,6 +335,46 @@ function setServiceStatus(elementId, isOk, text) {
 
 // ── 2. Event Listeners ──────────────────────────────────────────────────────
 
+// ── Rate limiter de importación de documentos (invitados) ────────────────────
+// Persiste en localStorage (ventana 8h, máx. 5 importaciones para invitados).
+// Los admins (isLoggedInAsAdmin()) no pasan por este objeto.
+const DocImportRateLimit = {
+    LS_KEY:      'techmind_import_rl',
+    MAX_IMPORTS: 5,
+    WINDOW_MS:   8 * 60 * 60 * 1000,
+
+    _load() {
+        try { return JSON.parse(localStorage.getItem(this.LS_KEY)) || { count: 0, windowStart: 0 }; }
+        catch { return { count: 0, windowStart: 0 }; }
+    },
+    _save(s) { try { localStorage.setItem(this.LS_KEY, JSON.stringify(s)); } catch {} },
+
+    /** @returns {{ allowed: boolean, remainingMs: number }} */
+    check() {
+        const now = Date.now();
+        let s = this._load();
+        if (now - s.windowStart >= this.WINDOW_MS) { s = { count: 0, windowStart: now }; this._save(s); }
+        return { allowed: s.count < this.MAX_IMPORTS, remainingMs: Math.max(0, this.WINDOW_MS - (now - s.windowStart)) };
+    },
+
+    /** Registra una importación exitosa. Llamar solo tras extraccion ok. */
+    record() {
+        const now = Date.now();
+        let s = this._load();
+        if (now - s.windowStart >= this.WINDOW_MS) s = { count: 0, windowStart: now };
+        s.count = Math.min(s.count + 1, this.MAX_IMPORTS);
+        this._save(s);
+    },
+
+    /** Formatea ms restantes como "Xh Ym". */
+    formatRemaining(ms) {
+        const m = Math.ceil(ms / 60000);
+        const h = Math.floor(m / 60), min = m % 60;
+        if (h > 0 && min > 0) return `${h}h ${min}m`;
+        return h > 0 ? `${h}h` : `${min}m`;
+    },
+};
+
 // ── Importar PDF / DOCX — funciones de soporte ───────────────────────────────
 
 /**
@@ -410,6 +454,17 @@ async function handleFileUpload(file) {
         return;
     }
 
+    // ── 2. Rate limit para usuarios invitados ──────────────────────────────
+    if (!isLoggedInAsAdmin()) {
+        const { allowed, remainingMs } = DocImportRateLimit.check();
+        if (!allowed) {
+            const timeStr = DocImportRateLimit.formatRemaining(remainingMs);
+            const msg = t('import_limit_reached').replace('{time}', timeStr);
+            showToast(msg, 'error', 4000);
+            return;
+        }
+    }
+
     // ── 2. Estado de carga ────────────────────────────────────────────────────
     hideFileExtractBadge();
     const originalBtnContent = btnImport ? btnImport.innerHTML : '';
@@ -456,6 +511,9 @@ async function handleFileUpload(file) {
 
         // ── 5. Mostrar badge de confirmación ──────────────────────────────────
         showFileExtractBadge(file.name, data.paginas_procesadas, data.advertencia || '');
+
+        // Registrar la importación en el rate limiter (solo para invitados)
+        if (!isLoggedInAsAdmin()) DocImportRateLimit.record();
 
         // Enfocar el campo de título para que el usuario pueda editar
         if (titleInput) titleInput.focus();
