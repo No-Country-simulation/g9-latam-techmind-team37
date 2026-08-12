@@ -83,7 +83,7 @@ const TRANSLATIONS = {
         confirm_delete: '⚠️ ¿Estás seguro de que deseas eliminar permanentemente la consulta ID #{id}?',
         no_session_json: '{\n  "mensaje": "Aún no se ha realizado ninguna clasificación en esta sesión."\n}',
         queries_label: 'Consultas',
-        // ── Importá documento ─────────────────────────────────────────────────────────
+        // ── Importa documento ─────────────────────────────────────────────────────────
         btn_import_doc: 'Importar PDF / DOCX',
         extracting_text: 'Extrayendo texto…',
         file_too_large: 'El archivo supera el límite de 5 MB.',
@@ -91,6 +91,9 @@ const TRANSLATIONS = {
         text_extracted_badge: '📄 Texto extraído de «{name}» — {pages} página(s). Podés editarlo antes de clasificar.',
         text_extracted_badge_warning: '📄 «{name}» — {warning}. Podés editarlo antes de clasificar.',
         toast_extract_error: 'No se pudo extraer el texto del archivo.',
+        // ── Etiquetas de categorías del filtro ──────────────────────────────────────────
+        cat_bases_de_datos: 'Bases de Datos',
+        cat_seguridad: 'Seguridad',
     },
     en: {
         brand_subtitle: 'Intelligent organization', nav_classifier: 'Classifier',
@@ -159,6 +162,9 @@ const TRANSLATIONS = {
         text_extracted_badge: '📄 Text extracted from «{name}» — {pages} page(s). You can edit it before classifying.',
         text_extracted_badge_warning: '📄 «{name}» — {warning}. You can edit it before classifying.',
         toast_extract_error: 'Could not extract text from the file.',
+        // ── Category filter labels ────────────────────────────────────────────────────
+        cat_bases_de_datos: 'Databases',
+        cat_seguridad: 'Security',
     }
 };
 
@@ -1314,36 +1320,37 @@ async function loadHistory() {
     }
 }
 
+// ── Helper: etiqueta visible de categoría según idioma activo ─────────────────
+// El VALUE del <option> siempre queda en español (es lo que se envía al filtro
+// y debe coincidir con los valores almacenados en la DB).
+// Solo el TEXTO visible se traduce.
+function getCategoryLabel(value) {
+    const overrides = {
+        'all':            t('all_categories'),
+        'Bases de Datos': t('cat_bases_de_datos'),
+        'Seguridad':      t('cat_seguridad'),
+    };
+    // Backend, Frontend, Data Science, DevOps, Mobile, Cloud son iguales en ambos idiomas
+    return overrides[value] !== undefined ? overrides[value] : value;
+}
+
 // ── 6a. Actualizar conteo de categorías en el filtro ─────────────────────────
 
 function updateCategoryFilterCounts(data) {
     const filterSelect = document.getElementById('filter-category');
     if (!filterSelect || !data) return;
 
-    // Count entries per category
+    // Contar entradas por categoría
     const counts = {};
     data.forEach(entry => {
         const cat = entry.categoria || 'Sin categoría';
         counts[cat] = (counts[cat] || 0) + 1;
     });
 
-    // Map of option values to their base label
-    const categoryLabels = {
-        'all': t('all_categories'),
-        'Backend': 'Backend',
-        'Frontend': 'Frontend',
-        'Data Science': 'Data Science',
-        'DevOps': 'DevOps',
-        'Mobile': 'Mobile',
-        'Bases de Datos': 'Bases de Datos',
-        'Seguridad': 'Seguridad',
-        'Cloud': 'Cloud'
-    };
-
-    // Update each option text with the count
+    // Actualizar texto de cada opción usando la etiqueta traducida + conteo
     Array.from(filterSelect.options).forEach(option => {
         const value = option.value;
-        const baseLabel = categoryLabels[value] || value;
+        const baseLabel = getCategoryLabel(value);
         if (value === 'all') {
             option.textContent = `${baseLabel} (${data.length})`;
         } else {
@@ -1923,4 +1930,17 @@ function applyTranslations() {
     // Actualizar el texto del botón de copiar JSON
     const copyBtnText = document.getElementById('copy-btn-text');
     if (copyBtnText) copyBtnText.textContent = t('copy_json');
+
+    // Actualizar las etiquetas visibles del filtro de categorías en Historial
+    // El VALUE de cada <option> no cambia (sigue en español para coincidir con la DB).
+    // Solo se re-etiqueta el TEXTO visible, preservando el conteo entre paréntesis si ya existe.
+    const filterSelect = document.getElementById('filter-category');
+    if (filterSelect) {
+        Array.from(filterSelect.options).forEach(option => {
+            // Extraer el sufijo de conteo si el texto ya lo tiene, e.g. " (5)"
+            const match = option.textContent.match(/(\s*\(\d+\))$/);
+            const countSuffix = match ? match[1] : '';
+            option.textContent = getCategoryLabel(option.value) + countSuffix;
+        });
+    }
 }

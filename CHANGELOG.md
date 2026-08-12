@@ -4,6 +4,20 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [2.2.1] — 2026-08-11 · Patch: Traducción del Filtro de Categorías en Historial
+
+### Corregido
+
+- **Filtro de categorías en "Historial" no se traducía al cambiar el idioma a inglés (`frontend/app.js`):**
+  - **Síntoma:** Al cambiar la UI a inglés, las opciones del `<select>` de filtro seguían mostrando los nombres en español (`Bases de Datos`, `Seguridad`), ya que el elemento no tenía atributos `data-i18n` y `applyTranslations()` no lo procesaba.
+  - **Causa:** Las opciones se renderizan desde HTML estático con texto hardcodeado, y `updateCategoryFilterCounts()` usaba un mapa de etiquetas también hardcodeado en español.
+  - **Solución sin tocar la DB:** El `value` de cada `<option>` permanece en español (es el valor que se compara contra los registros de la base de datos para filtrar). Solo el **texto visible** se traduce:
+    - Añadida función helper `getCategoryLabel(value)` que resuelve la etiqueta localizada según el idioma activo (`t()`).
+    - Actualizado `updateCategoryFilterCounts()` para usar `getCategoryLabel()` al construir el texto de cada opción (incluido el conteo `(N)`).
+    - Añadido bloque en `applyTranslations()` que re-etiqueta las opciones del filtro al cambiar de idioma, preservando el sufijo de conteo entre paréntesis si ya estaba visible.
+    - Añadidas claves de internacionalización `cat_bases_de_datos` y `cat_seguridad` en los diccionarios ES y EN de `TRANSLATIONS` (las demás categorías —`Backend`, `Frontend`, `Data Science`, `DevOps`, `Mobile`, `Cloud`— son iguales en ambos idiomas).
+  - **Categorías traducidas:** `Bases de Datos` → `Databases` · `Seguridad` → `Security`
+
 ## [2.2.0] — 2026-08-11 · Importación de Documentos (PDF/DOCX), Seguridad de Archivos y Optimización del Sidebar
 
 ### Añadido
