@@ -1,6 +1,6 @@
 # 🧪 Guía de QA, Testing e Informe de Resultados — TechMind
 
-Este documento describe la estrategia integral de **Aseguramiento de Calidad (QA)**, los requisitos de entorno, la guía de ejecución mediante el orquestador `setup.py` y el **Informe Final de Resultados** sobre los 57 Casos de Prueba (CP) ejecutados a lo largo de los 4 Sprints del proyecto **TechMind**.
+Este documento describe la estrategia integral de **Aseguramiento de Calidad (QA)**, los requisitos de entorno, la guía de ejecución mediante el orquestador `setup.py` y el **Informe Final de Resultados** sobre los 61 Casos de Prueba (CP) ejecutados a lo largo de los 5 Sprints del proyecto **TechMind**, incluyendo la auditoría exhaustiva de rendimiento, accesibilidad, buenas prácticas y SEO con **Google Lighthouse** (Escritorio y Mobile).
 
 ---
 
@@ -11,13 +11,15 @@ Este documento describe la estrategia integral de **Aseguramiento de Calidad (QA
 3. [Configuración del Entorno de Pruebas (Postman)](#-3-configuración-del-entorno-de-pruebas-postman)
 4. [Resumen Ejecutivo de Resultados QA](#-4-resumen-ejecutivo-de-resultados-qa)
 5. [Desglose por Módulo y Tipo de Prueba](#-5-desglose-por-módulo-y-tipo-de-prueba)
-6. [Detalle Completo de Casos de Prueba (CP-01 a CP-57)](#-6-detalle-completo-de-casos-de-prueba)
-   - [Sprint 1: Microservicio FastAPI & NLP](#-sprint-1-microservicio-fastapi--nlp-25-casos)
-   - [Sprint 2: Data QA — PostgreSQL (`techmind`)](#-sprint-2-data-qa--postgresql-techmind-17-casos)
-   - [Sprint 3: Backend Spring Boot & ML](#-sprint-3-backend-spring-boot--ml-6-casos)
-   - [Sprint 4: Frontend (Vanilla JS / Tailwind)](#-sprint-4-frontend-vanilla-js--tailwind-9-casos)
-7. [Assertions Automatizadas en Postman](#-7-assertions-automatizadas-en-postman)
-8. [Registro y Reporte de Evidencias](#-8-registro-y-reporte-de-evidencias)
+6. [Detalle Completo de Casos de Prueba (CP-01 a CP-61)](#-6-detalle-completo-de-casos-de-prueba)
+   - [Sprint 1: Microservicio FastAPI & NLP (25 casos)](#-sprint-1-microservicio-fastapi--nlp-25-casos)
+   - [Sprint 2: Data QA — PostgreSQL `techmind` (17 casos)](#-sprint-2-data-qa--postgresql-techmind-17-casos)
+   - [Sprint 3: Backend Spring Boot & ML (6 casos)](#-sprint-3-backend-spring-boot--ml-6-casos)
+   - [Sprint 4: Frontend Vanilla JS / Tailwind (9 casos)](#-sprint-4-frontend-vanilla-js--tailwind-9-casos)
+   - [Sprint 5: Auditoría de Performance & Web Vitals — Lighthouse (4 casos)](#-sprint-5-auditoría-de-performance--web-vitals--lighthouse-4-casos)
+7. [Informes de Rendimiento y Auditoría Técnica (Lighthouse)](#-7-informes-de-rendimiento-y-auditoría-técnica-lighthouse)
+8. [Assertions Automatizadas en Postman](#-8-assertions-automatizadas-en-postman)
+9. [Registro y Reporte de Evidencias](#-9-registro-y-reporte-de-evidencias)
 
 ---
 
@@ -29,7 +31,24 @@ Para levantar el entorno completo y ejecutar la suite de pruebas necesitás cont
 * **Java 17 / Maven** (para la API Backend en Spring Boot).
 * **Docker Desktop & Docker Compose** (para PostgreSQL o ejecución containerizada completa).
 * **Postman** (Client Desktop o Web) para las colecciones automatizadas de API.
+* **Google Chrome / DevTools (Lighthouse 13.4+)** para la auditoría de rendimiento y Web Vitals.
 * **Navegador Web** (Chrome/Firefox/Edge) para acceso a Swagger UI y pruebas e2e en Frontend.
+
+---
+
+## 🚀 2. Instalación y Ejecución Rápida (`setup.py`)
+
+El repositorio incluye el orquestador universal `setup.py` que instala dependencias y pone en marcha todos los microservicios en Windows, macOS o Linux.
+
+```bash
+# Modo A: Desarrollo local (Docker para PostgreSQL + APIs y Frontend nativos)
+python setup.py
+
+# Modo B: Inicio rápido de servicios previamente instalados
+python setup.py --start
+
+# Modo C: 100% Dockerizado (PostgreSQL + FastAPI + Spring Boot + Frontend)
+python setup.py --docker
 
 ---
 
@@ -242,7 +261,38 @@ Durante los Sprints 1, 2, 3 y 4 se ejecutaron de manera exhaustiva las suites de
 
 ---
 
-## 🔍 7. Assertions Automatizadas en Postman
+### ⚡ Sprint 5: Auditoría de Performance & Web Vitals — Google Lighthouse (4 Casos)
+* `CP-LIGHTHOUSE-01` **(Performance Desktop & Core Web Vitals):** Evaluación de FCP, LCP y CLS en escritorio. Puntaje alcanzado: 51/100. Detectado CLS crítico (1.516) por carga de fuentes externas no optimizadas.
+* `CP-LIGHTHOUSE-02` **(Performance Mobile & Redes 4G):** Simulación en Moto G Power bajo red Slow 4G . Puntaje alcanzado: 56/100. FCP/LCP elevados (~9.9s) por peticiones bloqueantes de renderizado. CLS perfecto (0).
+* `CP-LIGHTHOUSE-03` **(Accessibility & WCAG 2.1 AA):** Evaluación semántica, atributos ARIA y contraste. Puntaje alcanzado: 87/100 (Desktop/Mobile). Hallazgos en botones sin nombre accesible y bajo contraste en badges.
+* `CP-LIGHTHOUSE-04` **(Best Practices & SEO):** Evaluación de seguridad, cabeceras HTTP e indexación. Best Practices: 74/100 (Riesgo por HTTP no cifrado). SEO: 90/100 (Oportunidad de mejora en meta description).
+
+---
+## ⚡ 7. Informes de Rendimiento y Auditoría Técnica (Lighthouse)  
+
+Como parte de las pruebas no funcionales del Sprint 5, se ejecutó una auditoría exhaustiva sobre el entorno de despliegue mediante Google Lighthouse 13.4 tanto en modo Desktop como Mobile.
+
+### 📊 Tabla Comparativa de Auditoría Lighthouse
+| Categoría Auditada | Score Desktop | Score Mobile (Slow 4G) | Estado / Diagnóstico QA |
+|---|---|---|---|
+| **Performance** | 51 / 100 | 56 / 100 | ⚠️ Requiere optimización en bundles JS/CSS y fuentes. |
+| **Accessibility** | 87 / 100 | 87 / 100 | 🟡 Aceptable. Ajustar contraste y aria-labels. |
+| **Best Practices** | 74 / 100 | 74 / 100 | ⚠️ Inseguro. Servido en HTTP sin cabeceras CSP/HSTS. |
+| **SEO** | 90 / 100 | 90 / 100 | 🟢 Bueno. Agregar etiqueta <meta name="description"> |
+
+### 📄 Acceso a los Informes Detallados y Reportes PDF:
+
+#### 💻 Informe de Rendimiento Escritorio:
+* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Desktop_2026-08-13.md](https://drive.google.com/file/d/1e_xcBMoTtd0rkCGdtV3kbzkdpGTfC-0z/view?usp=sharing)
+* 📥 Descargar PDF Original: [Google Lighthouse (Desktop)](https://drive.google.com/file/d/1hABBis34oLTwinbT57K0m6-Q1qVM08Z9/view?usp=sharing)
+
+#### 📱 Informe de Rendimiento Mobile:
+* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Mobile_2026-08-13.md](https://drive.google.com/file/d/1e_xcBMoTtd0rkCGdtV3kbzkdpGTfC-0z/view?usp=sharing)
+* 📥 Descargar PDF Original: [Google Lighthouse (Mobile)](https://drive.google.com/file/d/1e_xcBMoTtd0rkCGdtV3kbzkdpGTfC-0z/view?usp=sharing)
+
+---
+
+## 🔍 8. Assertions Automatizadas en Postman
 
 Cada petición dentro de la colección automatizada de Postman contiene scripts en JavaScript (pestaña **Tests**) para validar contratos, códigos HTTP y latencia:
 
@@ -275,24 +325,40 @@ pm.test("La probabilidad es un número válido entre 0 y 1", function () {
 
 ---
 
-## 📂 8. Registro y Reporte de Evidencias
+## 📂 9. Registro y Reporte de Evidencias
 
 Todas las evidencias generadas durante las corridas de QA están ordenadas en el repositorio bajo la siguiente estructura:
 
 ```
-├── casos-de-prueba/            
+├── casos-de-prueba/
+│            
 ├── evidencias/             
 │   ├── Capturas de Pantalla/
+│   │   ├── Backend (Spring Boot)/ 
+│   │   ├── Base de Datos (PostgreSQL 16)/
+│   │   ├── Data Science (FastAPI)/
+│   │   ├──  FrontEnd/
+│   │   │    ├── Bugs/
+│   │   │    ├── Casos de Prueba/
+│   │   │    └── Mejoras/
+│   │   └── payload_largo.json
+│   │   
 │   └── JSON/
-├── reportes/                          
-│   ├── informes/                  
-│   ├── Reporte de BUGS/
-│   ├── resultados-sprint-1.md
-│   ├── resultados-sprint-2.md
-│   ├── resultados-sprint-3.md
-│   └── resultados-sprint-4.md
+│       ├── Backend (Spring Boot)/ 
+│       └── Base de Datos (PostgreSQL 16)/
+│
+├── reportes/                                        
+│   ├── Archivos/
+│   │   ├── BUGS/    
+│   │   └── Rendimiento/
+│   │
+│   ├── Informes/
+│   │
+│   └── Resultados Sprints/
+│ 
+└── README/
 ```
 
 ---
 
-_QA Guía de pruebas e informe de ejecución — TechMind Project v4.0 — Hackathon G9 LATAM (Equipo 37)_
+_QA Guía de pruebas e informe de ejecución — TechMind Project v4.1 — Hackathon G9 LATAM (Equipo 37)_
