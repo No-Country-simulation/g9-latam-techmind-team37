@@ -58,10 +58,10 @@
   - **Causa:** Las funciones de cambio de vista sobreescribían destructivamente la propiedad `className` de los enlaces, perdiendo la clase `relative` y provocando que el tooltip hijo se anclara al `#sidebar` contenedor en lugar del botón individual.
   - **Solución:** Se añadió `position: relative !important;` en CSS a `.sidebar-nav-item` y se refactorizó la lógica en JS mediante `classList.toggle('active-nav')`.
 
-- **Menú Móvil — Apertura Forzada de "Estado de Servicios" (`frontend/app.js`):**
-  - **Síntoma:** Al presionar el icono hamburguesa en móviles, se abría automáticamente la ventana flotante de "Estado de servicios", cubriendo la navegación.
-  - **Causa:** Un temporizador `setTimeout` en `toggleSidebar()` forzaba la apertura del estado de servicios en pantallas táctiles.
-  - **Solución:** Eliminada la llamada forzada para que el menú hamburguesa despliegue únicamente las opciones de navegación.
+- **Menú Móvil — Apertura Forzada de "Estado de Servicios" y Alineación (`frontend/index.html` + `frontend/app.js`):**
+  - **Síntoma:** Al presionar el icono hamburguesa en móviles, se abría automáticamente la ventana flotante de "Estado de servicios" y, al abrirse, aparecía desfasada hacia la derecha de la pantalla.
+  - **Causa:** Un temporizador `setTimeout` en `toggleSidebar()` forzaba la apertura y una regla CSS con offset fijo (`left: 74px`) desalineaba el panel con respecto al sidebar expandido.
+  - **Solución:** Eliminada la llamada forzada en `app.js` y reconfigurado `#status-popover` con `left: 0; right: 0; width: 100%;` en `index.html` para un despliegue alineado al margen izquierdo del menú móvil.
   - Ocultamiento estricto del botón `#btn-sidebar-mobile` en computadoras de escritorio (`@media (min-width: 768px)`).
 
 ## [2.3.0] — 2026-08-14 · Optimizaciones Lighthouse Sprint 5: Performance, Accesibilidad, Best Practices y SEO
