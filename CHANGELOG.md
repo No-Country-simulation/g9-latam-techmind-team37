@@ -4,6 +4,130 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [2.4.0] — 2026-08-14 · Tooltips Flotantes Dinámicos, UI/UX Pulida, Placeholders Interactivos y Optimizaciones Frontend
+
+### Añadido
+
+- **Tooltips Flotantes Dinámicos en Sidebar Colapsado (`frontend/index.html` + `frontend/app.js`):**
+  - Añadidos tooltips flotantes (`.sidebar-collapsed-tooltip`) a todos los botones del sidebar colapsado: Clasificador, Historial, Análisis, Tema, Estado de servicios y Toggle superior.
+  - **Sincronización 100% en tiempo real:**
+    - Botón de Tema: muestra dinámicamente `"Modo claro"` cuando el sol está visible (modo oscuro activo) y `"Modo oscuro"` cuando la luna está visible (modo claro activo).
+    - Botón de Sidebar: muestra `"Colapsar sidebar"` cuando la barra está abierta y `"Expandir sidebar"` cuando está cerrada.
+  - **Contraste y Legibilidad WCAG AAA:**
+    - En **Modo Claro**: fondo blanco puro sólido (`#ffffff`), borde morado fino (`rgba(92, 62, 145, 0.3)`), sombra púrpura suave y tipografía en púrpura profundo (`#2b0b4a`) con contraste superior a 14:1.
+    - En **Modo Oscuro**: fondo dark glass (`#171f33`), borde cyber (`rgba(208, 188, 255, 0.35)`) y texto blanco puro (`#ffffff`).
+  - Soporte multilingüe en tiempo real (Español / Inglés).
+
+- **Placeholders Dinámicos e Interactivos con Animación Typewriter (`frontend/index.html` + `frontend/app.js`):**
+  - Reemplazado el placeholder estático y complejo anterior por una rotación de ejemplos técnicos amigables y accesibles:
+    - *Español:* `ej. Tratamiento y gestión de bases de datos`, `ej. Introducción a la programación en Python`, `ej. Primeros pasos con Git y GitHub`, `ej. Guía básica de ciberseguridad y contraseñas`, `ej. Desarrollo de páginas y aplicaciones web`, `ej. Qué es el Cloud Computing y cómo funciona`, `ej. Conceptos fundamentales de Inteligencia Artificial`.
+    - *Inglés:* `e.g. Database management & processing`, `e.g. Introduction to Python programming`, `e.g. Getting started with Git & GitHub`, etc.
+  - **Comportamiento inteligente:** Efecto máquina de escribir suave (45ms por caracter, 3.2s de pausa de lectura). Se pausa automáticamente si el usuario hace foco o escribe en el campo, y se reanuda suavemente si el campo queda vacío al salir.
+
+- **Accesibilidad y Atajos de Teclado (`frontend/app.js`):**
+  - Añadido soporte para cerrar el modal de inicio de sesión de Admin o el modal de JSON al presionar la tecla `Escape`.
+
+### Modificado
+
+- **Botones Secundarios del Formulario Principal (`frontend/index.html`):**
+  - **Botón "Importar PDF / DOCX" (`#btn-import-doc`):** Añadido recuadro punteado nítido (`border-dashed border-purple-900/30`), fondo translúcido (`bg-purple-900/5`), sombra sutil (`shadow-sm`) y texto en púrpura oscuro (`text-purple-950`) en Modo Claro para delimitar claramente el área de acción.
+  - **Botón "Limpiar formulario" (`#btn-clear-form`):** Añadido borde sólido (`border-purple-900/25`), fondo blanco translúcido (`bg-white/70`), sombra suave (`shadow-sm`) y tipografía de alto contraste en Modo Claro, equilibrando su presencia con el botón principal de clasificar.
+  - **Etiqueta del contenido:** Simplificada a `"Contenido del documento o artículo"` (ES) / `"Document or article content"` (EN).
+
+- **Modal de Inicio de Sesión de Administrador (`frontend/index.html` + `frontend/app.js`):**
+  - Eliminado el botón redundante "Cancelar" del pie del formulario (el usuario dispone del botón de cierre `✕`, clic en backdrop exterior o tecla `Escape`).
+  - Rediseñado el botón principal "Ingresar" a ancho completo (`w-full py-3`) con estilo de elevación moderno para facilitar la interacción táctil y de escritorio.
+
+- **Dimensiones y Centrado del Botón Toggle de Sidebar (`frontend/index.html`):**
+  - Homologado el tamaño grande (`3rem` / 48px) del icono chevron tanto en estado expandido como colapsado en pantallas de escritorio, manteniendo un centrado geométrico perfecto en el rail colapsado de 64px.
+
+### Corregido
+
+- **Docker — Fallo de arranque de Nginx por UTF-8 BOM (`frontend/nginx.conf`):**
+  - **Síntoma:** El contenedor `techmind-frontend` fallaba al iniciar con código de salida `1` (`unknown directive` en línea 1).
+  - **Causa:** Un carácter invisible UTF-8 BOM (Byte Order Mark) al inicio del archivo generado por editores en Windows impedía el parseo de Nginx.
+  - **Solución:** Reescrito el archivo `frontend/nginx.conf` en codificación UTF-8 estricta sin BOM (`UTF8Encoding($false)`).
+
+- **Scope de Funciones en Inicialización de DOM (`frontend/app.js`):**
+  - **Síntoma:** Los botones de la aplicación dejaron de responder a los clics.
+  - **Causa:** `updateSidebarToggleIcons()` y `sidebarCollapsed` estaban declaradas con scope local dentro de `bindEvents()`. Al ser invocadas previamente por `applyTranslations()` durante `DOMContentLoaded`, se producía un `ReferenceError` que abortaba la ejecución del hilo principal antes de registrar los event listeners.
+  - **Solución:** Se elevaron `sidebarCollapsed` y `updateSidebarToggleIcons()` al ámbito global de `app.js`.
+
+- **Desfasaje Vertical de Tooltips al cambiar de pestaña (`frontend/index.html` + `frontend/app.js`):**
+  - **Síntoma:** Al hacer clic en "Historial" o "Análisis", el tooltip flotante saltaba al centro vertical del sidebar.
+  - **Causa:** Las funciones de cambio de vista sobreescribían destructivamente la propiedad `className` de los enlaces, perdiendo la clase `relative` y provocando que el tooltip hijo se anclara al `#sidebar` contenedor en lugar del botón individual.
+  - **Solución:** Se añadió `position: relative !important;` en CSS a `.sidebar-nav-item` y se refactorizó la lógica en JS mediante `classList.toggle('active-nav')`.
+
+- **Menú Móvil — Apertura Forzada de "Estado de Servicios" (`frontend/app.js`):**
+  - **Síntoma:** Al presionar el icono hamburguesa en móviles, se abría automáticamente la ventana flotante de "Estado de servicios", cubriendo la navegación.
+  - **Causa:** Un temporizador `setTimeout` en `toggleSidebar()` forzaba la apertura del estado de servicios en pantallas táctiles.
+  - **Solución:** Eliminada la llamada forzada para que el menú hamburguesa despliegue únicamente las opciones de navegación.
+  - Ocultamiento estricto del botón `#btn-sidebar-mobile` en computadoras de escritorio (`@media (min-width: 768px)`).
+
+## [2.3.0] — 2026-08-14 · Optimizaciones Lighthouse Sprint 5: Performance, Accesibilidad, Best Practices y SEO
+
+### Añadido
+
+- **Cabeceras de Seguridad HTTP en Nginx (`frontend/nginx.conf` [NUEVO] + `frontend/Dockerfile`):**
+  - Creado `nginx.conf` personalizado con cabeceras de seguridad HTTP que resuelven las brechas detectadas en el Sprint 5 de QA (Best Practices 74→~95).
+  - `X-Frame-Options: SAMEORIGIN` — Previene ataques de Clickjacking.
+  - `X-Content-Type-Options: nosniff` — Previene MIME-type sniffing.
+  - `Referrer-Policy: strict-origin-when-cross-origin` — Controla la información de referrer enviada a terceros.
+  - `Permissions-Policy` — Restringe APIs del navegador no utilizadas (`camera`, `microphone`, `geolocation`, `payment`).
+  - `Content-Security-Policy` — Política CSP que permite los CDNs requeridos (`tailwindcss`, `jsdelivr`, `fonts.googleapis.com`) y bloquea orígenes no autorizados.
+  - Compresión `gzip` habilitada para reducir el payload de red (JS, CSS, JSON, SVG).
+  - Cache headers para assets estáticos: 1 año para JS/CSS versionados, 30 días para fuentes e imágenes.
+  - `server_tokens off` — Oculta la versión de Nginx en cabeceras de respuesta.
+  - Actualizado `frontend/Dockerfile` para copiar `nginx.conf` al contenedor con `COPY frontend/nginx.conf /etc/nginx/nginx.conf`.
+
+- **CSS `size-adjust` para Font Fallbacks (`frontend/index.html`):**
+  - Añadidas declaraciones `@font-face` para `Inter-fallback` y `Outfit-fallback` usando `local('Arial')` como fuente base.
+  - Propiedades `ascent-override`, `descent-override` y `size-adjust` calibradas para que el fallback del sistema tenga métricas casi idénticas a Inter/Outfit, minimizando el FOUT (Flash of Unstyled Text) y el CLS durante la carga de la fuente web.
+
+- **Prevención de CLS por Layout en `#main-content` (`frontend/index.html`):**
+  - Añadido `min-height: 100vh` a `#main-content` para reservar el espacio vertical antes de que JS monte el DOM dinámico, evitando el reflow masivo en la carga inicial.
+  - Añadido `contain: layout` para aislar el contexto de layout y reducir el scope de los recálculos del motor de renderizado.
+
+- **Animaciones GPU-composited (`frontend/index.html`):**
+  - Añadido `will-change: opacity` y `transform: translateZ(0)` a los selectores `.animate-pulse`, `[class*="shimmer"]` y `.led-pulse` para que el navegador las componga en una capa de GPU separada, eliminando su contribución al CLS y reduciendo el trabajo del hilo principal.
+
+- **`aria-label` y atributos ARIA en `#btn-status-trigger` (`frontend/index.html`):**
+  - Agregados `aria-label="Estado de servicios"`, `aria-haspopup="true"` y `aria-expanded="false"` al botón de estado de servicios del sidebar.
+  - Resuelve el hallazgo de Accesibilidad (87→~95): lectores de pantalla como NVDA y VoiceOver ahora anuncian correctamente la función del botón.
+
+### Corregido
+
+- **SEO — Falta de `<meta name="description">` (`frontend/index.html`):**
+  - Añadida la etiqueta `<meta name="description" content="TechMind — Plataforma inteligente de clasificación y organización de contenido técnico. Detecta categorías como Backend, Frontend, Data Science, DevOps, Cloud y más con Machine Learning." />`.
+  - Resuelve el único hallazgo de SEO: puntaje SEO sube de 90 → **100/100**.
+
+- **Performance — Fuentes Google Fonts bloqueantes con CLS 1.516 (`frontend/index.html`):**
+  - **Síntoma:** El puntaje CLS era de `1.516` (umbral óptimo `< 0.1`) en Desktop, causado por fuentes cargadas con `display=block` que mantenían el texto invisible hasta terminar la descarga, provocando saltos de layout masivos.
+  - **Causa:** Tres familias de fuentes (`Inter`, `JetBrains Mono`, `Outfit`) con `display=block` y múltiples weights innecesarios sumaban **1.2 MB** de `.woff2` (72.5% del payload total).
+  - **Solución:**
+    - Cambiado `display=block` → `display=swap` en todas las URLs de Google Fonts: el texto es inmediatamente visible con la fuente del sistema y se sustituye sin layout shift cuando la fuente web carga.
+    - Reducidos los weights a los únicos realmente usados: `Inter:wght@400;600`, `Outfit:wght@600;700`, `JetBrains Mono:wght@400`. Reduce el peso de woff2 de ~1.2 MB a ~400 KB.
+    - Añadido `&subset=latin` para descargar solo los glifos latinos.
+    - Cambiado Material Symbols de variación completa (`wght,FILL@100..700,0..1`) a valor fijo (`wght,FILL@400,0`), reduciendo el peso del CSS de íconos.
+    - Font fallback CSS con `size-adjust` para que el cambio de fuente sea imperceptible visualmente.
+
+- **Performance — `chart.js` bloqueando el render (−550ms desktop / −3s mobile) (`frontend/index.html`):**
+  - **Síntoma:** `chart.js` (70.5 KB) se cargaba sincrónicamente en el `<head>`, bloqueando el First Contentful Paint.
+  - **Causa:** `<script src="https://cdn.jsdelivr.net/npm/chart.js">` sin atributo `defer` en el head.
+  - **Solución:** Movido al final del `<body>` con atributo `defer` y versión pinneada `@4.4.4`:
+    `<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>`
+  - Pineado a `@4.4.4` también resuelve el error **404 del Source Map** (`chart.umd.min.js.map`) reportado en Lighthouse Best Practices.
+
+- **Accesibilidad — Contraste insuficiente en badge Cloud (WCAG 2.1 AA) (`frontend/app.js`):**
+  - **Síntoma:** `dark:text-sky-400` sobre fondo `#0b1326` (modo oscuro) no superaba la relación de contraste mínima de 4.5:1 según WCAG 2.1 AA.
+  - **Solución:** Cambiado `dark:text-sky-400` → `dark:text-sky-300` en `CATEGORY_CONFIG['Cloud']`. `sky-300` tiene mayor luminancia y supera el ratio requerido.
+
+- **Accesibilidad — Contraste insuficiente en tarjetas del historial (`frontend/app.js`):**
+  - **Síntoma:** Los párrafos `.history-card-body` tenían clase `opacity-80` que reducía el contraste efectivo del color `text-on-surface-variant`, incumpliendo WCAG 2.1 AA bajo luz solar en dispositivos móviles.
+  - **Solución:** Eliminada la clase `opacity-80` de los 2 elementos `.history-card-body` (vista grid y vista lista del historial). El color `text-on-surface-variant` ya provee contraste adecuado sin necesidad de reducir la opacidad.
+
+- **Versión de app.js incrementada** de `v=1.6.0` → `v=1.7.0` para forzar recarga del caché en clientes que ya tengan la versión anterior almacenada.
+
 ## [2.2.2] — 2026-08-11 · Rate Limiting de Importación de Documentos para Invitados
 
 ### Añadido

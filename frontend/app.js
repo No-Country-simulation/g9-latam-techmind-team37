@@ -19,7 +19,9 @@ const CATEGORY_CONFIG = {
     'Mobile': { icon: 'smartphone', colorClass: 'text-amber-700 dark:text-amber-400 border-amber-500/40 bg-amber-500/10' },
     'Bases de Datos': { icon: 'storage', colorClass: 'text-orange-700 dark:text-orange-400 border-orange-500/40 bg-orange-500/10' },
     'Seguridad': { icon: 'shield', colorClass: 'text-rose-700 dark:text-rose-400 border-rose-500/40 bg-rose-500/10' },
-    'Cloud': { icon: 'cloud_queue', colorClass: 'text-sky-700 dark:text-sky-400 border-sky-500/40 bg-sky-500/10' }
+    // Sprint 5 QA Fix — Accesibilidad: text-sky-400 no superaba ratio WCAG 4.5:1 en modo oscuro.
+    // text-sky-300 tiene mayor contraste sobre el fondo dark (#0b1326).
+    'Cloud': { icon: 'cloud_queue', colorClass: 'text-sky-700 dark:text-sky-300 border-sky-500/40 bg-sky-500/10' }
 };
 
 // ── Internacionalización (i18n) ─────────────────────────────────────────────
@@ -27,6 +29,7 @@ const TRANSLATIONS = {
     es: {
         brand_subtitle: 'Organización inteligente', nav_classifier: 'Clasificador',
         nav_history: 'Historial', nav_analytics: 'Análisis',
+        expand_sidebar: 'Expandir sidebar', collapse_sidebar: 'Colapsar sidebar',
         theme_dark: 'Modo oscuro', theme_light: 'Modo claro',
         service_status: 'Estado de servicios', microservices: 'Microservicios',
         oci_server: 'Servidor OCI', ram_used: 'RAM Usada', free: 'Libre:',
@@ -37,9 +40,9 @@ const TRANSLATIONS = {
         header_analytics_title: 'Panel de análisis',
         header_analytics_subtitle: 'Visualizá métricas y estadísticas de las clasificaciones.',
         form_title: 'Ingresar contenido técnico', label_title: 'Título del documento o artículo',
-        placeholder_title: 'ej. orquestación avanzada de contenedores con Kubernetes',
-        label_body: 'Contenido técnico (texto crudo, markdown o resumen)',
-        placeholder_body: 'Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave...',
+        placeholder_title: 'ej. Tratamiento y gestión de bases de datos',
+        label_body: 'Contenido del documento o artículo',
+        placeholder_body: 'Pegá el texto aquí, o usá el botón «Importar PDF / DOCX» para extraerlo automáticamente. El modelo determinará la categoría y extraerá los conceptos clave...',
         btn_classify: 'Clasificar con TechMind', btn_clear: 'Limpiar formulario',
         results_title: 'Resultado del análisis', predicted_category: 'Categoría predicha',
         waiting: 'Esperando análisis...', confidence: 'Confianza del Modelo',
@@ -100,6 +103,7 @@ const TRANSLATIONS = {
     en: {
         brand_subtitle: 'Intelligent organization', nav_classifier: 'Classifier',
         nav_history: 'History', nav_analytics: 'Analytics',
+        expand_sidebar: 'Expand sidebar', collapse_sidebar: 'Collapse sidebar',
         theme_dark: 'Dark mode', theme_light: 'Light mode',
         service_status: 'Service status', microservices: 'Microservices',
         oci_server: 'OCI Server', ram_used: 'RAM Used', free: 'Free:',
@@ -110,9 +114,9 @@ const TRANSLATIONS = {
         header_analytics_title: 'Analytics dashboard',
         header_analytics_subtitle: 'View metrics and statistics from classifications.',
         form_title: 'Enter technical content', label_title: 'Document or article title',
-        placeholder_title: 'e.g. advanced container orchestration with Kubernetes',
-        label_body: 'Technical content (raw text, markdown or summary)',
-        placeholder_body: 'Paste the technical text or summary here so the model can determine the category and extract key concepts...',
+        placeholder_title: 'e.g. Database management & processing',
+        label_body: 'Document or article content',
+        placeholder_body: 'Paste the text here, or use the «Import PDF / DOCX» button to extract it automatically. The model will determine the category and extract key concepts...',
         btn_classify: 'Classify with TechMind', btn_clear: 'Clear form',
         results_title: 'Analysis result', predicted_category: 'Predicted category',
         waiting: 'Waiting for analysis...', confidence: 'Model Confidence',
@@ -178,6 +182,7 @@ function t(key) {
     return (lang && lang[key] !== undefined) ? lang[key] : (TRANSLATIONS.es[key] !== undefined ? TRANSLATIONS.es[key] : key);
 }
 let currentView = 'classifier';
+let sidebarCollapsed = false;
 
 let lastJsonResponse = null;
 let lastInput = null;
@@ -187,6 +192,77 @@ let healthStates = {
     fastapi: false,
     postgres: true
 };
+
+// Ejemplos amigables para el placeholder dinámico del campo de título
+const TITLE_EXAMPLES = {
+    es: [
+        'ej. Tratamiento y gestión de bases de datos',
+        'ej. Introducción a la programación en Python',
+        'ej. Primeros pasos con Git y GitHub',
+        'ej. Guía básica de ciberseguridad y contraseñas',
+        'ej. Desarrollo de páginas y aplicaciones web',
+        'ej. Qué es el Cloud Computing y cómo funciona',
+        'ej. Conceptos fundamentales de Inteligencia Artificial'
+    ],
+    en: [
+        'e.g. Database management & processing',
+        'e.g. Introduction to Python programming',
+        'e.g. Getting started with Git & GitHub',
+        'e.g. Basic cybersecurity & password guide',
+        'e.g. Web page and application development',
+        'e.g. What is Cloud Computing and how it works',
+        'e.g. Fundamentals of Artificial Intelligence'
+    ]
+};
+
+let titlePlaceholderTimer = null;
+let currentExampleIndex = 0;
+let currentCharIndex = 0;
+let isDeleting = false;
+
+function initDynamicTitlePlaceholder() {
+    const titleInput = document.getElementById('content-title');
+    if (!titleInput) return;
+
+    if (titlePlaceholderTimer) {
+        clearTimeout(titlePlaceholderTimer);
+        titlePlaceholderTimer = null;
+    }
+
+    const examples = TITLE_EXAMPLES[currentLang] || TITLE_EXAMPLES.es;
+    const currentText = examples[currentExampleIndex % examples.length];
+
+    // Si el usuario está escribiendo o el campo tiene foco, no alterar el placeholder
+    if (document.activeElement === titleInput || titleInput.value.trim().length > 0) {
+        titlePlaceholderTimer = setTimeout(initDynamicTitlePlaceholder, 1000);
+        return;
+    }
+
+    if (!isDeleting) {
+        currentCharIndex++;
+        titleInput.placeholder = currentText.substring(0, currentCharIndex);
+
+        if (currentCharIndex >= currentText.length) {
+            isDeleting = true;
+            titlePlaceholderTimer = setTimeout(initDynamicTitlePlaceholder, 3200);
+            return;
+        }
+        titlePlaceholderTimer = setTimeout(initDynamicTitlePlaceholder, 45);
+    } else {
+        currentCharIndex--;
+        titleInput.placeholder = currentText.substring(0, currentCharIndex);
+
+        const prefixLen = currentLang === 'es' ? 3 : 4; // 'ej.' vs 'e.g.'
+        if (currentCharIndex <= prefixLen) {
+            isDeleting = false;
+            currentExampleIndex = (currentExampleIndex + 1) % examples.length;
+            currentCharIndex = prefixLen;
+            titlePlaceholderTimer = setTimeout(initDynamicTitlePlaceholder, 400);
+            return;
+        }
+        titlePlaceholderTimer = setTimeout(initDynamicTitlePlaceholder, 25);
+    }
+}
 
 // Autenticación de Administrador
 let adminToken = sessionStorage.getItem('adminToken') || null;
@@ -207,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mobile: sidebar starts hidden, no icon init needed
     updateAdminUIState();
     applyTranslations();
+    initDynamicTitlePlaceholder();
     initHealthChecks();
     fetchSystemStats();
     setInterval(fetchSystemStats, 10000);
@@ -583,36 +660,10 @@ function bindEvents() {
     // La expansión del sidebar dura 0.3s; el popover se abre al terminar
     const SIDEBAR_ANIM_MS = 150;
 
-    // Iconos de los toggles según estado. En móviles y tablets, cerrar es una X;
-    // en escritorio se mantienen los chevrons.
-    const updateSidebarToggleIcons = (collapsed) => {
-        const touchLayout = isTabletOrMobileView();
-        const desktopIcon = document.getElementById('sidebar-toggle-icon');
-        const mobileIcon = document.getElementById('sidebar-mobile-icon');
-        const desktopBtn = document.getElementById('btn-sidebar-toggle');
-        const mobileBtn = document.getElementById('btn-sidebar-mobile');
-
-        if (desktopIcon) {
-            desktopIcon.textContent = collapsed
-                ? 'chevron_right'
-                : (touchLayout ? 'close' : 'chevron_left');
-        }
-        if (mobileIcon) {
-            mobileIcon.textContent = collapsed ? 'menu' : 'close';
-        }
-
-        const openTitle = 'Expandir sidebar';
-        const closeTitle = 'Cerrar sidebar';
-        if (desktopBtn) desktopBtn.setAttribute('title', collapsed ? openTitle : (touchLayout ? closeTitle : 'Colapsar sidebar'));
-        if (mobileBtn) mobileBtn.setAttribute('title', collapsed ? 'Abrir menú' : closeTitle);
-    };
-
     // La preferencia solo se guarda desde escritorio: en móvil siempre se arranca colapsado
     const persistCollapsed = (value) => {
         if (!isMobileView()) localStorage.setItem('sidebarCollapsed', value);
     };
-
-    let sidebarCollapsed = false;
 
     const collapseSidebar = () => {
         if (!sidebar) return;
@@ -645,11 +696,6 @@ function bindEvents() {
     const toggleSidebar = () => {
         if (sidebarCollapsed) {
             expandSidebar();
-            // En móviles y tablets, "Estado de servicios" se activa junto con el sidebar.
-            // El timeout deja pasar el cierre global por click y la animación de expansión.
-            if (isTabletOrMobileView()) {
-                setTimeout(() => setStatusPopoverOpen(true), SIDEBAR_ANIM_MS);
-            }
         } else {
             collapseSidebar();
         }
@@ -731,6 +777,22 @@ function bindEvents() {
         });
     }
 
+    // ── Input Title Dynamic Placeholder Focus Listeners ─────────────────────
+    const titleInput = document.getElementById('content-title');
+    if (titleInput) {
+        titleInput.addEventListener('focus', () => {
+            if (titlePlaceholderTimer) {
+                clearTimeout(titlePlaceholderTimer);
+                titlePlaceholderTimer = null;
+            }
+        });
+        titleInput.addEventListener('blur', () => {
+            if (!titleInput.value.trim()) {
+                initDynamicTitlePlaceholder();
+            }
+        });
+    }
+
     // ── Import PDF / DOCX ────────────────────────────────────────────────────
     const btnImportDoc = document.getElementById('btn-import-doc');
     const fileUploadInput = document.getElementById('file-upload-input');
@@ -756,13 +818,6 @@ function bindEvents() {
     if (statusTrigger && statusPopover) {
         statusTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Si el sidebar está colapsado, expandirlo primero
-            if (sidebarCollapsed) {
-                expandSidebar();
-                // Mostrar el popover tras la animación de expansión
-                setTimeout(() => setStatusPopoverOpen(true), SIDEBAR_ANIM_MS);
-                return;
-            }
             setStatusPopoverOpen(!isStatusPopoverOpen());
         });
 
@@ -792,15 +847,21 @@ function bindEvents() {
             if (headerSubtitle) headerSubtitle.textContent = subtitle;
         };
 
+        const setActiveNav = (activeEl) => {
+            [navClassifier, navHistory, navAnalytics].forEach(el => {
+                const isActive = el === activeEl;
+                el.classList.toggle('active-nav', isActive);
+                el.classList.toggle('text-on-surface-variant', !isActive);
+            });
+        };
+
         const showClassifier = () => {
             classifierView.classList.remove('hidden');
             historyView.classList.add('hidden');
             analyticsView.classList.add('hidden');
             analyticsView.classList.remove('flex');
 
-            navClassifier.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
-            navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
-            navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            setActiveNav(navClassifier);
 
             currentView = 'classifier';
             updateMainHeader(t('header_classifier_title'), t('header_classifier_subtitle'));
@@ -816,9 +877,7 @@ function bindEvents() {
             analyticsView.classList.add('hidden');
             analyticsView.classList.remove('flex');
 
-            navHistory.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
-            navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
-            navAnalytics.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            setActiveNav(navHistory);
 
             currentView = 'history';
             updateMainHeader(t('header_history_title'), t('header_history_subtitle'));
@@ -836,9 +895,7 @@ function bindEvents() {
             analyticsView.classList.remove('hidden');
             analyticsView.classList.add('flex');
 
-            navAnalytics.className = "sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer";
-            navClassifier.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
-            navHistory.className = "sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer";
+            setActiveNav(navAnalytics);
 
             currentView = 'analytics';
             updateMainHeader(t('header_analytics_title'), t('header_analytics_subtitle'));
@@ -851,9 +908,6 @@ function bindEvents() {
         };
 
         const handleNavClick = (viewFunc) => {
-            if (sidebarCollapsed && window.innerWidth >= 768) {
-                expandSidebar();
-            }
             viewFunc();
         };
 
@@ -963,7 +1017,6 @@ function bindEvents() {
     }
 
     if (closeAdminBtn) closeAdminBtn.addEventListener('click', hideAdminLoginModal);
-    if (cancelAdminBtn) cancelAdminBtn.addEventListener('click', hideAdminLoginModal);
 
     // Close admin login modal on backdrop click
     const adminLoginModal = document.getElementById('admin-login-modal');
@@ -974,6 +1027,19 @@ function bindEvents() {
             }
         });
     }
+
+    // Cerrar modales accesibles con la tecla Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (adminLoginModal && !adminLoginModal.classList.contains('hidden')) {
+                hideAdminLoginModal();
+            }
+            const jsonModal = document.getElementById('json-modal');
+            if (jsonModal && !jsonModal.classList.contains('hidden')) {
+                toggleJsonModal();
+            }
+        }
+    });
 
     // Close admin user popover on click outside
     document.addEventListener('click', (e) => {
@@ -1341,7 +1407,7 @@ async function loadHistory() {
                                 <span class="text-on-surface-variant font-label-sm text-[11px] shrink-0">${timeLabel}</span>
                             </div>
                             <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
-                            <p class="history-card-body text-on-surface-variant text-xs mt-1 line-clamp-2 opacity-80 leading-relaxed transition-all">${escapeHtml(textStr)}</p>
+                            <p class="history-card-body text-on-surface-variant text-xs mt-1 line-clamp-2 leading-relaxed transition-all">${escapeHtml(textStr)}</p>
                             ${expandBtnHtml}
                         </div>
                         <div class="mt-4 flex flex-wrap items-center justify-between opacity-90 pt-2.5 border-t border-black/5 dark:border-white/5 gap-2">
@@ -1508,7 +1574,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                     </span>
                                 </div>
                                 <h5 class="text-on-surface font-bold text-base sm:text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
-                                <p class="history-card-body text-on-surface-variant text-sm line-clamp-2 opacity-80 leading-relaxed transition-all mt-1">${escapeHtml(textStr || 'Sin descripción disponible')}</p>
+                                <p class="history-card-body text-on-surface-variant text-sm line-clamp-2 leading-relaxed transition-all mt-1">${escapeHtml(textStr || 'Sin descripción disponible')}</p>
                                 ${expandBtnHtml}
                             </div>
                             <div class="flex flex-wrap gap-1.5 pt-2">
@@ -1932,10 +1998,50 @@ async function loadAnalyticsDashboard() {
 
 // ── Internacionalización: helpers globales ────────────────────────────────────
 
+function updateSidebarToggleIcons(collapsed) {
+    const isTouch = window.innerWidth <= 1024 || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const desktopIcon = document.getElementById('sidebar-toggle-icon');
+    const mobileIcon = document.getElementById('sidebar-mobile-icon');
+    const desktopBtn = document.getElementById('btn-sidebar-toggle');
+    const mobileBtn = document.getElementById('btn-sidebar-mobile');
+    const toggleTooltip = document.getElementById('sidebar-toggle-tooltip');
+
+    if (desktopIcon) {
+        desktopIcon.textContent = collapsed
+            ? 'chevron_right'
+            : (isTouch ? 'close' : 'chevron_left');
+    }
+    if (mobileIcon) {
+        mobileIcon.textContent = collapsed ? 'menu' : 'close';
+    }
+
+    const openTitle = t('expand_sidebar');
+    const closeTitle = t('collapse_sidebar');
+    const activeTitle = collapsed ? openTitle : (isTouch ? 'Cerrar sidebar' : closeTitle);
+
+    if (desktopBtn) {
+        desktopBtn.setAttribute('title', activeTitle);
+        desktopBtn.setAttribute('aria-label', activeTitle);
+    }
+    if (mobileBtn) mobileBtn.setAttribute('title', collapsed ? 'Abrir menú' : 'Cerrar sidebar');
+    if (toggleTooltip) toggleTooltip.textContent = collapsed ? openTitle : closeTitle;
+}
+
 function updateThemeToggleUI() {
     const icon = document.getElementById('theme-toggle-icon');
+    const tooltip = document.getElementById('theme-toggle-tooltip');
+    const btn = document.getElementById('btn-theme-toggle');
     const isDark = document.documentElement.classList.contains('dark');
+    // Si está en modo oscuro (sol visible), el tooltip/botón indica "Modo claro"
+    // Si está en modo claro (luna visible), el tooltip/botón indica "Modo oscuro"
+    const label = isDark ? t('theme_light') : t('theme_dark');
+
     if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    if (tooltip) tooltip.textContent = label;
+    if (btn) {
+        btn.setAttribute('title', label);
+        btn.setAttribute('aria-label', label);
+    }
 }
 
 function applyTranslations() {
@@ -1955,7 +2061,14 @@ function applyTranslations() {
 
     // Elementos cuyo texto es gestionado dinámicamente
     updateThemeToggleUI();
+    updateSidebarToggleIcons(sidebarCollapsed);
     updateAdminUIState();
+
+    // Reiniciar placeholders dinámicos con el idioma activo
+    currentExampleIndex = 0;
+    currentCharIndex = 0;
+    isDeleting = false;
+    initDynamicTitlePlaceholder();
 
     // Actualizar el header según la vista activa
     const headerTitle = document.getElementById('main-header-title');

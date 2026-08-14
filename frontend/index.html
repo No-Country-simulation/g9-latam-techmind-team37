@@ -5,21 +5,28 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>TechMind - Clasificador Inteligente de Conocimiento Técnico</title>
+    <!-- SEO: Meta description para motores de búsqueda (Sprint 5 QA Fix) -->
+    <meta name="description" content="TechMind — Plataforma inteligente de clasificación y organización de contenido técnico. Detecta categorías como Backend, Frontend, Data Science, DevOps, Cloud y más con Machine Learning." />
 
-    <!-- Preconnect y Preload de Google Fonts con display=block para eliminar la transición de fuentes (font swap) -->
+    <!-- Google Fonts: optimizado para CLS — display=swap (texto visible inmediatamente con font de sistema),
+         weights reducidos solo a los usados, subset=latin para reducir ~800 KB de woff2 descargados.
+         Sprint 5 QA Fix: eliminado display=block que causaba CLS 1.516 en Desktop. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" as="style"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@400;600;700&amp;display=block" />
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400&amp;family=Outfit:wght@600;700&amp;subset=latin&amp;display=swap" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@400;600;700&amp;display=block"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400&amp;family=Outfit:wght@600;700&amp;subset=latin&amp;display=swap"
         rel="stylesheet" />
+    <!-- Material Symbols: display=swap para que los íconos no bloqueen render -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0&amp;display=swap"
         rel="stylesheet" />
 
-    <!-- Tailwind Configuration (Stitch Cyber AI Theme) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tailwind Configuration (Stitch Cyber AI Theme)
+         NOTA: Tailwind CDN debe estar en el <head> porque procesa el DOM completo al cargar.
+         No puede ir con `defer` ya que necesita leer las clases del HTML antes de pintarlas.
+         chart.js sí puede ir al final del <body> con defer (Sprint 5 QA Fix). -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -98,8 +105,29 @@
         }
     </script>
     <style>
+        /* Font fallbacks con size-adjust para minimizar FOUT (Flash of Unstyled Text) y CLS.
+           Hace que el font de sistema (Arial) tenga métricas similares a Inter/Outfit,
+           eliminando el salto visual cuando la fuente web termina de cargar.
+           Sprint 5 QA Fix: reduce CLS causado por cambio de fuente durante la carga. */
+        @font-face {
+            font-family: 'Inter-fallback';
+            src: local('Arial'), local('Helvetica Neue'), local('Helvetica');
+            ascent-override: 90%;
+            descent-override: 22%;
+            line-gap-override: 0%;
+            size-adjust: 107%;
+        }
+        @font-face {
+            font-family: 'Outfit-fallback';
+            src: local('Arial'), local('Helvetica Neue'), local('Helvetica');
+            ascent-override: 92%;
+            descent-override: 18%;
+            line-gap-override: 0%;
+            size-adjust: 105%;
+        }
+
         html, body {
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', 'Inter-fallback', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         :root {
@@ -257,13 +285,24 @@
         #sidebar.sidebar-collapsed .sidebar-header {
             justify-content: center;
             align-items: center;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            overflow: visible !important;
         }
-        /* En el rail colapsado el símbolo se centra sin caja */
-        #sidebar.sidebar-collapsed #btn-sidebar-toggle,
-        #sidebar.sidebar-collapsed #btn-sidebar-mobile {
+        /* En el rail colapsado el toggle de escritorio se centra perfectamente manteniendo su tamaño */
+        #sidebar.sidebar-collapsed #btn-sidebar-toggle {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 44px !important;
+            height: 44px !important;
             margin: auto !important;
-            position: static !important;
+            position: relative !important;
             transform: none !important;
+            top: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            left: auto !important;
         }
         #sidebar.sidebar-collapsed #btn-brand-home,
         #sidebar.sidebar-collapsed .sidebar-brand-text,
@@ -425,14 +464,19 @@
             border-radius: 0 !important;
             box-shadow: none !important;
             line-height: 1 !important;
-            transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-                        transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #btn-theme-toggle #theme-toggle-icon {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         /* El hover solo se activa con el puntero sobre el símbolo, y queda fijo
            al hacer click (mientras el símbolo conserve el foco) */
         #btn-theme-toggle:hover,
         #btn-theme-toggle.theme-symbol-active {
             color: #4c1d95 !important;
+        }
+        #btn-theme-toggle:hover #theme-toggle-icon,
+        #btn-theme-toggle.theme-symbol-active #theme-toggle-icon {
             transform: scale(1.15);
         }
         .dark #btn-theme-toggle:hover,
@@ -445,6 +489,7 @@
         }
 
         .sidebar-nav-item {
+            position: relative !important;
             display: flex;
             align-items: center;
             height: 44px;
@@ -453,6 +498,14 @@
             font-family: var(--font-label-sm, inherit);
             font-size: 0.875rem;
             cursor: pointer;
+        }
+
+        /* Micro-animación uniforme en los iconos de los botones al hacer hover */
+        .sidebar-nav-item .material-symbols-outlined {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-nav-item:hover .material-symbols-outlined {
+            transform: scale(1.15);
         }
 
         /* Fuerza a que 'Estado de servicios' quede en una sola línea horizontal y centrado */
@@ -531,6 +584,16 @@
                 width: calc(100vw - 16px) !important;
                 max-width: 280px !important;
             }
+            /* Status popover: flotante al lado del rail en móvil sin deformarse */
+            #status-popover {
+                position: fixed !important;
+                bottom: 16px !important;
+                left: calc(var(--sidebar-collapsed-width) + 10px) !important;
+                right: auto !important;
+                width: calc(100vw - var(--sidebar-collapsed-width) - 24px) !important;
+                max-width: 300px !important;
+                z-index: 60 !important;
+            }
             /* Solo se ve el toggle móvil; el chevron de escritorio queda oculto */
             #sidebar #btn-sidebar-toggle,
             #sidebar.sidebar-collapsed #btn-sidebar-toggle {
@@ -542,15 +605,97 @@
             }
         }
 
+        /* En escritorio el botón de móvil siempre debe estar oculto */
+        @media (min-width: 768px) {
+            #sidebar #btn-sidebar-mobile,
+            #sidebar.sidebar-collapsed #btn-sidebar-mobile {
+                display: none !important;
+            }
+        }
+
         /* Pantallas grandes (por encima del umbral de tablet): símbolo de abrir/cerrar
-           más grande. El offset derecho se recalcula con el nuevo tamaño para que el
-           símbolo conserve su posición. */
+           más grande (3rem) tanto expandido como colapsado, con offset solo en expandido */
         @media (min-width: 1025px) {
             #sidebar #btn-sidebar-toggle #sidebar-toggle-icon {
                 font-size: 3rem !important;
             }
-            #sidebar #btn-sidebar-toggle {
+            #sidebar:not(.sidebar-collapsed) #btn-sidebar-toggle {
                 right: calc((44px - 3rem) / 2);
+            }
+        }
+
+        /* Sprint 5 QA Fix: Performance — CLS prevention
+           Reserva espacio mínimo para el contenido principal ANTES de que cargue JS,
+           evitando que el navegador haga reflow masivo al montar el DOM dinámico.
+           contain:layout aisla el contexto de layout de #main-content del resto del árbol. */
+        #main-content {
+            min-height: 100vh;
+            contain: layout;
+        }
+
+        /* Sprint 5 QA Fix: Performance — Animaciones pulsantes composited en GPU
+           Usar will-change:opacity + transform:translateZ(0) evita que el browser
+           recalcule el layout al animar (solo compone en capa separada de GPU). */
+        .animate-pulse,
+        [class*="shimmer"],
+        .led-pulse {
+            will-change: opacity;
+            transform: translateZ(0);
+        }
+
+        /* ── Tooltips flotantes del Sidebar Colapsado ────────────────────────── */
+        .sidebar-collapsed-tooltip {
+            display: none;
+            position: absolute;
+            left: calc(100% + 14px);
+            top: 50%;
+            transform: translateY(-50%) translateX(-8px) scale(0.96);
+            white-space: nowrap;
+            pointer-events: none !important;
+            user-select: none;
+            opacity: 0;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            
+            /* Modo Claro por defecto: fondo blanco puro y texto púrpura profundo (máxima nitidez y contraste 14:1) */
+            background-color: #ffffff;
+            color: #2b0b4a;
+            border: 1px solid rgba(92, 62, 145, 0.3);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 0.75rem; /* 12px unificado */
+            font-weight: 700;
+            line-height: 1;
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(92, 62, 145, 0.2), 0 2px 6px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Modo Oscuro: fondo glassmorphism oscuro y texto blanco puro brillante */
+        .dark .sidebar-collapsed-tooltip {
+            background-color: #171f33;
+            color: #ffffff;
+            border: 1px solid rgba(208, 188, 255, 0.35);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Visible en hover para los botones del sidebar y el toggle superior */
+        #sidebar.sidebar-collapsed nav {
+            overflow: visible !important;
+        }
+        #btn-sidebar-toggle:hover .sidebar-collapsed-tooltip,
+        #sidebar.sidebar-collapsed .sidebar-nav-item:hover .sidebar-collapsed-tooltip,
+        #sidebar.sidebar-collapsed #btn-theme-toggle:hover .sidebar-collapsed-tooltip {
+            display: block;
+            opacity: 1;
+            transform: translateY(-50%) translateX(0) scale(1);
+        }
+
+        @media (max-width: 767px) {
+            .sidebar-collapsed-tooltip {
+                display: none !important;
             }
         }
     </style>
@@ -593,51 +738,61 @@
             </div>
             <button id="btn-sidebar-toggle" type="button"
                 class="absolute top-1/2 -translate-y-1/2 shrink-0 text-on-surface-variant flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none"
-                title="Colapsar sidebar">
+                title="Colapsar sidebar" aria-label="Colapsar sidebar">
                 <span class="material-symbols-outlined text-xl" id="sidebar-toggle-icon">chevron_left</span>
+                <span class="sidebar-collapsed-tooltip" id="sidebar-toggle-tooltip">Colapsar sidebar</span>
             </button>
             <!-- Toggle para móvil: mismas dimensiones y posición que el de escritorio, icono propio -->
             <button id="btn-sidebar-mobile" type="button"
                 class="md:hidden absolute top-1/2 -translate-y-1/2 shrink-0 text-on-surface-variant flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none"
-                title="Abrir menú">
+                title="Abrir menú" aria-label="Abrir menú">
                 <span class="material-symbols-outlined text-2xl" id="sidebar-mobile-icon">menu</span>
             </button>
         </div>
         <nav class="flex-1 space-y-1.5 overflow-y-auto">
             <a id="nav-classifier"
-                class="sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer">
+                class="sidebar-nav-item active-nav relative flex items-center gap-3 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">category</span>
                 <span class="sidebar-label font-label-sm text-sm font-bold" data-i18n="nav_classifier">Clasificador</span>
+                <span class="sidebar-collapsed-tooltip" data-i18n="nav_classifier">Clasificador</span>
             </a>
             <a id="nav-history"
-                class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
+                class="sidebar-nav-item relative flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">history</span>
                 <span class="sidebar-label font-label-sm text-sm font-semibold" data-i18n="nav_history">Historial</span>
+                <span class="sidebar-collapsed-tooltip" data-i18n="nav_history">Historial</span>
             </a>
             <a id="nav-analytics"
-                class="sidebar-nav-item flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
+                class="sidebar-nav-item relative flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">analytics</span>
                 <span class="sidebar-label font-label-sm text-sm font-semibold" data-i18n="nav_analytics">Análisis</span>
+                <span class="sidebar-collapsed-tooltip" data-i18n="nav_analytics">Análisis</span>
             </a>
         </nav>
         <!-- Sidebar Bottom Controls: Theme Toggle & Service Status -->
         <div class="relative mt-auto pt-4 border-t medium-border flex flex-col space-y-1" style="overflow:visible;">
             <!-- Theme Toggle: sin caja de botón, solo el símbolo (el hover vive en el icono) -->
             <button id="btn-theme-toggle" type="button"
-                class="p-0 text-on-surface-variant transition-all flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none mx-auto my-1 shrink-0"
-                title="Cambiar tema" aria-label="Cambiar tema">
+                class="relative p-0 text-on-surface-variant transition-all flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none mx-auto my-1 shrink-0"
+                title="Modo claro" aria-label="Modo claro">
                 <span class="material-symbols-outlined text-xl leading-none flex items-center justify-center" id="theme-toggle-icon">light_mode</span>
+                <span class="sidebar-collapsed-tooltip" id="theme-toggle-tooltip">Modo claro</span>
             </button>
 
             <!-- Status Trigger Button -->
+            <!-- aria-label: Sprint 5 QA Fix — Accesibilidad: botón sin nombre accesible para lectores de pantalla -->
             <button id="btn-status-trigger" type="button"
-                class="sidebar-nav-item w-full flex items-center justify-center gap-2 px-3 py-3 text-on-surface-variant cursor-pointer active:scale-95 focus:outline-none">
+                aria-label="Estado de servicios"
+                aria-haspopup="true"
+                aria-expanded="false"
+                class="sidebar-nav-item relative w-full flex items-center justify-center gap-2 px-3 py-3 text-on-surface-variant cursor-pointer active:scale-95 focus:outline-none">
                 <div class="flex items-center justify-center gap-2">
                     <div id="overall-status-led" class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></div>
                     <span class="sidebar-label sidebar-status-text font-label-sm text-xs sm:text-sm font-semibold whitespace-nowrap text-center" data-i18n="service_status">Estado de servicios</span>
                     <span id="status-chevron"
                         class="material-symbols-outlined text-lg transition-transform duration-300 shrink-0">expand_less</span>
                 </div>
+                <span class="sidebar-collapsed-tooltip" data-i18n="service_status">Estado de servicios</span>
             </button>
 
             <!-- Status Popover Dropdown -->
@@ -801,16 +956,16 @@
                                     for="content-title" data-i18n="label_title">Título del documento o artículo</label>
                                 <input id="content-title" type="text"
                                     class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all"
-                                    placeholder="ej. orquestación avanzada de contenedores con Kubernetes"
+                                    placeholder="ej. Tratamiento y gestión de bases de datos"
                                     data-i18n-placeholder="placeholder_title" />
                             </div>
 
                             <div class="space-y-2 flex-1 flex flex-col">
                                 <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
-                                    for="content-body" data-i18n="label_body">Contenido técnico (texto crudo, markdown o resumen)</label>
+                                    for="content-body" data-i18n="label_body">Contenido del documento o artículo</label>
                                 <textarea id="content-body"
                                     class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed"
-                                    placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."
+                                    placeholder="Pegá el texto aquí, o usá el botón «Importar PDF / DOCX» para extraerlo automáticamente. El modelo determinará la categoría y extraerá los conceptos clave..."
                                     data-i18n-placeholder="placeholder_body"></textarea>
                             </div>
 
@@ -824,8 +979,8 @@
 
                             <div class="flex flex-col items-start gap-2">
                                 <button id="btn-import-doc" type="button"
-                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-label-sm text-sm font-semibold border border-dashed border-outline-variant/70 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/40 transition-all duration-200 active:scale-95 cursor-pointer">
-                                    <span class="material-symbols-outlined text-base leading-none">upload_file</span>
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-label-sm text-sm font-semibold border border-dashed border-purple-900/30 dark:border-outline-variant/70 bg-purple-900/5 dark:bg-transparent text-purple-950 dark:text-on-surface-variant hover:text-purple-900 dark:hover:text-on-surface hover:bg-purple-900/15 dark:hover:bg-surface-variant/40 hover:border-purple-800/60 dark:hover:border-purple-800/40 shadow-sm dark:shadow-none transition-all duration-200 active:scale-95 cursor-pointer">
+                                    <span class="material-symbols-outlined text-base leading-none text-purple-700 dark:text-primary">upload_file</span>
                                     <span data-i18n="btn_import_doc">Importar PDF / DOCX</span>
                                 </button>
 
@@ -848,7 +1003,7 @@
                                     </div>
                                 </button>
                                 <button id="btn-clear-form" type="button"
-                                    class="w-full sm:w-auto min-w-[200px] px-8 sm:px-10 py-3.5 rounded-xl font-label-sm text-base font-bold border border-outline-variant/50 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/30 transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center text-center">
+                                    class="w-full sm:w-auto min-w-[200px] px-8 sm:px-10 py-3.5 rounded-xl font-label-sm text-base font-bold border border-purple-900/25 dark:border-outline-variant/50 bg-white/70 dark:bg-surface-variant/10 text-purple-950 dark:text-on-surface-variant hover:text-purple-900 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/50 dark:hover:border-purple-800/30 shadow-sm transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center text-center">
                                     <span data-i18n="btn_clear">Limpiar formulario</span>
                                 </button>
                             </div>
@@ -1122,10 +1277,9 @@
                     <label class="block font-label-sm text-xs text-on-surface-variant mb-1.5 font-semibold" data-i18n="admin_pass_label">Contraseña</label>
                     <input id="admin-password-input" type="password" placeholder="••••••••" autocomplete="current-password" class="w-full px-4 py-2.5 rounded-xl tech-input text-sm focus:outline-none font-body-md" required />
                 </div>
-                <div class="pt-2 flex items-center justify-end gap-3">
-                    <button id="btn-cancel-admin-modal" type="button" class="px-4 py-2 rounded-xl border border-white/10 text-on-surface-variant hover:text-on-surface text-xs font-label-sm font-semibold transition-all" data-i18n="admin_cancel">Cancelar</button>
-                    <button id="btn-submit-admin-login" type="submit" class="px-5 py-2 rounded-xl bg-primary-container hover:bg-primary-container/80 text-on-primary-container text-xs font-label-sm font-bold shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95">
-                        <span class="material-symbols-outlined text-sm">login</span>
+                <div class="pt-2">
+                    <button id="btn-submit-admin-login" type="submit" class="w-full py-3 rounded-xl bg-primary-container hover:bg-primary-container/80 text-on-primary-container text-sm font-label-sm font-bold shadow-lg shadow-primary-container/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]">
+                        <span class="material-symbols-outlined text-base">login</span>
                         <span data-i18n="admin_submit">Ingresar</span>
                     </button>
                 </div>
@@ -1133,8 +1287,13 @@
         </div>
     </div>
 
+    <!-- chart.js: cargado al final del body con defer para no bloquear el render inicial.
+         Sprint 5 QA Fix: eliminado bloqueo render-blocking (~550ms desktop / 3s mobile).
+         Versión pinneada @4.4.4 que resuelve el error 404 del source map en DevTools. -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+
     <!-- Script Principal -->
-    <script src="app.js?v=1.6.0"></script>
+    <script src="app.js?v=2.7.0"></script>
 
 </body>
 
