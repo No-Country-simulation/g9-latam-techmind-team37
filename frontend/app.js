@@ -29,7 +29,7 @@ const TRANSLATIONS = {
     es: {
         brand_subtitle: 'Organización inteligente', nav_classifier: 'Clasificador',
         nav_history: 'Historial', nav_analytics: 'Análisis',
-        expand_sidebar: 'Expandir sidebar', collapse_sidebar: 'Colapsar sidebar',
+        expand_sidebar: 'Abrir barra lateral', collapse_sidebar: 'Cerrar barra lateral',
         theme_dark: 'Modo oscuro', theme_light: 'Modo claro',
         service_status: 'Estado de servicios', microservices: 'Microservicios',
         oci_server: 'Servidor OCI', ram_used: 'RAM Usada', free: 'Libre:',
@@ -103,7 +103,7 @@ const TRANSLATIONS = {
     en: {
         brand_subtitle: 'Intelligent organization', nav_classifier: 'Classifier',
         nav_history: 'History', nav_analytics: 'Analytics',
-        expand_sidebar: 'Expand sidebar', collapse_sidebar: 'Collapse sidebar',
+        expand_sidebar: 'Open sidebar', collapse_sidebar: 'Close sidebar',
         theme_dark: 'Dark mode', theme_light: 'Light mode',
         service_status: 'Service status', microservices: 'Microservices',
         oci_server: 'OCI Server', ram_used: 'RAM Used', free: 'Free:',
@@ -941,20 +941,38 @@ function bindEvents() {
     if (themeToggle) {
         updateThemeToggleUI();
 
+        const themeIcon = document.getElementById('theme-toggle-icon');
+        if (themeIcon) {
+            themeIcon.addEventListener('animationend', () => {
+                themeIcon.classList.remove('theme-icon-spin');
+            });
+        }
+
         themeToggle.addEventListener('click', (e) => {
             e.preventDefault();
             triggerHaptic(15);
+
+            // Disparar micro-animación fluida de giro 360°
+            if (themeIcon) {
+                themeIcon.classList.remove('theme-icon-spin');
+                void themeIcon.offsetWidth; // Forzar reflow para reiniciar animación
+                themeIcon.classList.add('theme-icon-spin');
+            }
+
             document.documentElement.classList.toggle('dark');
             const nowDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('theme', nowDark ? 'dark' : 'light');
-            updateThemeToggleUI();
+            updateThemeToggleUI(true);
+
+            // Sincronizar suavemente la paleta de Chart.js sin parpadeos
+            updateChartsTheme();
 
             // El hover del símbolo queda activado tras el click
             themeToggle.classList.add('theme-symbol-active');
 
-            // Re-render analytics dashboard if charts exist to update slice borders and legend text colors
+            // Re-render analytics dashboard solo si las instancias aún no existían
             const analyticsViewEl = document.getElementById('analytics-view-section');
-            if (analyticsViewEl && !analyticsViewEl.classList.contains('hidden')) {
+            if (analyticsViewEl && !analyticsViewEl.classList.contains('hidden') && (!chartCategoriesInstance || !chartHourlyInstance)) {
                 loadAnalyticsDashboard();
             }
         });
@@ -1880,6 +1898,40 @@ let chartCategoriesInstance = null;
 let chartHourlyInstance = null;
 let chartKeywordsInstance = null;
 
+function updateChartsTheme() {
+    if (typeof Chart === 'undefined') return;
+    const isDark = document.documentElement.classList.contains('dark');
+    const textColor = isDark ? '#cbc3d7' : '#231f18';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+    const sliceBorderColor = isDark ? '#171f33' : '#e8e2d5';
+
+    if (chartCategoriesInstance && chartCategoriesInstance.ctx) {
+        if (chartCategoriesInstance.data?.datasets?.[0]) {
+            chartCategoriesInstance.data.datasets[0].borderColor = sliceBorderColor;
+        }
+        if (chartCategoriesInstance.options?.plugins?.legend?.labels) {
+            chartCategoriesInstance.options.plugins.legend.labels.color = textColor;
+        }
+        chartCategoriesInstance.update('none');
+    }
+
+    if (chartHourlyInstance && chartHourlyInstance.ctx) {
+        if (chartHourlyInstance.options?.scales?.x?.ticks) {
+            chartHourlyInstance.options.scales.x.ticks.color = textColor;
+        }
+        if (chartHourlyInstance.options?.scales?.y?.ticks) {
+            chartHourlyInstance.options.scales.y.ticks.color = textColor;
+        }
+        if (chartHourlyInstance.options?.scales?.x?.grid) {
+            chartHourlyInstance.options.scales.x.grid.color = gridColor;
+        }
+        if (chartHourlyInstance.options?.scales?.y?.grid) {
+            chartHourlyInstance.options.scales.y.grid.color = gridColor;
+        }
+        chartHourlyInstance.update('none');
+    }
+}
+
 async function loadAnalyticsDashboard() {
     try {
         const tzOffset = -new Date().getTimezoneOffset();
@@ -2034,17 +2086,23 @@ function updateSidebarToggleIcons(collapsed) {
 
     const openTitle = t('expand_sidebar');
     const closeTitle = t('collapse_sidebar');
-    const activeTitle = collapsed ? openTitle : (isTouch ? 'Cerrar sidebar' : closeTitle);
+    const activeTitle = collapsed ? openTitle : closeTitle;
 
     if (desktopBtn) {
         desktopBtn.setAttribute('title', activeTitle);
         desktopBtn.setAttribute('aria-label', activeTitle);
     }
-    if (mobileBtn) mobileBtn.setAttribute('title', collapsed ? 'Abrir menú' : 'Cerrar sidebar');
+    if (mobileBtn) {
+        const mobileTitle = collapsed
+            ? (currentLang === 'es' ? 'Abrir menú' : 'Open menu')
+            : closeTitle;
+        mobileBtn.setAttribute('title', mobileTitle);
+        mobileBtn.setAttribute('aria-label', mobileTitle);
+    }
     if (toggleTooltip) toggleTooltip.textContent = collapsed ? openTitle : closeTitle;
 }
 
-function updateThemeToggleUI() {
+function updateThemeToggleUI(isAnimating = false) {
     const icon = document.getElementById('theme-toggle-icon');
     const tooltip = document.getElementById('theme-toggle-tooltip');
     const btn = document.getElementById('btn-theme-toggle');
@@ -2054,7 +2112,17 @@ function updateThemeToggleUI() {
     // Si está en modo claro (luna visible), el tooltip/botón indica "Modo oscuro"
     const label = isDark ? t('theme_light') : t('theme_dark');
 
-    if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    if (icon) {
+        if (isAnimating) {
+            // A mitad del giro de 360° (a los 200ms cuando el icono se reduce al mínimo), conmutamos el glifo
+            setTimeout(() => {
+                const currentDark = document.documentElement.classList.contains('dark');
+                icon.textContent = currentDark ? 'light_mode' : 'dark_mode';
+            }, 200);
+        } else {
+            icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+        }
+    }
     if (tooltip) tooltip.textContent = label;
     if (btn) {
         btn.setAttribute('title', label);

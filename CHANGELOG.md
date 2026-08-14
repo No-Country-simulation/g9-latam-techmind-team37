@@ -12,7 +12,7 @@
   - Añadidos tooltips flotantes (`.sidebar-collapsed-tooltip`) a todos los botones del sidebar colapsado: Clasificador, Historial, Análisis, Tema, Estado de servicios y Toggle superior.
   - **Sincronización 100% en tiempo real:**
     - Botón de Tema: muestra dinámicamente `"Modo claro"` cuando el sol está visible (modo oscuro activo) y `"Modo oscuro"` cuando la luna está visible (modo claro activo).
-    - Botón de Sidebar: muestra `"Colapsar sidebar"` cuando la barra está abierta y `"Expandir sidebar"` cuando está cerrada.
+    - Botón de Sidebar: muestra `"Cerrar barra lateral"` cuando la barra está abierta y `"Abrir barra lateral"` cuando está cerrada.
   - **Contraste y Legibilidad WCAG AAA:**
     - En **Modo Claro**: fondo blanco puro sólido (`#ffffff`), borde morado fino (`rgba(92, 62, 145, 0.3)`), sombra púrpura suave y tipografía en púrpura profundo (`#2b0b4a`) con contraste superior a 14:1.
     - En **Modo Oscuro**: fondo dark glass (`#171f33`), borde cyber (`rgba(208, 188, 255, 0.35)`) y texto blanco puro (`#ffffff`).
@@ -28,6 +28,11 @@
   - Añadido meta tag `<meta name="theme-color" content="#0b1326" id="meta-theme-color" />` en el `<head>`.
   - Sincronización en tiempo real desde `updateThemeToggleUI()`: conmuta automáticamente entre `#0b1326` (Modo Oscuro) y `#e8e2d5` (Modo Claro) para colorear la barra de estado nativa superior en navegadores móviles como Safari (iOS) y Chrome (Android), logrando una integración visual inmersiva de borde a borde.
 
+- **Transición Visual Cinemática de Tema y Microanimaciones (`frontend/index.html` + `frontend/app.js`):**
+  - **Física de Transición Suave (`cubic-bezier(0.16, 1, 0.3, 1)`):** Eliminada la regla de transición universal destructiva `*` y reemplazada por transiciones selectivas aceleradas por hardware de 350ms sobre superficies, contenedores glass, barras laterales, inputs y modales, logrando un cambio de iluminación continuo y gradual sin *layout reflows* ni microparpadeos.
+  - **Microanimación 3D del Icono Sol ☀️ ⇄ Luna 🌙:** Giro rotacional suave de 360° con reducción de escala y destello luminoso (`@keyframes themeIconSpin` en 0.45s), conmutando el glifo a mitad de animación (`200ms`) en el punto de compresión mínima para una metamorfosis visual fluida.
+  - **Sincronización Dinámica de Gráficos (`frontend/app.js`):** Implementada la función `updateChartsTheme()` que actualiza dinámicamente colores de grilla, bordes y leyendas de los gráficos Chart.js activos en tiempo real sin recargar datos ni destruir instancias de Canvas.
+
 - **Respuesta Háptica Táctil en Dispositivos Móviles (`frontend/app.js`):**
   - Implementada la función helper `triggerHaptic(pattern)` utilizando la API nativa `navigator.vibrate()`.
   - Proporciona microvibraciones hápticas de confirmación física (entre 12ms y 22ms) en eventos clave de la interfaz:
@@ -42,6 +47,13 @@
   - Añadido soporte para cerrar el modal de inicio de sesión de Admin o el modal de JSON al presionar la tecla `Escape`.
 
 ### Modificado
+
+- **Estandarización de Terminología Bilingüe en Barra Lateral (`frontend/index.html` + `frontend/app.js`):**
+  - Actualizados los textos de la barra lateral para mayor claridad y coherencia en ambos idiomas:
+    - *Español:* `"Abrir barra lateral"` / `"Cerrar barra lateral"` (reemplazando los anglicismos anteriores).
+    - *Inglés:* `"Open sidebar"` / `"Close sidebar"`.
+  - Actualizados los atributos de accesibilidad (`aria-label`, `title`) y tooltips flotantes en tiempo real para desktop y mobile.
+  - Actualizada la versión del script en `frontend/index.html` (`app.js?v=2.4.0`) para invalidar la caché estática de los clientes.
 
 - **Botones Secundarios del Formulario Principal (`frontend/index.html`):**
   - **Botón "Importar PDF / DOCX" (`#btn-import-doc`):** Añadido recuadro punteado nítido (`border-dashed border-purple-900/30`), fondo translúcido (`bg-purple-900/5`), sombra sutil (`shadow-sm`) y texto en púrpura oscuro (`text-purple-950`) en Modo Claro para delimitar claramente el área de acción.

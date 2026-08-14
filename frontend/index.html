@@ -207,25 +207,76 @@
             --json-bg: var(--surface-container-lowest);
         }
 
-        /* Transición de iluminación (tema) perfectamente sincronizada en toda la página y el sidebar */
-        *, *::before, *::after {
-            transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity;
-            transition-duration: 0.3s;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        /* Transición de iluminación (tema) selectiva, ergonómica y cinematográfica (350ms) */
+        html,
+        body,
+        #sidebar,
+        #main-content,
+        header,
+        footer,
+        .glass-panel,
+        .tech-input,
+        .tech-select,
+        .sidebar-collapsed-tooltip,
+        #status-popover,
+        #admin-user-popover,
+        #json-modal > div,
+        #admin-login-modal > div,
+        .sidebar-nav-item,
+        button:not(#theme-toggle-icon),
+        input,
+        textarea,
+        select,
+        .subtle-border,
+        .medium-border {
+            transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        fill 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        stroke 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Preservar la animación de ancho y transform del sidebar en 0.3s */
+        /* Micro-animación de giro 360°, escala y destello para el icono Sol ☀️ / Luna 🌙 */
+        @keyframes themeIconSpin {
+            0% {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+                filter: drop-shadow(0 0 0px transparent);
+            }
+            45% {
+                transform: rotate(180deg) scale(0.2);
+                opacity: 0;
+                filter: drop-shadow(0 0 8px currentColor);
+            }
+            55% {
+                transform: rotate(180deg) scale(0.2);
+                opacity: 0;
+                filter: drop-shadow(0 0 8px currentColor);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+                opacity: 1;
+                filter: drop-shadow(0 0 0px transparent);
+            }
+        }
+
+        .theme-icon-spin {
+            animation: themeIconSpin 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        }
+
+        /* Preservar la animación de ancho y transform del sidebar con curva ergonómica */
         #sidebar {
             width: var(--sidebar-width);
             /* px-3 base (0.75rem) + corrimiento de los lados izquierdos */
             padding-left: calc(0.75rem + var(--sidebar-left-shift));
             padding-right: 0.75rem;
-            transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                        padding-left 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                        transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                        background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                        border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                        color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                        padding-left 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                        background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
         #sidebar.sidebar-collapsed {
             width: var(--sidebar-collapsed-width);
@@ -466,10 +517,13 @@
             border-radius: 0 !important;
             box-shadow: none !important;
             line-height: 1 !important;
-            transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
         #btn-theme-toggle #theme-toggle-icon {
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            transform-origin: center center;
+            will-change: transform, opacity, filter;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         /* El hover solo se activa con el puntero sobre el símbolo, y queda fijo
            al hacer click (mientras el símbolo conserve el foco) */
@@ -477,8 +531,8 @@
         #btn-theme-toggle.theme-symbol-active {
             color: #4c1d95 !important;
         }
-        #btn-theme-toggle:hover #theme-toggle-icon,
-        #btn-theme-toggle.theme-symbol-active #theme-toggle-icon {
+        #btn-theme-toggle:hover #theme-toggle-icon:not(.theme-icon-spin),
+        #btn-theme-toggle.theme-symbol-active #theme-toggle-icon:not(.theme-icon-spin) {
             transform: scale(1.15);
         }
         .dark #btn-theme-toggle:hover,
@@ -740,9 +794,9 @@
             </div>
             <button id="btn-sidebar-toggle" type="button"
                 class="absolute top-1/2 -translate-y-1/2 shrink-0 text-on-surface-variant flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none"
-                title="Colapsar sidebar" aria-label="Colapsar sidebar">
+                title="Cerrar barra lateral" aria-label="Cerrar barra lateral">
                 <span class="material-symbols-outlined text-xl" id="sidebar-toggle-icon">chevron_left</span>
-                <span class="sidebar-collapsed-tooltip" id="sidebar-toggle-tooltip">Colapsar sidebar</span>
+                <span class="sidebar-collapsed-tooltip" id="sidebar-toggle-tooltip">Cerrar barra lateral</span>
             </button>
             <!-- Toggle para móvil: mismas dimensiones y posición que el de escritorio, icono propio -->
             <button id="btn-sidebar-mobile" type="button"
@@ -1295,7 +1349,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
 
     <!-- Script Principal -->
-    <script src="app.js?v=2.10.0"></script>
+    <script src="app.js?v=2.4.0"></script>
 
 </body>
 
