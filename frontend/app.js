@@ -31,27 +31,27 @@ const TRANSLATIONS = {
         service_status: 'Estado de servicios', microservices: 'Microservicios',
         oci_server: 'Servidor OCI', ram_used: 'RAM Usada', free: 'Libre:',
         header_classifier_title: 'Clasificación de contenido técnico',
-        header_classifier_subtitle: 'Ingresá textos para clasificarlos en tiempo real',
+        header_classifier_subtitle: 'Ingresá textos para clasificarlos en tiempo real.',
         header_history_title: 'Historial de consultas',
-        header_history_subtitle: 'Revisá y filtrá todas las predicciones',
+        header_history_subtitle: 'Revisá y filtrá todas las predicciones.',
         header_analytics_title: 'Panel de análisis',
-        header_analytics_subtitle: 'Visualizá métricas y estadísticas de las clasificaciones',
+        header_analytics_subtitle: 'Visualizá métricas y estadísticas de las clasificaciones.',
         form_title: 'Ingresar contenido técnico', label_title: 'Título del documento o artículo',
         placeholder_title: 'ej. orquestación avanzada de contenedores con Kubernetes',
         label_body: 'Contenido técnico (texto crudo, markdown o resumen)',
-        placeholder_body: 'Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave',
-        btn_classify: 'Clasificar', btn_clear: 'Limpiar',
+        placeholder_body: 'Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave...',
+        btn_classify: 'Clasificar con TechMind', btn_clear: 'Limpiar formulario',
         results_title: 'Resultado del análisis', predicted_category: 'Categoría predicha',
-        waiting: 'Esperando análisis', confidence: 'Confianza del Modelo',
+        waiting: 'Esperando análisis...', confidence: 'Confianza del Modelo',
         keywords_title: 'Palabras clave extraídas',
-        keywords_placeholder: 'Las entidades detectadas aparecerán aquí',
+        keywords_placeholder: 'Las entidades detectadas aparecerán aquí...',
         btn_view_json: 'Ver JSON', recent_title: 'Contenidos clasificados recientemente',
-        loading_history_grid: 'Cargando publicaciones guardadas desde PostgreSQL',
-        loading_detailed: 'Cargando historial detallado',
-        no_data: 'No hay publicaciones guardadas en la base de datos aún',
-        no_results: 'No se encontraron registros para la categoría seleccionada',
+        loading_history_grid: 'Cargando publicaciones guardadas desde PostgreSQL...',
+        loading_detailed: 'Cargando historial detallado ...',
+        no_data: 'No hay publicaciones guardadas en la base de datos aún.',
+        no_results: 'No se encontraron registros para la categoría seleccionada.',
         confidence_label: 'Confianza:', delete_btn: 'Borrar', see_more: 'Ver más', see_less: 'Ver menos',
-        search_placeholder: 'Buscar por título o palabra clave',
+        search_placeholder: 'Buscar por título o palabra clave...',
         filter_label: 'Filtrar:', all_categories: 'Todas las categorías',
         total_classifications: 'Total Clasificaciones', top_category: 'Categoría Líder',
         avg_confidence: 'Confianza Promedio', dist_by_category: 'Distribución por categoría',
@@ -70,13 +70,13 @@ const TRANSLATIONS = {
         toast_error: 'Hubo un error, por favor intenta de nuevo más tarde',
         toast_admin_login_ok: '🛡️ Sesión de Administrador iniciada',
         toast_admin_logout: 'Sesión de Administrador cerrada',
-        toast_deleted: '🗑️ Consulta ID #{id} eliminada correctamente',
+        toast_deleted: '🗑️ Consulta ID #{id} eliminada correctamente.',
         toast_delete_error: 'Error al eliminar:',
-        toast_not_admin: 'Debe iniciar sesión como Administrador para eliminar registros',
+        toast_not_admin: 'Debe iniciar sesión como Administrador para eliminar registros.',
         toast_copied: '📋 JSON copiado al portapapeles con éxito',
         toast_copy_error: '⚠️ No se pudo copiar el contenido',
         toast_not_found: '⚠️ No se encontró la información de la consulta',
-        error_db: 'Error al conectar con la base de datos',
+        error_db: 'Error al conectar con la base de datos.',
         no_keywords: 'Sin palabras clave', no_description: 'Sin descripción disponible',
         no_terms: 'Sin términos clave destacados', date_not_available: 'Fecha no disponible',
         no_keywords_data: 'Sin datos de palabras clave',
@@ -84,17 +84,15 @@ const TRANSLATIONS = {
         no_session_json: '{\n  "mensaje": "Aún no se ha realizado ninguna clasificación en esta sesión."\n}',
         queries_label: 'Consultas',
         // ── Importa documento ─────────────────────────────────────────────────────────
-        btn_import_doc: 'Usar PDF / DOCX',
-        file_drop_title: 'Arrastra y suelta tu PDF / DOCX aquí',
-        file_drop_subtitle: 'o haz clic para explorar tus archivos locales',
-        extracting_text: 'Extrayendo texto',
-        file_too_large: 'El archivo supera el límite de 5 MB',
-        invalid_file_type: 'Solo se aceptan archivos .pdf o .docx',
-        text_extracted_badge: '📄 Texto extraído de «{name}» — {pages} página(s). Podés editarlo antes de clasificar',
-        text_extracted_badge_warning: '📄 «{name}» — {warning}. Podés editarlo antes de clasificar',
-        toast_extract_error: 'No se pudo extraer el texto del archivo',
+        btn_import_doc: 'Importar PDF / DOCX',
+        extracting_text: 'Extrayendo texto…',
+        file_too_large: 'El archivo supera el límite de 5 MB.',
+        invalid_file_type: 'Solo se aceptan archivos .pdf o .docx.',
+        text_extracted_badge: '📄 Texto extraído de «{name}» — {pages} página(s). Podés editarlo antes de clasificar.',
+        text_extracted_badge_warning: '📄 «{name}» — {warning}. Podés editarlo antes de clasificar.',
+        toast_extract_error: 'No se pudo extraer el texto del archivo.',
         // ── Rate limit importación de documentos ─────────────────────────────────
-        import_limit_reached: 'Límite alcanzado: ya importaste 5 documentos. Probá de nuevo en {time}. Iniciá sesión como Admin para no tener límites',
+        import_limit_reached: 'Límite alcanzado: ya importaste 5 documentos. Probá de nuevo en {time}. Iniciá sesión como Admin para no tener límites.',
         // ── Etiquetas de categorías del filtro ──────────────────────────────────────────
         cat_bases_de_datos: 'Bases de Datos',
         cat_seguridad: 'Seguridad',
@@ -106,27 +104,27 @@ const TRANSLATIONS = {
         service_status: 'Service status', microservices: 'Microservices',
         oci_server: 'OCI Server', ram_used: 'RAM Used', free: 'Free:',
         header_classifier_title: 'Technical content classification',
-        header_classifier_subtitle: 'Enter texts to classify them in real time',
+        header_classifier_subtitle: 'Enter texts to classify them in real time.',
         header_history_title: 'Query history',
-        header_history_subtitle: 'Review and filter all predictions',
+        header_history_subtitle: 'Review and filter all predictions.',
         header_analytics_title: 'Analytics dashboard',
-        header_analytics_subtitle: 'View metrics and statistics from classifications',
+        header_analytics_subtitle: 'View metrics and statistics from classifications.',
         form_title: 'Enter technical content', label_title: 'Document or article title',
         placeholder_title: 'e.g. advanced container orchestration with Kubernetes',
         label_body: 'Technical content (raw text, markdown or summary)',
-        placeholder_body: 'Paste the technical text or summary here so the model can determine the category and extract key concepts',
-        btn_classify: 'Classify', btn_clear: 'Clean',
+        placeholder_body: 'Paste the technical text or summary here so the model can determine the category and extract key concepts...',
+        btn_classify: 'Classify with TechMind', btn_clear: 'Clear form',
         results_title: 'Analysis result', predicted_category: 'Predicted category',
-        waiting: 'Waiting for analysis', confidence: 'Model Confidence',
+        waiting: 'Waiting for analysis...', confidence: 'Model Confidence',
         keywords_title: 'Extracted keywords',
-        keywords_placeholder: 'Detected entities will appear here',
+        keywords_placeholder: 'Detected entities will appear here...',
         btn_view_json: 'View JSON', recent_title: 'Recently classified content',
-        loading_history_grid: 'Loading saved publications from PostgreSQL',
-        loading_detailed: 'Loading detailed history',
-        no_data: 'No publications saved in the database yet',
-        no_results: 'No records found for the selected category',
+        loading_history_grid: 'Loading saved publications from PostgreSQL...',
+        loading_detailed: 'Loading detailed history...',
+        no_data: 'No publications saved in the database yet.',
+        no_results: 'No records found for the selected category.',
         confidence_label: 'Confidence:', delete_btn: 'Delete', see_more: 'See more', see_less: 'See less',
-        search_placeholder: 'Search by title or keyword',
+        search_placeholder: 'Search by title or keyword...',
         filter_label: 'Filter:', all_categories: 'All categories',
         total_classifications: 'Total Classifications', top_category: 'Top Category',
         avg_confidence: 'Avg. Confidence', dist_by_category: 'Distribution by category',
@@ -145,13 +143,13 @@ const TRANSLATIONS = {
         toast_error: 'An error occurred, please try again later',
         toast_admin_login_ok: '🛡️ Administrator session started',
         toast_admin_logout: 'Administrator session closed',
-        toast_deleted: '🗑️ Query ID #{id} deleted successfully',
+        toast_deleted: '🗑️ Query ID #{id} deleted successfully.',
         toast_delete_error: 'Error deleting:',
-        toast_not_admin: 'You must log in as Administrator to delete records',
+        toast_not_admin: 'You must log in as Administrator to delete records.',
         toast_copied: '📋 JSON copied to clipboard',
         toast_copy_error: '⚠️ Could not copy content',
         toast_not_found: '⚠️ Query information not found',
-        error_db: 'Error connecting to database',
+        error_db: 'Error connecting to database.',
         no_keywords: 'No keywords', no_description: 'No description available',
         no_terms: 'No key terms detected', date_not_available: 'Date not available',
         no_keywords_data: 'No keyword data',
@@ -159,17 +157,15 @@ const TRANSLATIONS = {
         no_session_json: '{\n  "message": "No classification has been performed in this session yet."\n}',
         queries_label: 'Queries',
         // ── Document import ───────────────────────────────────────────────────────────
-        btn_import_doc: 'Use PDF / DOCX',
-        file_drop_title: 'Drag and drop your PDF / DOCX here',
-        file_drop_subtitle: 'or click to browse your local files',
-        extracting_text: 'Extracting text',
-        file_too_large: 'The file exceeds the 5 MB limit',
-        invalid_file_type: 'Only .pdf or .docx files are accepted',
-        text_extracted_badge: '📄 Text extracted from «{name}» — {pages} page(s). You can edit it before classifying',
-        text_extracted_badge_warning: '📄 «{name}» — {warning}. You can edit it before classifying',
-        toast_extract_error: 'Could not extract text from the file',
+        btn_import_doc: 'Import PDF / DOCX',
+        extracting_text: 'Extracting text…',
+        file_too_large: 'The file exceeds the 5 MB limit.',
+        invalid_file_type: 'Only .pdf or .docx files are accepted.',
+        text_extracted_badge: '📄 Text extracted from «{name}» — {pages} page(s). You can edit it before classifying.',
+        text_extracted_badge_warning: '📄 «{name}» — {warning}. You can edit it before classifying.',
+        toast_extract_error: 'Could not extract text from the file.',
         // ── Document import rate limit ────────────────────────────────────────
-        import_limit_reached: 'Limit reached: you have imported 5 documents. Try again in {time}. Log in as Admin for unlimited imports',
+        import_limit_reached: 'Limit reached: you have imported 5 documents. Try again in {time}. Log in as Admin for unlimited imports.',
         // ── Category filter labels ────────────────────────────────────────────────────
         cat_bases_de_datos: 'Databases',
         cat_seguridad: 'Security',
@@ -200,55 +196,14 @@ function isLoggedInAsAdmin() {
     return adminToken !== null;
 }
 
-// ── Preferencias antes del primer pintado ────────────────────────────────────
-// Este archivo se carga desde el <head>, así que todo lo de aquí corre antes de que
-// exista el body. El markup se sirve en español y en modo oscuro: ambas preferencias
-// se corrigen ahora, no en DOMContentLoaded, que llega después del primer pintado.
-
-// El markup ya trae class="dark": solo el tema claro necesita corrección
-if (localStorage.getItem('theme') === 'light') {
-    document.documentElement.classList.remove('dark');
-}
-
-/** Traduce un elemento con data-i18n / data-i18n-placeholder, si tiene alguno. */
-function translateElement(el) {
-    const key = el.dataset.i18n;
-    if (key) {
-        const value = t(key);
-        // Solo se escribe cuando cambia: evita re-disparar al observer en bucle
-        if (el.textContent !== value) el.textContent = value;
-    }
-    const placeholderKey = el.dataset.i18nPlaceholder;
-    if (placeholderKey) {
-        const value = t(placeholderKey);
-        if (el.placeholder !== value) el.placeholder = value;
-    }
-}
-
-// Traducción durante el parseo: cada elemento se traduce en cuanto el parser lo
-// inserta, en el mismo ciclo y siempre antes del pintado que lo incluiría, así que la
-// página se dibuja progresivamente con el texto ya en su idioma. Corre en todos los
-// idiomas, español incluido: el markup es solo el punto de partida y TRANSLATIONS
-// manda, de modo que cualquier diferencia entre ambos se resuelve sin destello.
-document.documentElement.lang = currentLang;
-const parseTimeTranslator = new MutationObserver(records => {
-    for (const record of records) {
-        for (const node of record.addedNodes) {
-            if (node.nodeType !== Node.ELEMENT_NODE) {
-                // Texto que el parser añade a un elemento ya visto: se retraduce
-                if (record.target.nodeType === Node.ELEMENT_NODE) translateElement(record.target);
-                continue;
-            }
-            translateElement(node);
-            node.querySelectorAll('[data-i18n], [data-i18n-placeholder]').forEach(translateElement);
-        }
-    }
-});
-parseTimeTranslator.observe(document.documentElement, { childList: true, subtree: true });
-// Terminado el parseo, applyTranslations() y t() se encargan del resto
-document.addEventListener('DOMContentLoaded', () => parseTimeTranslator.disconnect());
-
 document.addEventListener('DOMContentLoaded', () => {
+    // Load theme setting
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+    } else {
+        document.documentElement.classList.add('dark');
+    }
     // Mobile: sidebar starts hidden, no icon init needed
     updateAdminUIState();
     applyTranslations();
@@ -435,62 +390,6 @@ function hideFileExtractBadge() {
     }
 }
 
-/** Alterna entre el botón compacto y la zona de carga sin cambiar su contenedor. */
-function setFileDropZoneOpen(isOpen) {
-    const importBtn = document.getElementById('btn-import-doc');
-    const manualContent = document.getElementById('manual-entry-content');
-    const dropZone = document.getElementById('file-drop-zone');
-    if (!importBtn || !manualContent || !dropZone) return;
-
-    // Se vuelve invisible, pero conserva su espacio natural para que el botón
-    // inferior nunca suba ni se superponga con la zona de carga.
-    manualContent.classList.toggle('invisible', isOpen);
-    manualContent.classList.toggle('pointer-events-none', isOpen);
-    manualContent.setAttribute('aria-hidden', String(isOpen));
-    dropZone.classList.toggle('hidden', !isOpen);
-    dropZone.classList.toggle('flex', isOpen);
-    importBtn.setAttribute('aria-expanded', String(isOpen));
-    if (isOpen) dropZone.focus({ preventScroll: true });
-}
-
-/**
- * Oculta o restaura el botón "Usar PDF / DOCX". Se controla aparte de la zona de
- * carga: una vez usado, el botón solo vuelve al limpiar el formulario.
- * @param {boolean} isHidden
- */
-function setImportButtonHidden(isHidden) {
-    const importBtn = document.getElementById('btn-import-doc');
-    if (!importBtn) return;
-    // Invisible en lugar de oculto: reserva su hueco para que las distancias
-    // verticales del formulario no cambien.
-    importBtn.classList.toggle('invisible', isHidden);
-    importBtn.classList.toggle('pointer-events-none', isHidden);
-    importBtn.setAttribute('aria-hidden', String(isHidden));
-    importBtn.tabIndex = isHidden ? -1 : 0;
-}
-
-/** Mantiene las dimensiones de la zona mientras se extrae el texto del archivo. */
-function setFileDropZoneLoading(isLoading) {
-    const importBtn = document.getElementById('btn-import-doc');
-    const dropZone = document.getElementById('file-drop-zone');
-    const idleContent = document.getElementById('file-drop-zone-idle');
-    const loadingContent = document.getElementById('file-drop-zone-loading');
-
-    if (importBtn) importBtn.disabled = isLoading;
-    if (dropZone) {
-        dropZone.disabled = isLoading;
-        dropZone.setAttribute('aria-busy', String(isLoading));
-    }
-    if (idleContent) {
-        idleContent.classList.toggle('hidden', isLoading);
-        idleContent.classList.toggle('flex', !isLoading);
-    }
-    if (loadingContent) {
-        loadingContent.classList.toggle('hidden', !isLoading);
-        loadingContent.classList.toggle('flex', isLoading);
-    }
-}
-
 /**
  * Muestra el badge de extracción exitosa con la información del archivo.
  * @param {string} filename - Nombre original del archivo.
@@ -539,6 +438,7 @@ async function handleFileUpload(file) {
     const ALLOWED_EXTENSIONS = ['pdf', 'docx'];
     const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 
+    const btnImport = document.getElementById('btn-import-doc');
     const titleInput = document.getElementById('content-title');
     const bodyInput = document.getElementById('content-body');
 
@@ -567,7 +467,14 @@ async function handleFileUpload(file) {
 
     // ── 2. Estado de carga ────────────────────────────────────────────────────
     hideFileExtractBadge();
-    setFileDropZoneLoading(true);
+    const originalBtnContent = btnImport ? btnImport.innerHTML : '';
+    if (btnImport) {
+        btnImport.disabled = true;
+        btnImport.innerHTML = `
+            <span class="material-symbols-outlined text-base leading-none animate-spin">progress_activity</span>
+            <span>${t('extracting_text')}</span>
+        `;
+    }
 
     // ── 3. Llamada a FastAPI /extraer-texto ───────────────────────────────────
     try {
@@ -603,8 +510,6 @@ async function handleFileUpload(file) {
         }
 
         // ── 5. Mostrar badge de confirmación ──────────────────────────────────
-        // Mostrar los campos ya poblados al terminar la extracción.
-        setFileDropZoneOpen(false);
         showFileExtractBadge(file.name, data.paginas_procesadas, data.advertencia || '');
 
         // Registrar la importación en el rate limiter (solo para invitados)
@@ -617,7 +522,11 @@ async function handleFileUpload(file) {
         console.error('[TechMind] Error al extraer texto del archivo:', err);
         showToast(t('toast_extract_error'), 'error');
     } finally {
-        setFileDropZoneLoading(false);
+        // Restaurar el botón de importar
+        if (btnImport) {
+            btnImport.disabled = false;
+            btnImport.innerHTML = originalBtnContent;
+        }
     }
 }
 
@@ -698,6 +607,11 @@ function bindEvents() {
         if (mobileBtn) mobileBtn.setAttribute('title', collapsed ? 'Abrir menú' : closeTitle);
     };
 
+    // La preferencia solo se guarda desde escritorio: en móvil siempre se arranca colapsado
+    const persistCollapsed = (value) => {
+        if (!isMobileView()) localStorage.setItem('sidebarCollapsed', value);
+    };
+
     let sidebarCollapsed = false;
 
     const collapseSidebar = () => {
@@ -710,6 +624,7 @@ function bindEvents() {
         if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
         // Al colapsar, el panel de estado se cierra con el sidebar
         setStatusPopoverOpen(false);
+        persistCollapsed('true');
     };
 
     const expandSidebar = () => {
@@ -724,13 +639,17 @@ function bindEvents() {
         }
         updateSidebarToggleIcons(false);
         if (sidebarOverlay) sidebarOverlay.classList.toggle('hidden', !isMobileView());
+        persistCollapsed('false');
     };
 
     const toggleSidebar = () => {
         if (sidebarCollapsed) {
-            // El sidebar se abre sin activar "Estado de servicios": el popover solo
-            // responde a su propio botón, también en móviles y tablets
             expandSidebar();
+            // En móviles y tablets, "Estado de servicios" se activa junto con el sidebar.
+            // El timeout deja pasar el cierre global por click y la animación de expansión.
+            if (isTabletOrMobileView()) {
+                setTimeout(() => setStatusPopoverOpen(true), SIDEBAR_ANIM_MS);
+            }
         } else {
             collapseSidebar();
         }
@@ -755,12 +674,14 @@ function bindEvents() {
         sidebarOverlay.addEventListener('click', closeSidebar);
     }
 
-    // Estado inicial del sidebar: en cada carga arranca expandido en pantallas
-    // grandes, sin recordar si se dejó colapsado en una visita anterior
+    // Restore saved sidebar state
+    const savedCollapsed = localStorage.getItem('sidebarCollapsed');
     sidebar.classList.remove('-translate-x-full');
     sidebar.classList.add('translate-x-0', 'md:translate-x-0');
     if (isMobileView()) {
         // Móvil: rail visible siempre, colapsado por defecto
+        collapseSidebar();
+    } else if (savedCollapsed === 'true') {
         collapseSidebar();
     } else {
         expandSidebar();
@@ -804,10 +725,6 @@ function bindEvents() {
             if (titleInput) titleInput.focus();
             // Ocultar badge de archivo importado al limpiar el formulario
             hideFileExtractBadge();
-            setFileDropZoneLoading(false);
-            setFileDropZoneOpen(false);
-            // "Limpiar" es el único punto donde el botón de importar reaparece
-            setImportButtonHidden(false);
             // Resetear el file input para permitir subir el mismo archivo de nuevo
             const fileInput = document.getElementById('file-upload-input');
             if (fileInput) fileInput.value = '';
@@ -817,55 +734,16 @@ function bindEvents() {
     // ── Import PDF / DOCX ────────────────────────────────────────────────────
     const btnImportDoc = document.getElementById('btn-import-doc');
     const fileUploadInput = document.getElementById('file-upload-input');
-    const fileDropZone = document.getElementById('file-drop-zone');
 
-    if (btnImportDoc && fileUploadInput && fileDropZone) {
-        // Primer clic: muestra la zona de carga sin alterar el alto del formulario
-        // y retira el botón, que ya no vuelve hasta pulsar "Limpiar".
-        btnImportDoc.addEventListener('click', () => {
-            setFileDropZoneOpen(true);
-            setImportButtonHidden(true);
-        });
-
-        // Segundo clic, ahora dentro de la zona: abre el selector nativo.
-        fileDropZone.addEventListener('click', () => fileUploadInput.click());
+    // Clic en el botón → dispara el selector de archivos nativo
+    if (btnImportDoc && fileUploadInput) {
+        btnImportDoc.addEventListener('click', () => fileUploadInput.click());
 
         fileUploadInput.addEventListener('change', async (e) => {
             const file = e.target.files && e.target.files[0];
             if (!file) return;
             await handleFileUpload(file);
             // Resetear el input para permitir seleccionar el mismo archivo otra vez
-            fileUploadInput.value = '';
-        });
-
-        const setDragActive = (isActive) => {
-            fileDropZone.style.borderColor = isActive ? 'var(--glass-hover-border)' : '';
-            fileDropZone.style.backgroundColor = isActive ? 'rgba(139, 92, 246, 0.12)' : '';
-        };
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            fileDropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!fileDropZone.disabled) setDragActive(true);
-            });
-        });
-
-        fileDropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!e.relatedTarget || !fileDropZone.contains(e.relatedTarget)) setDragActive(false);
-        });
-
-        fileDropZone.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setDragActive(false);
-            if (fileDropZone.disabled) return;
-
-            const file = e.dataTransfer?.files?.[0];
-            if (!file) return;
-            await handleFileUpload(file);
             fileUploadInput.value = '';
         });
     }
@@ -995,22 +873,10 @@ function bindEvents() {
     if (themeToggle) {
         updateThemeToggleUI();
 
-        // 0.3s de transición de iluminación (ver .theme-switching en index.html) + margen
-        // para que ningún elemento salte antes de terminar
-        const THEME_SYNC_MS = 360;
-        let themeSyncTimer = null;
-
         themeToggle.addEventListener('click', (e) => {
             e.preventDefault();
-            // La clase iguala la transición de todos los elementos durante el cambio, para
-            // que el sidebar y el resto de la página se iluminen a la par
-            const root = document.documentElement;
-            root.classList.add('theme-switching');
-            clearTimeout(themeSyncTimer);
-            themeSyncTimer = setTimeout(() => root.classList.remove('theme-switching'), THEME_SYNC_MS);
-
-            root.classList.toggle('dark');
-            const nowDark = root.classList.contains('dark');
+            document.documentElement.classList.toggle('dark');
+            const nowDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('theme', nowDark ? 'dark' : 'light');
             updateThemeToggleUI();
 
@@ -1208,7 +1074,7 @@ async function handleAdminLogin(username, password) {
         loadDetailedHistory();
     } catch (err) {
         if (errorEl && errorTextEl) {
-            errorTextEl.textContent = err.message || 'Error de autenticación';
+            errorTextEl.textContent = err.message || 'Error de autenticación.';
             errorEl.classList.remove('hidden');
         }
     }
@@ -1415,7 +1281,7 @@ function renderResult(data) {
             `;
         }).join('');
     } else {
-        keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm">${t('no_terms')}</span>`;
+        keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm italic">${t('no_terms')}</span>`;
     }
 
     // Efecto visual
@@ -1646,7 +1512,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                 ${expandBtnHtml}
                             </div>
                             <div class="flex flex-wrap gap-1.5 pt-2">
-                                ${keywordsPills || `<span class="text-xs text-on-surface-variant opacity-60">${t('no_keywords')}</span>`}
+                                ${keywordsPills || `<span class="text-xs text-on-surface-variant italic opacity-60">${t('no_keywords')}</span>`}
                             </div>
                         </div>
                         <div class="flex flex-row md:flex-col items-center justify-between md:justify-center gap-3 border-t md:border-t-0 md:border-l border-black/10 dark:border-white/10 pt-3 md:pt-0 md:pl-6 md:min-w-[150px] shrink-0 md:self-stretch">
@@ -1880,7 +1746,7 @@ function setLoadingState(isLoading) {
         btn.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container opacity-80"></div>
             <div class="relative flex items-center justify-center text-center w-full">
-                <span>Analizando</span>
+                <span>Analizando...</span>
             </div>
         `;
     } else {
@@ -2076,7 +1942,12 @@ function applyTranslations() {
     document.documentElement.lang = currentLang;
 
     // Actualizar todos los elementos estáticos con data-i18n / data-i18n-placeholder
-    document.querySelectorAll('[data-i18n], [data-i18n-placeholder]').forEach(translateElement);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
 
     // Indicador del botón de idioma (muestra el idioma al que se puede cambiar)
     const langText = document.getElementById('lang-toggle-text');
@@ -2110,7 +1981,7 @@ function applyTranslations() {
         }
         const keywordsList = document.getElementById('keywords-list');
         if (keywordsList) {
-            keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm sm:text-base opacity-60">${t('keywords_placeholder')}</span>`;
+            keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm sm:text-base italic opacity-60">${t('keywords_placeholder')}</span>`;
         }
     }
 

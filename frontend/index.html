@@ -177,31 +177,14 @@
             --json-bg: var(--surface-container-lowest);
         }
 
-        /* Transición de iluminación (tema) por defecto en toda la página */
+        /* Transición de iluminación (tema) perfectamente sincronizada en toda la página y el sidebar */
         *, *::before, *::after {
             transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity;
             transition-duration: 0.3s;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Mientras dura el cambio de tema, TODOS los elementos animan la iluminación con
-           la misma duración y curva. El !important neutraliza las transiciones propias
-           que si no irían a su ritmo y romperían la sincronía: #sidebar (0.15s),
-           .sidebar-nav-item (0.2s) y las utilidades transition-all de Tailwind del
-           markup (0.2s, 0.5s…). La clase la pone y la quita el toggle en app.js. */
-        html.theme-switching,
-        html.theme-switching *,
-        html.theme-switching *::before,
-        html.theme-switching *::after {
-            transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity !important;
-            transition-duration: 0.3s !important;
-            transition-delay: 0s !important;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-
-        /* El ancho, el padding y el transform del sidebar animan en 0.15s (colapsar y
-           expandir); los colores mantienen los 0.3s globales para no desincronizarse
-           del resto de la página al cambiar de tema */
+        /* Preservar la animación de ancho y transform del sidebar en 0.3s */
         #sidebar {
             width: var(--sidebar-width);
             /* px-3 base (0.75rem) + corrimiento de los lados izquierdos */
@@ -210,9 +193,9 @@
             transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1),
                         padding-left 0.15s cubic-bezier(0.4, 0, 0.2, 1),
                         transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-                        background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #sidebar.sidebar-collapsed {
             width: var(--sidebar-collapsed-width);
@@ -309,20 +292,27 @@
             height: 44px !important;
             margin-left: auto !important;
             margin-right: auto !important;
+            margin-top: 0.25rem !important;
             padding: 0 !important;
+        }
+        /* El símbolo de iluminación no tiene caja de botón: ocupa solo el icono,
+           tanto en el sidebar expandido como en el rail colapsado */
+        #sidebar.sidebar-collapsed #btn-theme-toggle {
+            margin-left: auto !important;
+            margin-right: auto !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        #sidebar.sidebar-collapsed div.relative.mt-auto {
+            flex-direction: column !important;
         }
         #sidebar.sidebar-collapsed #overall-status-led {
             margin: 0 auto;
         }
-        /* La altura del bloque inferior no cambia al expandir o colapsar. Así, el
-           separador conserva exactamente la misma coordenada vertical y el símbolo
-           de iluminación permanece centrado debajo de la línea durante la animación. */
-        .sidebar-bottom-controls {
-            flex: 0 0 auto;
-            width: 100%;
-            padding-top: 1rem;
-            gap: 0.5rem;
-        }
+        /* El `space-y-1` del contenedor anula el `mb-3` del popover (mayor
+           especificidad), y sin ese margen el panel de estado queda pegado a la línea
+           divisoria que está sobre el símbolo de iluminación: la línea se ve cruzando
+           sus esquinas redondeadas. Se restituye la separación. */
         #status-popover {
             margin-bottom: 0.75rem !important;
         }
@@ -427,11 +417,8 @@
         /* ── Símbolo de iluminación: sin caja de botón ────────────────────────── */
         #btn-theme-toggle {
             display: inline-flex !important;
-            width: 20px !important;
-            height: 20px !important;
-            min-width: 20px !important;
-            min-height: 20px !important;
-            margin: 0 auto !important;
+            width: auto !important;
+            height: auto !important;
             padding: 0 !important;
             background: none !important;
             border: 0 !important;
@@ -567,13 +554,6 @@
             }
         }
     </style>
-
-    <!-- Script Principal — se carga aquí (bloqueante, antes de que exista el body) y no al
-         final, para que el tema guardado se aplique y los textos [data-i18n] se traduzcan
-         a medida que el parser inserta cada elemento. Así la página en inglés se refresca
-         igual que la española: mismo pintado progresivo, sin textos intermedios en español
-         ni contenido oculto. Ver el bloque "Preferencias antes del primer pintado" en app.js. -->
-    <script src="app.js?v=1.7.0"></script>
 </head>
 
 <body
@@ -623,7 +603,7 @@
                 <span class="material-symbols-outlined text-2xl" id="sidebar-mobile-icon">menu</span>
             </button>
         </div>
-        <nav class="flex-1 space-y-1.5 overflow-y-auto overflow-x-hidden">
+        <nav class="flex-1 space-y-1.5 overflow-y-auto">
             <a id="nav-classifier"
                 class="sidebar-nav-item active-nav flex items-center gap-3 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">category</span>
@@ -641,10 +621,10 @@
             </a>
         </nav>
         <!-- Sidebar Bottom Controls: Theme Toggle & Service Status -->
-        <div class="sidebar-bottom-controls relative mt-auto border-t medium-border flex flex-col" style="overflow:visible;">
+        <div class="relative mt-auto pt-4 border-t medium-border flex flex-col space-y-1" style="overflow:visible;">
             <!-- Theme Toggle: sin caja de botón, solo el símbolo (el hover vive en el icono) -->
             <button id="btn-theme-toggle" type="button"
-                class="p-0 text-on-surface-variant transition-all flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none shrink-0"
+                class="p-0 text-on-surface-variant transition-all flex items-center justify-center cursor-pointer active:scale-90 focus:outline-none mx-auto my-1 shrink-0"
                 title="Cambiar tema" aria-label="Cambiar tema">
                 <span class="material-symbols-outlined text-xl leading-none flex items-center justify-center" id="theme-toggle-icon">light_mode</span>
             </button>
@@ -750,7 +730,7 @@
                         class="font-headline-md text-base sm:text-2xl md:text-3xl text-on-surface font-bold tracking-tight leading-snug">
                         Clasificación de contenido técnico</h2>
                     <p id="main-header-subtitle" class="font-body-md text-[11px] sm:text-sm md:text-base text-on-surface-variant mt-0.5 sm:mt-1 line-clamp-1 sm:line-clamp-none opacity-85">Ingresá textos
-                        para clasificarlos en tiempo real</p>
+                        para clasificarlos en tiempo real.</p>
                 </div>
             </div>
             <div class="relative flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -811,46 +791,27 @@
                             class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                         </div>
 
+                        <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface mb-6 font-bold" data-i18n="form_title">
+                            Ingresar contenido técnico
+                        </h3>
+
                         <form class="flex flex-col gap-6 flex-1" onsubmit="return false;">
-                            <!-- El formulario manual y la zona de carga ocupan exactamente la misma caja. -->
-                            <div id="content-entry-area" class="relative flex-1">
-                                <div id="manual-entry-content" class="flex flex-col gap-6 h-full">
-                                    <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold" data-i18n="form_title">
-                                        Ingresar contenido técnico
-                                    </h3>
+                            <div class="space-y-2">
+                                <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
+                                    for="content-title" data-i18n="label_title">Título del documento o artículo</label>
+                                <input id="content-title" type="text"
+                                    class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all"
+                                    placeholder="ej. orquestación avanzada de contenedores con Kubernetes"
+                                    data-i18n-placeholder="placeholder_title" />
+                            </div>
 
-                                    <div class="space-y-2">
-                                        <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
-                                            for="content-title" data-i18n="label_title">Título del documento o artículo</label>
-                                        <input id="content-title" type="text"
-                                            class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all"
-                                            placeholder="ej. orquestación avanzada de contenedores con Kubernetes"
-                                            data-i18n-placeholder="placeholder_title" />
-                                    </div>
-
-                                    <div class="space-y-2 flex-1 flex flex-col">
-                                        <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
-                                            for="content-body" data-i18n="label_body">Contenido técnico (texto crudo, markdown o resumen)</label>
-                                        <textarea id="content-body"
-                                            class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed"
-                                            placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave"
-                                            data-i18n-placeholder="placeholder_body"></textarea>
-                                    </div>
-                                </div>
-
-                                <button id="file-drop-zone" type="button"
-                                    class="hidden absolute inset-0 w-full h-full px-4 rounded-xl border border-dashed border-outline-variant/70 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/40 transition-all duration-200 cursor-pointer focus:outline-none focus:border-purple-800/50"
-                                    aria-label="Seleccionar o soltar un archivo PDF o DOCX">
-                                    <span id="file-drop-zone-idle" class="flex flex-col items-center justify-center w-full h-full text-center">
-                                        <span class="material-symbols-outlined text-[64px] leading-none mb-4 opacity-80">upload</span>
-                                        <span class="font-label-sm text-xs sm:text-sm leading-tight" data-i18n="file_drop_title">Arrastra y suelta tu PDF / DOCX aquí</span>
-                                        <span class="font-body-md text-[10px] sm:text-xs leading-tight mt-2 opacity-70" data-i18n="file_drop_subtitle">o haz clic para explorar tus archivos locales</span>
-                                    </span>
-                                    <span id="file-drop-zone-loading" class="hidden flex-col items-center justify-center w-full h-full text-center">
-                                        <span class="material-symbols-outlined text-4xl leading-none animate-spin mb-3">progress_activity</span>
-                                        <span class="font-label-sm text-sm" data-i18n="extracting_text">Extrayendo texto</span>
-                                    </span>
-                                </button>
+                            <div class="space-y-2 flex-1 flex flex-col">
+                                <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
+                                    for="content-body" data-i18n="label_body">Contenido técnico (texto crudo, markdown o resumen)</label>
+                                <textarea id="content-body"
+                                    class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed"
+                                    placeholder="Pegue aquí el texto o resumen técnico para que el modelo determine la categoría y extraiga los conceptos clave..."
+                                    data-i18n-placeholder="placeholder_body"></textarea>
                             </div>
 
                             <!-- ── Importar PDF / DOCX ─────────────────────── -->
@@ -863,8 +824,9 @@
 
                             <div class="flex flex-col items-start gap-2">
                                 <button id="btn-import-doc" type="button"
-                                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-label-sm text-sm font-semibold border border-dashed border-outline-variant/70 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/40 transition-all duration-200 active:scale-95 cursor-pointer">
-                                    <span data-i18n="btn_import_doc">Usar PDF / DOCX</span>
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-label-sm text-sm font-semibold border border-dashed border-outline-variant/70 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/40 transition-all duration-200 active:scale-95 cursor-pointer">
+                                    <span class="material-symbols-outlined text-base leading-none">upload_file</span>
+                                    <span data-i18n="btn_import_doc">Importar PDF / DOCX</span>
                                 </button>
 
                                 <!-- Badge visible solo tras una extracción exitosa -->
@@ -875,19 +837,19 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 mt-4">
+                            <div class="flex flex-col sm:flex-row justify-center items-center gap-3 mt-4">
                                 <button id="btn-classify" type="button"
-                                    class="group relative w-full h-14 min-w-0 px-1 sm:px-4 xl:px-1 py-3.5 rounded-xl font-label-sm text-[clamp(10px,2.8vw,14px)] font-bold text-white whitespace-nowrap overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer flex items-center justify-center text-center">
+                                    class="group relative w-full sm:w-auto min-w-[200px] px-8 sm:px-10 py-3.5 rounded-xl font-label-sm text-base font-bold text-white overflow-hidden transition-all duration-300 active:scale-95 shadow-xl shadow-primary-container/30 cursor-pointer flex items-center justify-center text-center">
                                     <div
                                         class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300">
                                     </div>
                                     <div class="relative flex items-center justify-center text-center w-full">
-                                        <span data-i18n="btn_classify">Clasificar</span>
+                                        <span data-i18n="btn_classify">Clasificar con TechMind</span>
                                     </div>
                                 </button>
                                 <button id="btn-clear-form" type="button"
-                                    class="w-full h-14 min-w-0 px-1 sm:px-4 xl:px-1 py-3.5 rounded-xl font-label-sm text-[clamp(10px,2.8vw,14px)] font-bold border border-outline-variant/50 text-on-surface-variant whitespace-nowrap overflow-hidden hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/30 transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center text-center">
-                                    <span data-i18n="btn_clear">Limpiar</span>
+                                    class="w-full sm:w-auto min-w-[200px] px-8 sm:px-10 py-3.5 rounded-xl font-label-sm text-base font-bold border border-outline-variant/50 text-on-surface-variant hover:text-purple-950 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/30 transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center text-center">
+                                    <span data-i18n="btn_clear">Limpiar formulario</span>
                                 </button>
                             </div>
                         </form>
@@ -913,7 +875,7 @@
                             <div id="category-badge-container">
                                 <div
                                     class="inline-flex max-w-full items-center gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-base sm:text-lg font-bold bg-primary/10 border-primary/30 text-primary-fixed">
-                                    <span data-i18n="waiting">Esperando análisis</span>
+                                    <span data-i18n="waiting">Esperando análisis...</span>
                                 </div>
                             </div>
                         </div>
@@ -940,7 +902,7 @@
                                 class="font-label-sm text-xs sm:text-sm text-on-surface-variant mb-3 font-semibold uppercase tracking-wider" data-i18n="keywords_title">
                                 Palabras clave extraídas</p>
                             <div id="keywords-list" class="flex flex-wrap gap-2">
-                                <span class="text-on-surface-variant text-sm sm:text-base opacity-60" data-i18n="keywords_placeholder">Las entidades detectadas aparecerán aquí</span>
+                                <span class="text-on-surface-variant text-sm sm:text-base italic opacity-60" data-i18n="keywords_placeholder">Las entidades detectadas aparecerán aquí...</span>
                             </div>
                         </div>
 
@@ -969,7 +931,7 @@
                 <div id="history-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     <div class="col-span-full py-8 text-center glass-panel rounded-xl">
                         <span class="material-symbols-outlined text-4xl text-outline mb-2 animate-spin">refresh</span>
-                        <p class="text-on-surface-variant text-sm font-label-sm" data-i18n="loading_history_grid">Cargando publicaciones guardadas desde PostgreSQL</p>
+                        <p class="text-on-surface-variant text-sm font-label-sm" data-i18n="loading_history_grid">Cargando publicaciones guardadas desde PostgreSQL...</p>
                     </div>
                 </div>
             </section>
@@ -983,7 +945,7 @@
                 <div class="relative flex-1 min-w-0">
                     <span
                         class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
-                    <input id="search-history" type="text" placeholder="Buscar por título o palabra clave"
+                    <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..."
                         data-i18n-placeholder="search_placeholder"
                         class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all">
                 </div>
@@ -1148,7 +1110,7 @@
             
             <div id="admin-login-error" class="hidden mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-label-sm flex items-center gap-2">
                 <span class="material-symbols-outlined text-sm shrink-0" style="color: var(--led-error-text)">error</span>
-                <span id="admin-login-error-text" style="color: var(--led-error-text)">Usuario o contraseña incorrectos</span>
+                <span id="admin-login-error-text" style="color: var(--led-error-text)">Usuario o contraseña incorrectos.</span>
             </div>
 
             <form id="form-admin-login" class="space-y-4" onsubmit="return false;">
@@ -1170,6 +1132,9 @@
             </form>
         </div>
     </div>
+
+    <!-- Script Principal -->
+    <script src="app.js?v=1.6.0"></script>
 
 </body>
 
