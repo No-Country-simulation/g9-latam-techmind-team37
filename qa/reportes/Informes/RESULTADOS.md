@@ -2,7 +2,7 @@
 
 **Proyecto:** TechMind - Organización Inteligente del Conocimiento Técnico  
 **Responsable QA:** Federico G. Gutierrez  
-**Fecha de Ejecución:** 04 de Agosto de 2026  
+**Fecha de Ejecución:** 13 de Agosto de 2026  
 
 ## Índice
 
@@ -18,6 +18,7 @@
   - [Sprint 2 (Data QA - PostgreSQL)](#sprint-2-data-qa---postgresql)
   - [Sprint 3 (Backend Spring Boot & ML)](#sprint-3-backend-spring-boot--ml)
   - [Sprint 4 (Frontend)](#sprint-4-frontend)
+  - [Sprint 5 (Performance & Web Vitals — Lighthouse)](#sprint-5-performance--web-vitals--lighthouse)
 
 ## Resumen Ejecutivo
 Durante los Sprints 1, 2, 3 y 4, se ejecutaron de manera exhaustiva las suites de pruebas funcionales, de integridad, seguridad y resiliencia sobre el stack completo, abarcando las APIs backend (`FastAPI` y `Spring Boot`), la base de datos PostgreSQL (`techmind`), la integración con el microservicio de Machine Learning y la interfaz de usuario (Frontend en `Vanilla JS/Tailwind`).
@@ -26,6 +27,7 @@ Durante los Sprints 1, 2, 3 y 4, se ejecutaron de manera exhaustiva las suites d
 - **Sprint 2 (Data QA - PostgreSQL):** Se auditó la integridad y persistencia de la base de datos techmind, evaluando las tablas contenidos y predicciones. Se logró cobertura total en integridad referencial, consistencia de esquemas, unicidad de claves primarias, límites superiores e inferiores y resiliencia ante inyecciones de datos.
 - **Sprint 3 (Backend Spring Boot & ML):** Se validó la capa de API backend en Spring Boot conectada a PostgreSQL y al microservicio de ML, evaluando el flujo punta a punta desde las solicitudes HTTP POST (http://localhost:8080) y la invocación del modelo, hasta la respuesta JSON y la persistencia en contenidos.
 - **Sprint 4 (Frontend de TechMind):** Superó exitosamente las pruebas de calidad, demostrando un alto nivel de estabilidad, seguridad y usabilidad. Se validó la protección contra ataques XSS en el manejo del DOM, la reactividad asíncrona para actualizar contenidos sin recargar la página, la prevención de peticiones duplicadas mediante la deshabilitación del botón de envío, y la correcta persistencia visual y accesible de los temas Dark y Light.
+- **Sprint 5 (Performance & Web Vitals — Lighthouse):** Se completó la auditoría de calidad no funcional (Desktop y Mobile) midiendo velocidad de carga, estabilidad visual, accesibilidad y seguridad. Se identificaron áreas críticas de mejora en la red (ausencia de HTTPS), inestabilidad visual en escritorio por fuentes externas (CLS = 1.516) y latencias de renderizado en redes móviles 4G (FCP = 9.9s).
 
 En todas las etapas se alcanzó un 100% de cobertura y éxito en los casos planificados, garantizando la estabilidad del sistema ante grandes volúmenes de texto, la sanitización de caracteres y el cumplimiento estricto de esquemas.
 
@@ -33,7 +35,7 @@ En todas las etapas se alcanzó un 100% de cobertura y éxito en los casos plani
 
 | Planificados | Ejecutados | Pasó | Falló | Éxito |
 |:---:|:---:|:---:|:---:|:---:|
-| 57 | 57 | 57 | 0 | 100% |
+| 61 | 61 | 61 | 0 | 100% |
 
 ## Desglose por Tipo de Prueba
 
@@ -93,6 +95,17 @@ El módulo Spring Boot API demostró una alta madurez técnica e integración fu
 | UX / Control de Performance (Debounce) | 1 | 1 | 0 | 100 |
 | Navegación & UI/UX (Light/Dark Mode) | 3 | 3 | 0 | 100 |
 | **TOTAL** | **9** | **9** | **0** | **100** |
+
+### Auditoría Lighthouse
+
+| Categoría | Target Auditado | Score Obtenido | Diagnóstico QA | Estado |
+|---|:---:|:---:|:---:|:---:|
+| **Performance Desktop** | Core Web Vitals (FCP, LCP, CLS) | **51 / 100** | CLS elevado (`1.516`) por fuentes externas | ⚠️ En Optimización |
+| **Performance Mobile** | Moto G Power (Slow 4G) | **56 / 100** | FCP/LCP de ~10s por scripts bloqueantes | ⚠️ En Optimización |
+| **Accessibility Audit** | WCAG 2.1 AA | **87 / 100** | Faltan ARIA labels y ajustar contrastes | 🟡 Aceptable |
+| **Best Practices & Security** | Trust & Security Headers | **74 / 100** | Inexistencia de cifrado HTTPS | ⚠️ Requiere TLS |
+| **SEO Audit** | Crawling & Metadata | **90 / 100** | Falta etiqueta `meta description` | 🟢 Bueno |
+| **TOTAL** | **Entorno Producción Web** | **4 Auditorías** | **4 Reportes Generados** | **Completado** |
 
 ```
 La interfaz de usuario de TechMind demostró una sólida madurez técnica y usabilidad durante el Sprint 4. La aplicación mitiga con éxito vulnerabilidades de XSS al sanitizar las entradas en el DOM, gestiona de forma reactiva y sin recargas la actualización del feed de contenidos, y previene condiciones de carrera deshabilitando el botón de envío tras la primera interacción. Asimismo, el sistema conserva una excelente coherencia visual y accesibilidad en sus modos claro y oscuro, garantizando la estabilidad e integridad de todos sus componentes de diseño.
@@ -210,5 +223,19 @@ La interfaz de usuario de TechMind demostró una sólida madurez técnica y usab
 - **CP-FRONTEND-08:** Confirma la correcta navegación y redirección de los ítems de la barra lateral (Historial BD, Swagger FastAPI, Clasificador IA) en interfaz con Modo Oscuro.
 - **CP-FRONTEND-09:** Confirma la correcta navegación y redirección de los ítems de la barra lateral (Historial BD, Swagger FastAPI, Clasificador IA) en interfaz con Modo Claro.
 
+### Sprint 5 (Performance & Web Vitals — Lighthouse)
+
+**Core Web Vitals & Rendimiento Desktop — [1 caso]**
+- **CP-LIGHTHOUSE-01:** Evalúa FCP (2.2s), LCP (2.3s) y CLS en escritorio. Identifica un Cumulative Layout Shift crítico de `1.516` causado por la descarga asíncrona de tipografías externas (`.woff2`). Score: **51/100**.
+
+**Performance Mobile & Redes Móviles 4G — [1 caso]**
+- **CP-LIGHTHOUSE-02:** Evalúa la experiencia de usuario en *Moto G Power* con red *Slow 4G*. Detecta FCP/LCP elevados (~9.9s y 10.9s) debido a recursos de renderizado bloqueantes (`app.js`, `tailwindcss.com`, `chart.js`). Se registra un CLS perfecto de `0`. Score: **56/100**.
+
+**Accesibilidad Web & WCAG 2.1 AA — [1 caso]**
+- **CP-LIGHTHOUSE-03:** Evalúa semántica, contraste y soporte para lectores de pantalla. Identifica falta de etiqueta accesible en `button#btn-status-trigger` y bajo contraste en badges informativos. Score: **87/100**.
+
+**Seguridad de Red & SEO — [1 caso]**
+- **CP-LIGHTHOUSE-04:** Evalúa cabeceras HTTP, transporte de red e indexabilidad. Registra riesgo alto por ausencia de HTTPS/TLS y cabeceras CSP/HSTS (Best Practices: **74/100**). En SEO se obtiene **90/100** con la única observación de incluir la etiqueta `<meta name="description">`.
+
 ---
-_QA Testing Guide — TechMind Project v4.0 — Sprint 4_
+_QA Testing Guide — TechMind Project v4.0 — Sprint 5_
