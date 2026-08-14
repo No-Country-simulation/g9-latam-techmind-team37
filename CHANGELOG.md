@@ -24,6 +24,20 @@
     - *Inglés:* `e.g. Database management & processing`, `e.g. Introduction to Python programming`, `e.g. Getting started with Git & GitHub`, etc.
   - **Comportamiento inteligente:** Efecto máquina de escribir suave (45ms por caracter, 3.2s de pausa de lectura). Se pausa automáticamente si el usuario hace foco o escribe en el campo, y se reanuda suavemente si el campo queda vacío al salir.
 
+- **Sincronización Dinámica de `theme-color` en Navegadores Móviles (`frontend/index.html` + `frontend/app.js`):**
+  - Añadido meta tag `<meta name="theme-color" content="#0b1326" id="meta-theme-color" />` en el `<head>`.
+  - Sincronización en tiempo real desde `updateThemeToggleUI()`: conmuta automáticamente entre `#0b1326` (Modo Oscuro) y `#e8e2d5` (Modo Claro) para colorear la barra de estado nativa superior en navegadores móviles como Safari (iOS) y Chrome (Android), logrando una integración visual inmersiva de borde a borde.
+
+- **Respuesta Háptica Táctil en Dispositivos Móviles (`frontend/app.js`):**
+  - Implementada la función helper `triggerHaptic(pattern)` utilizando la API nativa `navigator.vibrate()`.
+  - Proporciona microvibraciones hápticas de confirmación física (entre 12ms y 22ms) en eventos clave de la interfaz:
+    - *Clasificación exitosa:* doble pulso suave de confirmación `[18, 40, 22]`.
+    - *Alternar Modo Claro / Modo Oscuro:* vibración instantánea `15ms`.
+    - *Limpiar formulario:* pulso de vaciado `15ms`.
+    - *Alternar idioma:* pulso táctil `12ms`.
+    - *Extracción exitosa de documento PDF/DOCX:* pulso doble `[15, 30, 15]`.
+  - Sensación táctil inmersiva en dispositivos Android e iOS compatibles sin degradar navegadores de escritorio.
+
 - **Accesibilidad y Atajos de Teclado (`frontend/app.js`):**
   - Añadido soporte para cerrar el modal de inicio de sesión de Admin o el modal de JSON al presionar la tecla `Escape`.
 

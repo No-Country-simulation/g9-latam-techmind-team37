@@ -184,6 +184,18 @@ function t(key) {
 let currentView = 'classifier';
 let sidebarCollapsed = false;
 
+/**
+ * Emite una vibración háptica suave si el dispositivo móvil lo soporta.
+ * @param {number|number[]} pattern - Duración en ms o patrón de pulsos
+ */
+function triggerHaptic(pattern = 15) {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        try {
+            navigator.vibrate(pattern);
+        } catch (_) { /* Ignorar silenciosamente */ }
+    }
+}
+
 let lastJsonResponse = null;
 let lastInput = null;
 let allHistoryData = [];
@@ -588,6 +600,7 @@ async function handleFileUpload(file) {
 
         // ── 5. Mostrar badge de confirmación ──────────────────────────────────
         showFileExtractBadge(file.name, data.paginas_procesadas, data.advertencia || '');
+        triggerHaptic([15, 30, 15]);
 
         // Registrar la importación en el rate limiter (solo para invitados)
         if (!isLoggedInAsAdmin()) DocImportRateLimit.record();
@@ -764,6 +777,7 @@ function bindEvents() {
     const btnClearForm = document.getElementById('btn-clear-form');
     if (btnClearForm) {
         btnClearForm.addEventListener('click', () => {
+            triggerHaptic(15);
             const titleInput = document.getElementById('content-title');
             const bodyInput = document.getElementById('content-body');
             if (titleInput) titleInput.value = '';
@@ -929,6 +943,7 @@ function bindEvents() {
 
         themeToggle.addEventListener('click', (e) => {
             e.preventDefault();
+            triggerHaptic(15);
             document.documentElement.classList.toggle('dark');
             const nowDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('theme', nowDark ? 'dark' : 'light');
@@ -954,6 +969,7 @@ function bindEvents() {
     const langToggle = document.getElementById('btn-lang-toggle');
     if (langToggle) {
         langToggle.addEventListener('click', () => {
+            triggerHaptic(12);
             currentLang = currentLang === 'es' ? 'en' : 'es';
             localStorage.setItem('lang', currentLang);
             applyTranslations();
@@ -1288,6 +1304,7 @@ async function handleClassification() {
 
         // Renderizar resultado
         renderResult(data);
+        triggerHaptic([18, 40, 22]);
 
         // Limpiar los campos de entrada para nuevas búsquedas
         document.getElementById('content-title').value = '';
@@ -2031,6 +2048,7 @@ function updateThemeToggleUI() {
     const icon = document.getElementById('theme-toggle-icon');
     const tooltip = document.getElementById('theme-toggle-tooltip');
     const btn = document.getElementById('btn-theme-toggle');
+    const metaThemeColor = document.getElementById('meta-theme-color');
     const isDark = document.documentElement.classList.contains('dark');
     // Si está en modo oscuro (sol visible), el tooltip/botón indica "Modo claro"
     // Si está en modo claro (luna visible), el tooltip/botón indica "Modo oscuro"
@@ -2041,6 +2059,9 @@ function updateThemeToggleUI() {
     if (btn) {
         btn.setAttribute('title', label);
         btn.setAttribute('aria-label', label);
+    }
+    if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', isDark ? '#0b1326' : '#e8e2d5');
     }
 }
 
