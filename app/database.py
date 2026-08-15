@@ -69,7 +69,7 @@ def get_predicciones(limit: int = 50):
                 "id": r[0],
                 "titulo": r[1],
                 "categoria": r[2],
-                "probabilidad": round(float(r[3]), 2),
+                "probabilidad": round(float(r[3]), 4),
                 "keywords": r[4].split(",") if r[4] else [],
                 "created_at": r[5].isoformat() + "Z" if r[5] else "",
                 "texto": r[6] if r[6] else ""

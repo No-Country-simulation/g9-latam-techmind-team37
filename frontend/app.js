@@ -34,7 +34,7 @@ const TRANSLATIONS = {
         service_status: 'Estado de servicios', microservices: 'Microservicios',
         oci_server: 'Servidor OCI', ram_used: 'RAM Usada', free: 'Libre:',
         header_classifier_title: 'Clasificación de contenido técnico',
-        header_classifier_subtitle: 'Ingresá textos para clasificarlos en tiempo real.',
+        header_classifier_subtitle: 'Ingresá textos para categorizarlos en tiempo real.',
         header_history_title: 'Historial de consultas',
         header_history_subtitle: 'Revisá y filtrá todas las predicciones.',
         header_analytics_title: 'Panel de análisis',
@@ -54,6 +54,7 @@ const TRANSLATIONS = {
         no_data: 'No hay publicaciones guardadas en la base de datos aún.',
         no_results: 'No se encontraron registros para la categoría seleccionada.',
         confidence_label: 'Confianza:', delete_btn: 'Borrar', see_more: 'Ver más', see_less: 'Ver menos',
+        copy_text: 'Copiar texto',
         search_placeholder: 'Buscar por título o palabra clave...',
         filter_label: 'Filtrar:', all_categories: 'Todas las categorías',
         total_classifications: 'Total Clasificaciones', top_category: 'Categoría Líder',
@@ -77,6 +78,7 @@ const TRANSLATIONS = {
         toast_delete_error: 'Error al eliminar:',
         toast_not_admin: 'Debe iniciar sesión como Administrador para eliminar registros.',
         toast_copied: '📋 JSON copiado al portapapeles con éxito',
+        toast_text_copied: '📋 Contenido copiado al portapapeles con éxito',
         toast_copy_error: '⚠️ No se pudo copiar el contenido',
         toast_not_found: '⚠️ No se encontró la información de la consulta',
         error_db: 'Error al conectar con la base de datos.',
@@ -108,7 +110,7 @@ const TRANSLATIONS = {
         service_status: 'Service status', microservices: 'Microservices',
         oci_server: 'OCI Server', ram_used: 'RAM Used', free: 'Free:',
         header_classifier_title: 'Technical content classification',
-        header_classifier_subtitle: 'Enter texts to classify them in real time.',
+        header_classifier_subtitle: 'Enter texts to categorize them in real time.',
         header_history_title: 'Query history',
         header_history_subtitle: 'Review and filter all predictions.',
         header_analytics_title: 'Analytics dashboard',
@@ -128,6 +130,7 @@ const TRANSLATIONS = {
         no_data: 'No publications saved in the database yet.',
         no_results: 'No records found for the selected category.',
         confidence_label: 'Confidence:', delete_btn: 'Delete', see_more: 'See more', see_less: 'See less',
+        copy_text: 'Copy text',
         search_placeholder: 'Search by title or keyword...',
         filter_label: 'Filter:', all_categories: 'All categories',
         total_classifications: 'Total Classifications', top_category: 'Top Category',
@@ -151,6 +154,7 @@ const TRANSLATIONS = {
         toast_delete_error: 'Error deleting:',
         toast_not_admin: 'You must log in as Administrator to delete records.',
         toast_copied: '📋 JSON copied to clipboard',
+        toast_text_copied: '📋 Content copied to clipboard successfully',
         toast_copy_error: '⚠️ Could not copy content',
         toast_not_found: '⚠️ Query information not found',
         error_db: 'Error connecting to database.',
@@ -1310,9 +1314,9 @@ async function handleClassification() {
         }
 
         const data = await response.json();
-        // Redondear probabilidad a 2 decimales y asegurar timestamp ISO local
+        // Conservar precisión de probabilidad (4 decimales) y asegurar timestamp ISO local
         if (data.probabilidad != null) {
-            data.probabilidad = Math.round(data.probabilidad * 100) / 100;
+            data.probabilidad = Math.round(Number(data.probabilidad) * 10000) / 10000;
         }
         if (!data.created_at) {
             data.created_at = getLocalISOString();
@@ -1417,13 +1421,26 @@ async function loadHistory() {
                 const probPct = Number(prob * 100).toFixed(1);
                 const timeLabel = formatTimeString(entry.created_at);
                 const textStr = entry.texto || entry.titulo || '';
-                const isLong = textStr.length > 30;
+                // Umbral calibrado: solo mostrar si el texto realmente desborda los 2 renglones (~110 chars)
+                const isLong = textStr.length > 110;
                 const expandBtnHtml = isLong ? `
-                    <div class="flex justify-start items-center mt-1.5 mb-1">
-                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="${t('see_more')}">
-                            <span>${t('see_more')}</span>
-                            <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
-                        </button>
+                    <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" aria-expanded="false" title="${t('see_more')}">
+                        <span>${t('see_more')}</span>
+                        <span class="material-symbols-outlined text-xs pointer-events-none transition-transform duration-200">expand_more</span>
+                    </button>
+                ` : '';
+
+                const copyTextBtnHtml = textStr ? `
+                    <button type="button" class="btn-copy-entry-text px-2.5 py-1 rounded-full border border-primary/20 bg-primary/5 hover:bg-primary/15 text-primary-fixed text-[11px] font-label-sm font-semibold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="${t('copy_text')}">
+                        <span class="material-symbols-outlined text-xs pointer-events-none">content_copy</span>
+                        <span class="btn-copy-label pointer-events-none">${t('copy_text')}</span>
+                    </button>
+                ` : '';
+
+                const textActionsHtml = (expandBtnHtml || copyTextBtnHtml) ? `
+                    <div class="flex flex-wrap items-center gap-1.5 mt-2 mb-1">
+                        ${expandBtnHtml}
+                        ${copyTextBtnHtml}
                     </div>
                 ` : '';
 
@@ -1435,7 +1452,7 @@ async function loadHistory() {
                 ` : '';
 
                 return `
-                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0 flex flex-col justify-between">
+                    <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0 flex flex-col justify-between h-full">
                         <div>
                             <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(entry.categoria || 'Sin categoría')}</span>
@@ -1443,7 +1460,7 @@ async function loadHistory() {
                             </div>
                             <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
                             <p class="history-card-body text-on-surface-variant text-xs mt-1 line-clamp-2 leading-relaxed transition-all">${escapeHtml(textStr)}</p>
-                            ${expandBtnHtml}
+                            ${textActionsHtml}
                         </div>
                         <div class="mt-4 flex flex-wrap items-center justify-between opacity-90 pt-2.5 border-t border-black/5 dark:border-white/5 gap-2">
                             <div class="flex items-center gap-1.5">
@@ -1576,13 +1593,26 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                 }).join(' ');
 
                 const textStr = entry.texto || entry.titulo || '';
-                const isLong = textStr.length > 30;
+                // Umbral calibrado para vista detallada full-width (~150 chars)
+                const isLong = textStr.length > 150;
                 const expandBtnHtml = isLong ? `
-                    <div class="flex justify-start items-center mt-1.5 mb-1">
-                        <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" title="${t('see_more')}">
-                            <span>${t('see_more')}</span>
-                            <span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>
-                        </button>
+                    <button type="button" class="btn-toggle-expand px-2.5 py-1 rounded-full border border-primary/25 bg-primary/10 hover:bg-primary/20 text-primary-fixed text-[11px] font-label-sm font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" aria-expanded="false" title="${t('see_more')}">
+                        <span>${t('see_more')}</span>
+                        <span class="material-symbols-outlined text-xs pointer-events-none transition-transform duration-200">expand_more</span>
+                    </button>
+                ` : '';
+
+                const copyTextBtnHtml = textStr ? `
+                    <button type="button" class="btn-copy-entry-text px-2.5 py-1 rounded-full border border-primary/20 bg-primary/5 hover:bg-primary/15 text-primary-fixed text-[11px] font-label-sm font-semibold transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm" data-id="${entry.id}" title="${t('copy_text')}">
+                        <span class="material-symbols-outlined text-xs pointer-events-none">content_copy</span>
+                        <span class="btn-copy-label pointer-events-none">${t('copy_text')}</span>
+                    </button>
+                ` : '';
+
+                const textActionsHtml = (expandBtnHtml || copyTextBtnHtml) ? `
+                    <div class="flex flex-wrap items-center gap-1.5 mt-2 mb-1">
+                        ${expandBtnHtml}
+                        ${copyTextBtnHtml}
                     </div>
                 ` : '';
 
@@ -1610,7 +1640,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                 </div>
                                 <h5 class="text-on-surface font-bold text-base sm:text-lg group-hover:text-primary-fixed transition-colors">${escapeHtml(entry.titulo)}</h5>
                                 <p class="history-card-body text-on-surface-variant text-sm line-clamp-2 leading-relaxed transition-all mt-1">${escapeHtml(textStr || 'Sin descripción disponible')}</p>
-                                ${expandBtnHtml}
+                                ${textActionsHtml}
                             </div>
                             <div class="flex flex-wrap gap-1.5 pt-2">
                                 ${keywordsPills || `<span class="text-xs text-on-surface-variant italic opacity-60">${t('no_keywords')}</span>`}
@@ -1756,20 +1786,61 @@ document.addEventListener('click', (e) => {
 
     const expandBtn = e.target.closest('.btn-toggle-expand');
     if (expandBtn) {
+        triggerHaptic(10);
         // Encontrar el párrafo .history-card-body que es previo al div contenedor del botón
         const parentDiv = expandBtn.parentElement;
         const p = parentDiv ? parentDiv.previousElementSibling : null;
         if (p && p.classList.contains('history-card-body')) {
-            const isExpanded = p.classList.contains('line-clamp-none');
+            // En el grid del Clasificador (#history-grid) se expande hasta un máximo de 10 renglones.
+            // En el listado detallado del Historial (#detailed-history-list) se expande el contenido completo.
+            const isInRecentGrid = !!expandBtn.closest('#history-grid');
+            const targetExpandedClass = isInRecentGrid ? 'line-clamp-10' : 'line-clamp-none';
+            const isExpanded = p.classList.contains('line-clamp-none') || p.classList.contains('line-clamp-10');
+
             if (isExpanded) {
-                p.classList.remove('line-clamp-none');
+                p.classList.remove('line-clamp-none', 'line-clamp-10');
                 p.classList.add('line-clamp-2');
-                expandBtn.innerHTML = `<span>${t('see_more')}</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_more</span>`;
+                expandBtn.setAttribute('aria-expanded', 'false');
+                expandBtn.setAttribute('title', t('see_more'));
+                expandBtn.innerHTML = `<span>${t('see_more')}</span><span class="material-symbols-outlined text-xs pointer-events-none transition-transform duration-200">expand_more</span>`;
             } else {
                 p.classList.remove('line-clamp-2');
-                p.classList.add('line-clamp-none');
-                expandBtn.innerHTML = `<span>${t('see_less')}</span><span class="material-symbols-outlined text-xs pointer-events-none">expand_less</span>`;
+                p.classList.add(targetExpandedClass);
+                expandBtn.setAttribute('aria-expanded', 'true');
+                expandBtn.setAttribute('title', t('see_less'));
+                expandBtn.innerHTML = `<span>${t('see_less')}</span><span class="material-symbols-outlined text-xs pointer-events-none transition-transform duration-200">expand_less</span>`;
             }
+        }
+    }
+
+    const copyTextBtn = e.target.closest('.btn-copy-entry-text');
+    if (copyTextBtn) {
+        triggerHaptic(15);
+        const id = copyTextBtn.getAttribute('data-id');
+        const entry = (allHistoryData || []).find(item => String(item.id) === String(id));
+        const contentToCopy = entry ? (entry.texto || entry.titulo || '') : '';
+
+        if (contentToCopy) {
+            navigator.clipboard.writeText(contentToCopy).then(() => {
+                showToast(t('toast_text_copied'), 'success');
+                const iconSpan = copyTextBtn.querySelector('.material-symbols-outlined');
+                const labelSpan = copyTextBtn.querySelector('.btn-copy-label');
+
+                if (iconSpan) iconSpan.textContent = 'check';
+                if (labelSpan) labelSpan.textContent = t('copied');
+                copyTextBtn.classList.add('border-emerald-500/50', 'bg-emerald-500/15', 'text-emerald-700', 'dark:text-emerald-300');
+
+                setTimeout(() => {
+                    if (iconSpan) iconSpan.textContent = 'content_copy';
+                    if (labelSpan) labelSpan.textContent = t('copy_text');
+                    copyTextBtn.classList.remove('border-emerald-500/50', 'bg-emerald-500/15', 'text-emerald-700', 'dark:text-emerald-300');
+                }, 1800);
+            }).catch(err => {
+                console.error('Error al copiar texto:', err);
+                showToast(t('toast_copy_error'), 'error');
+            });
+        } else {
+            showToast(t('toast_not_found'), 'warning');
         }
     }
 

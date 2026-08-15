@@ -424,6 +424,14 @@
             box-shadow: 0 0 20px var(--glass-hover-shadow);
         }
 
+        /* Utilidad para limitar la expansión del texto en tarjetas compactas del clasificador a un máximo de 10 renglones */
+        .line-clamp-10 {
+            display: -webkit-box !important;
+            -webkit-box-orient: vertical !important;
+            -webkit-line-clamp: 10 !important;
+            overflow: hidden !important;
+        }
+
         .tech-input {
             background-color: var(--input-bg) !important;
             border: 1px solid var(--subtle-border) !important;
@@ -941,7 +949,7 @@
                         class="font-headline-md text-base sm:text-2xl md:text-3xl text-on-surface font-bold tracking-tight leading-snug">
                         Clasificación de contenido técnico</h2>
                     <p id="main-header-subtitle" class="font-body-md text-[11px] sm:text-sm md:text-base text-on-surface-variant mt-0.5 sm:mt-1 line-clamp-1 sm:line-clamp-none opacity-85">Ingresá textos
-                        para clasificarlos en tiempo real.</p>
+                        para categorizarlos en tiempo real.</p>
                 </div>
             </div>
             <div class="relative flex items-center gap-1.5 sm:gap-2 shrink-0">
