@@ -1,7 +1,8 @@
-# Informe de Auditoría Técnica y QA - Google Lighthouse (Mobile)
+# Informe de Auditoría Técnica y QA - Google Lighthouse (Mobile) — Evaluación v1.6.0
 
 **Proyecto / URL:** `http://147.15.127.238:5173/` (Clasificación de contenido técnico)  
 **Fecha de Ejecución:** 13 de agosto de 2026, 18:47hs (GMT-3)  
+**Versión de la App:** `1.6.0`   
 **Entorno de Prueba:** Emulated Moto G Power | Slow 4G Throttling | Chrome 151.0.0.0 | Lighthouse 13.4.0  
 **Rol:** Tester QA  
 

@@ -16,8 +16,8 @@ Este documento describe la estrategia integral de **Aseguramiento de Calidad (QA
    - [Sprint 2: Data QA — PostgreSQL `techmind` (17 casos)](#-sprint-2-data-qa--postgresql-techmind-17-casos)
    - [Sprint 3: Backend Spring Boot & ML (6 casos)](#-sprint-3-backend-spring-boot--ml-6-casos)
    - [Sprint 4: Frontend Vanilla JS / Tailwind (9 casos)](#-sprint-4-frontend-vanilla-js--tailwind-9-casos)
-   - [Sprint 5: Auditoría de Performance & Web Vitals — Lighthouse (4 casos)](#-sprint-5-auditoría-de-performance--web-vitals--lighthouse-4-casos)
-7. [Informes de Rendimiento y Auditoría Técnica (Lighthouse)](#-7-informes-de-rendimiento-y-auditoría-técnica-lighthouse)
+   - [Sprint 5: Auditoría de Performance & Web Vitals — Lighthouse Re-evaluación (4 casos)](#-sprint-5-auditoría-de-performance--web-vitals--lighthouse-re-evaluación-4-casos)
+7. [Informes de Rendimiento y Auditoría Técnica (Lighthouse Re-evaluación v2.4.0)](#-7-informes-de-rendimiento-y-auditoría-técnica-lighthouse-re-evaluación-v240)
 8. [Assertions Automatizadas en Postman](#-8-assertions-automatizadas-en-postman)
 9. [Registro y Reporte de Evidencias](#-9-registro-y-reporte-de-evidencias)
 
@@ -261,34 +261,34 @@ Durante los Sprints 1, 2, 3 y 4 se ejecutaron de manera exhaustiva las suites de
 
 ---
 
-### ⚡ Sprint 5: Auditoría de Performance & Web Vitals — Google Lighthouse (4 Casos)
-* `CP-LIGHTHOUSE-01` **(Performance Desktop & Core Web Vitals):** Evaluación de FCP, LCP y CLS en escritorio. Puntaje alcanzado: 51/100. Detectado CLS crítico (1.516) por carga de fuentes externas no optimizadas.
-* `CP-LIGHTHOUSE-02` **(Performance Mobile & Redes 4G):** Simulación en Moto G Power bajo red Slow 4G . Puntaje alcanzado: 56/100. FCP/LCP elevados (~9.9s) por peticiones bloqueantes de renderizado. CLS perfecto (0).
-* `CP-LIGHTHOUSE-03` **(Accessibility & WCAG 2.1 AA):** Evaluación semántica, atributos ARIA y contraste. Puntaje alcanzado: 87/100 (Desktop/Mobile). Hallazgos en botones sin nombre accesible y bajo contraste en badges.
-* `CP-LIGHTHOUSE-04` **(Best Practices & SEO):** Evaluación de seguridad, cabeceras HTTP e indexación. Best Practices: 74/100 (Riesgo por HTTP no cifrado). SEO: 90/100 (Oportunidad de mejora en meta description).
+### ⚡ Sprint 5: Auditoría de Performance & Web Vitals — Google Lighthouse Re-evaluación v2.4.0 (4 Casos)
+* `CP-LIGHTHOUSE-01` **(Performance Desktop & Core Web Vitals):** Re-evaluación de FCP (`1.1s`), LCP (`1.1s`) y TBT (`20ms`) en escritorio. Registró avance de 51 a 70/100. Reducción del payload total a `819 KiB`. Mantiene CLS parcial (`1.144`) atribuido a fuentes externas de Google Fonts.
+* `CP-LIGHTHOUSE-02` **(Performance Mobile & Redes 4G):** Simulación en Moto G Power bajo red Slow 4G. FCP y LCP acelerados de `9.9s` a `5.5s`. Registra TBT de `0ms`, CLS perfecto (`0`) y reducción del 51% de consumo de datos móviles (`817 KiB`). Puntaje incrementó de 56 a 66/100.
+* `CP-LIGHTHOUSE-03` **(Accessibility & WCAG 2.1 AA):** Evaluación semántica y lectores de pantalla. Confirmado arreglo al incorporar el atributo `aria-label="Estado de servicios"` en `button#btn-status-trigger`. Puntaje alcanzó un nivel sobresaliente de 95/100.  
+* `CP-LIGHTHOUSE-04` **(Best Practices & SEO):** Evaluación de transporte de red, metadatos e indexabilidad. SEO alcanzó 91/100 tras validar la etiqueta `<meta name="description">`. Best Practices se mantiene en 74/100 debido a la falta de HTTPS/TLS en el servidor.
 
 ---
-## ⚡ 7. Informes de Rendimiento y Auditoría Técnica (Lighthouse)  
+## ⚡ 7. Informes de Rendimiento y Auditoría Técnica (Lighthouse Re-evaluación v2.4.0)
 
-Como parte de las pruebas no funcionales del Sprint 5, se ejecutó una auditoría exhaustiva sobre el entorno de despliegue mediante Google Lighthouse 13.4 tanto en modo Desktop como Mobile.
+Como parte de las pruebas no funcionales del Sprint 5, se ejecutó una re-evaluación sobre el entorno de despliegue mediante Google Lighthouse 13.4 (`v2.4.0`) tanto en modo Desktop como Mobile
 
 ### 📊 Tabla Comparativa de Auditoría Lighthouse
-| Categoría Auditada | Score Desktop | Score Mobile (Slow 4G) | Estado / Diagnóstico QA |
-|---|---|---|---|
-| **Performance** | 51 / 100 | 56 / 100 | ⚠️ Requiere optimización en bundles JS/CSS y fuentes. |
-| **Accessibility** | 87 / 100 | 87 / 100 | 🟡 Aceptable. Ajustar contraste y aria-labels. |
-| **Best Practices** | 74 / 100 | 74 / 100 | ⚠️ Inseguro. Servido en HTTP sin cabeceras CSP/HSTS. |
-| **SEO** | 90 / 100 | 90 / 100 | 🟢 Bueno. Agregar etiqueta <meta name="description"> |
+| Categoría Auditada | Score Desktop `v1.6.0` | Score Desktop `v2.4.0` | Score Mobile `v1.6.0` | Score Mobile `v2.4.0` | Estado / Diagnóstico QA |
+|---|---|---|---|---|---|
+| **Performance** | 51 / 100 |70 / 100 | 56 / 100 | 66 / 100 | 🟢 Reducción del 50% en tiempo de carga y tráfico de red (817 KiB). |
+| **Accessibility** | 87 / 100 | 95 / 100 | 87 / 100 | 95 / 100 | 🟢 Excelente. Agregado `aria-label` en `button#btn-status-trigger` |
+| **Best Practices** | 74 / 100 | 74 / 100 | 74 / 100 | 74 / 100 | ⚠️ Requiere habilitar cifrado HTTPS/TLS en servidor. |
+| **SEO** | 90 / 100 | 91 / 100 | 90 / 100 | 91 / 100 | 🟢 Excelente. Incorporada la etiqueta <meta name="description"> |
 
 ### 📄 Acceso a los Informes Detallados y Reportes PDF:
 
 #### 💻 Informe de Rendimiento Escritorio:
-* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Desktop_2026-08-13.md](https://drive.google.com/file/d/1e_xcBMoTtd0rkCGdtV3kbzkdpGTfC-0z/view?usp=sharing)
-* 📥 Descargar PDF Original: [Google Lighthouse (Desktop)](https://drive.google.com/file/d/1hABBis34oLTwinbT57K0m6-Q1qVM08Z9/view?usp=sharing)
+* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Desktop_v2.0.md](./reportes/Archivos/Rendimiento/REPORTE-QA_Lighthouse_Desktop_v2.0.md)
+* 📥 Descargar PDF Original: [Google Lighthouse (Desktop) - v2.0.pdf](https://drive.google.com/file/d/1JG5DfL7kTJzXwJiAg1gE8kbzWes1Hktg/view?usp=drive_link)
 
 #### 📱 Informe de Rendimiento Mobile:
-* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Mobile_2026-08-13.md](https://drive.google.com/file/d/1e_xcBMoTtd0rkCGdtV3kbzkdpGTfC-0z/view?usp=sharing)
-* 📥 Descargar PDF Original: [Google Lighthouse (Mobile)](https://drive.google.com/file/d/1e_xcBMoTtd0rkCGdtV3kbzkdpGTfC-0z/view?usp=sharing)
+* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Mobile_v2.0.md](./reportes/Archivos/Rendimiento/REPORTE-QA_Lighthouse_Mobile_v2.0.md)
+* 📥 Descargar PDF Original: [Google Lighthouse (Mobile) - v2.0.pdf](https://drive.google.com/file/d/1ONBKcit5ZvSoSF2PND6vIHDWaDPEZWwy/view?usp=drive_link)
 
 ---
 
