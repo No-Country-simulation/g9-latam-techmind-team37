@@ -1743,17 +1743,61 @@ function toggleJsonModal() {
     }
 }
 
-function copyJsonToClipboard() {
+/**
+ * Copia texto al portapapeles de forma robusta y universal.
+ * Compatible tanto con contextos seguros (HTTPS / localhost con navigator.clipboard)
+ * como con contextos no seguros HTTP en IPs remotas (ej. OCI) mediante fallback invisible document.execCommand.
+ */
+async function copyToClipboard(text) {
+    if (!text) return false;
+
+    // 1. Intentar con la API moderna navigator.clipboard si está disponible y en contexto seguro
+    if (navigator.clipboard && window.isSecureContext) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            console.warn('navigator.clipboard falló, intentando fallback:', err);
+        }
+    }
+
+    // 2. Fallback universal compatible con HTTP (OCI, IPs públicas) y navegadores móviles
+    try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.width = '2em';
+        textArea.style.height = '2em';
+        textArea.style.padding = '0';
+        textArea.style.border = 'none';
+        textArea.style.outline = 'none';
+        textArea.style.boxShadow = 'none';
+        textArea.style.background = 'transparent';
+        textArea.setAttribute('readonly', '');
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        textArea.setSelectionRange(0, textArea.value.length);
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return Boolean(successful);
+    } catch (fallbackErr) {
+        console.error('Fallback de copia al portapapeles falló:', fallbackErr);
+        return false;
+    }
+}
+
+async function copyJsonToClipboard() {
     const jsonPre = document.getElementById('json-content');
     const copyBtn = document.getElementById('btn-copy-json');
     const copyText = document.getElementById('copy-btn-text');
     if (!jsonPre || !jsonPre.textContent) return;
 
-    navigator.clipboard.writeText(jsonPre.textContent).then(() => {
+    const ok = await copyToClipboard(jsonPre.textContent);
+    if (ok) {
         if (copyBtn && copyText) {
-            const originalText = copyText.textContent;
-            const originalIcon = copyBtn.querySelector('.material-symbols-outlined').textContent;
-            
             copyText.textContent = t('copied');
             copyBtn.querySelector('.material-symbols-outlined').textContent = 'check';
             copyBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
@@ -1766,10 +1810,9 @@ function copyJsonToClipboard() {
                 copyBtn.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
             }, 2000);
         }
-    }).catch(err => {
-        console.error('Error al copiar JSON:', err);
+    } else {
         showToast(t('toast_copy_error'), 'error');
-    });
+    }
 }
 
 // Global Backdrop Click & Escape Key listeners for JSON Modal, Expand & View buttons
@@ -1821,23 +1864,24 @@ document.addEventListener('click', (e) => {
         const contentToCopy = entry ? (entry.texto || entry.titulo || '') : '';
 
         if (contentToCopy) {
-            navigator.clipboard.writeText(contentToCopy).then(() => {
-                showToast(t('toast_text_copied'), 'success');
-                const iconSpan = copyTextBtn.querySelector('.material-symbols-outlined');
-                const labelSpan = copyTextBtn.querySelector('.btn-copy-label');
+            copyToClipboard(contentToCopy).then(success => {
+                if (success) {
+                    showToast(t('toast_text_copied'), 'success');
+                    const iconSpan = copyTextBtn.querySelector('.material-symbols-outlined');
+                    const labelSpan = copyTextBtn.querySelector('.btn-copy-label');
 
-                if (iconSpan) iconSpan.textContent = 'check';
-                if (labelSpan) labelSpan.textContent = t('copied');
-                copyTextBtn.classList.add('border-emerald-500/50', 'bg-emerald-500/15', 'text-emerald-700', 'dark:text-emerald-300');
+                    if (iconSpan) iconSpan.textContent = 'check';
+                    if (labelSpan) labelSpan.textContent = t('copied');
+                    copyTextBtn.classList.add('border-emerald-500/50', 'bg-emerald-500/15', 'text-emerald-700', 'dark:text-emerald-300');
 
-                setTimeout(() => {
-                    if (iconSpan) iconSpan.textContent = 'content_copy';
-                    if (labelSpan) labelSpan.textContent = t('copy_text');
-                    copyTextBtn.classList.remove('border-emerald-500/50', 'bg-emerald-500/15', 'text-emerald-700', 'dark:text-emerald-300');
-                }, 1800);
-            }).catch(err => {
-                console.error('Error al copiar texto:', err);
-                showToast(t('toast_copy_error'), 'error');
+                    setTimeout(() => {
+                        if (iconSpan) iconSpan.textContent = 'content_copy';
+                        if (labelSpan) labelSpan.textContent = t('copy_text');
+                        copyTextBtn.classList.remove('border-emerald-500/50', 'bg-emerald-500/15', 'text-emerald-700', 'dark:text-emerald-300');
+                    }, 1800);
+                } else {
+                    showToast(t('toast_copy_error'), 'error');
+                }
             });
         } else {
             showToast(t('toast_not_found'), 'warning');

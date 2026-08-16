@@ -84,6 +84,11 @@
 
 ### Corregido
 
+- **Compatibilidad de Copia al Portapapeles en Entornos HTTP / OCI (`frontend/app.js`):**
+  - **Síntoma:** Al acceder a la aplicación mediante una IP pública o dominio sin SSL/TLS en servidores OCI (`http://<ip>:5173`), los botones *"Copiar texto"* y *"Copiar JSON"* no lograban escribir en el portapapeles.
+  - **Causa:** La API moderna `navigator.clipboard` está restringida por las políticas de seguridad de los navegadores exclusivamente a *Contextos Seguros* (`HTTPS` o `localhost`). Al acceder vía `HTTP` desde una IP remota, `navigator.clipboard` es `undefined` o bloqueado por el navegador.
+  - **Solución:** Implementada la función universal `copyToClipboard()` con mecanismo de fallback transparente basado en `document.execCommand('copy')`, garantizando copiado 100% funcional en servidores cloud (OCI), conexiones HTTP, dominios con HTTPS y navegadores móviles.
+
 - **Precisión Decimal en Porcentaje de Confianza (`app/database.py` + `frontend/app.js`):**
   - **Síntoma:** El porcentaje de confianza en las tarjetas del *Clasificador* y del *Historial* siempre mostraba decimales redondeados en cero (ej. `26.0%`, `56.0%`).
   - **Causa:** En `app/database.py` la consulta a PostgreSQL truncaba la probabilidad a 2 decimales (`round(float(r[3]), 2)`), y en `frontend/app.js` se aplicaba un redondeo prematuro a 2 decimales (`Math.round(prob * 100) / 100`), provocando que al multiplicarse por 100 el resultado fuera siempre un número entero que `.toFixed(1)` formateaba con `.0%`.
