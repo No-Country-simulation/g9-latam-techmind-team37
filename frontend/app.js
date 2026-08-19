@@ -412,6 +412,26 @@ function setServiceStatus(elementId, isOk, text) {
     if (elementId === 'status-fastapi') healthStates.fastapi = isOk;
     if (elementId === 'status-postgres') healthStates.postgres = isOk;
 
+    // Sync mini LEDs (sidebar colapsado)
+    const miniLedMap = {
+        'status-springboot': 'mini-led-springboot',
+        'status-fastapi':    'mini-led-fastapi',
+        'status-postgres':   'mini-led-postgres',
+    };
+    const miniLedId = miniLedMap[elementId];
+    if (miniLedId) {
+        const miniLed = document.getElementById(miniLedId);
+        if (miniLed) {
+            if (isOk) {
+                miniLed.className = 'w-2.5 h-2.5 rounded-full led-pulse shrink-0';
+                miniLed.style.backgroundColor = 'var(--led-ok-bg)';
+            } else {
+                miniLed.className = 'w-2.5 h-2.5 rounded-full shrink-0';
+                miniLed.style.backgroundColor = 'var(--led-error-bg)';
+            }
+        }
+    }
+
     // Update overall indicator
     const overallLed = document.getElementById('overall-status-led');
     if (overallLed) {
@@ -639,6 +659,46 @@ function bindEvents() {
         jsonModalClose.addEventListener('click', toggleJsonModal);
     }
 
+    // ── Animación del botón Clasificar según contenido de los campos ────────────
+    const titleField = document.getElementById('content-title');
+    const bodyField  = document.getElementById('content-body');
+    const classifyReadyIcon = document.getElementById('classify-ready-icon');
+
+    const updateClassifyReadyState = () => {
+        if (!classifyBtn) return;
+        const hasContent = !!(titleField && titleField.value.trim()) &&
+                           !!(bodyField  && bodyField.value.trim());
+
+        if (hasContent && !classifyBtn.classList.contains('classify-ready')) {
+            // Activar: glow + shine en el botón
+            classifyBtn.classList.add('classify-ready');
+            // Animar entrada del icóno de rayo
+            if (classifyReadyIcon) {
+                classifyReadyIcon.classList.remove('classify-icon-exit', 'w-0', 'opacity-0');
+                classifyReadyIcon.classList.add('classify-icon-enter', 'w-auto');
+                classifyReadyIcon.style.pointerEvents = 'none';
+            }
+        } else if (!hasContent && classifyBtn.classList.contains('classify-ready')) {
+            // Desactivar: remover glow + shine
+            classifyBtn.classList.remove('classify-ready');
+            // Animar salida del icóno de rayo
+            if (classifyReadyIcon) {
+                classifyReadyIcon.classList.remove('classify-icon-enter', 'w-auto');
+                classifyReadyIcon.classList.add('classify-icon-exit');
+                // Ocultar el espacio luego de que termina la anim de salida
+                setTimeout(() => {
+                    classifyReadyIcon.classList.remove('classify-icon-exit');
+                    classifyReadyIcon.classList.add('w-0', 'opacity-0');
+                }, 260);
+            }
+        }
+    };
+
+    if (titleField) titleField.addEventListener('input', updateClassifyReadyState);
+    if (bodyField)  bodyField.addEventListener('input', updateClassifyReadyState);
+    // Evaluar el estado inicial por si los campos tienen contenido al cargar (ej. autocompletado)
+    updateClassifyReadyState();
+
     // Sidebar selectors
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -674,6 +734,31 @@ function bindEvents() {
         return !!popover && !popover.classList.contains('pointer-events-none');
     };
 
+    // Abre/cierra el mini popover lateral (sidebar colapsado)
+    const setMiniPopoverOpen = (open, anchorEl) => {
+        const mini = document.getElementById('status-mini-popover');
+        if (!mini) return;
+        if (open && anchorEl) {
+            // Posicionamiento vertical dinámico: centrado con el botón disparador
+            const rect = anchorEl.getBoundingClientRect();
+            const miniH = mini.offsetHeight || 100;
+            let topPx = rect.top + rect.height / 2 - miniH / 2;
+            // Evitar que se salga por arriba o abajo del viewport
+            topPx = Math.max(8, Math.min(topPx, window.innerHeight - miniH - 8));
+            mini.style.top = `${topPx}px`;
+            mini.classList.remove('opacity-0', 'pointer-events-none', '-translate-x-2');
+            mini.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
+        } else {
+            mini.classList.add('opacity-0', 'pointer-events-none', '-translate-x-2');
+            mini.classList.remove('opacity-100', 'pointer-events-auto', 'translate-x-0');
+        }
+    };
+
+    const isMiniPopoverOpen = () => {
+        const mini = document.getElementById('status-mini-popover');
+        return !!mini && !mini.classList.contains('pointer-events-none');
+    };
+
     // La expansión del sidebar dura 0.3s; el popover se abre al terminar
     const SIDEBAR_ANIM_MS = 150;
 
@@ -699,6 +784,8 @@ function bindEvents() {
         if (!sidebar) return;
         sidebarCollapsed = false;
         sidebar.classList.remove('sidebar-collapsed');
+        // Al expandir, cerrar el mini popover lateral (en modo expandido se usa el popover normal)
+        setMiniPopoverOpen(false);
         // En móvil el sidebar expandido se superpone al contenido en vez de empujarlo
         if (mainContent) {
             mainContent.style.marginLeft = isMobileView()
@@ -742,7 +829,9 @@ function bindEvents() {
     sidebar.classList.remove('-translate-x-full');
     sidebar.classList.add('translate-x-0', 'md:translate-x-0');
     if (isMobileView()) {
-        // Móvil: rail visible siempre, colapsado por defecto
+        // Móvil: colapsado por defecto.
+        // Las transiciones ya están suprimidas globalmente por .no-transition en <html>
+        // (el script inline del head lo remueve tras el primer rAF, evitando el flash).
         collapseSidebar();
     } else if (savedCollapsed === 'true') {
         collapseSidebar();
@@ -787,6 +876,8 @@ function bindEvents() {
             if (titleInput) titleInput.value = '';
             if (bodyInput) bodyInput.value = '';
             if (titleInput) titleInput.focus();
+            // Resetear animación del botón Clasificar al limpiar el formulario
+            updateClassifyReadyState();
             // Ocultar badge de archivo importado al limpiar el formulario
             hideFileExtractBadge();
             // Resetear el file input para permitir subir el mismo archivo de nuevo
@@ -831,21 +922,40 @@ function bindEvents() {
     // Service Status Popover Control
     const statusTrigger = document.getElementById('btn-status-trigger');
     const statusPopover = document.getElementById('status-popover');
-    const statusChevron = document.getElementById('status-chevron');
+    const statusMiniPopover = document.getElementById('status-mini-popover');
 
     if (statusTrigger && statusPopover) {
         statusTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
-            setStatusPopoverOpen(!isStatusPopoverOpen());
+            if (sidebarCollapsed) {
+                // Sidebar colapsado: toggle mini popover lateral
+                const miniOpen = isMiniPopoverOpen();
+                setMiniPopoverOpen(!miniOpen, statusTrigger);
+                setStatusPopoverOpen(false);
+            } else {
+                // Sidebar expandido: toggle popover normal
+                setStatusPopoverOpen(!isStatusPopoverOpen());
+                setMiniPopoverOpen(false);
+            }
         });
 
-        // Close popover when clicking anywhere else
-        document.addEventListener('click', () => setStatusPopoverOpen(false));
+        // Close both popovers when clicking anywhere else
+        document.addEventListener('click', () => {
+            setStatusPopoverOpen(false);
+            setMiniPopoverOpen(false);
+        });
 
-        // Prevent closing when clicking inside the popover
+        // Prevent closing when clicking inside the main popover
         statusPopover.addEventListener('click', (e) => {
             e.stopPropagation();
         });
+
+        // Prevent closing when clicking inside the mini popover
+        if (statusMiniPopover) {
+            statusMiniPopover.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
     }
 
     // View Switcher Control (SPA subpage logic)

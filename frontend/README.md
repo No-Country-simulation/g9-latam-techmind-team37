@@ -74,8 +74,8 @@ El popover de "Estado de servicios" también muestra métricas del servidor OCI 
 
 ### 9. Sidebar Responsivo
 - **Desktop:** colapsable a icon rail (64 px), expandible a 256 px. Estado persistido en `localStorage`.
-- **Mobile:** panel overlay activado con botón hamburger `☰`.
-- Al hacer clic en cualquier ícono de navegación o en el LED de estado mientras el sidebar está colapsado, se expande automáticamente.
+- **Mobile:** panel overlay activado con botón hamburger `☰`. Se inicializa colapsado instantáneamente sin flash de animación (técnica *no-transition on load*).
+- **Estado de servicios en sidebar colapsado:** Al hacer clic en el botón de *"Estado de servicios"* con el sidebar contraído, se despliega un **mini popover compacto hacia la derecha del rail** con el estado de los 3 microservicios (Spring Boot, FastAPI ML, PostgreSQL). Si el sidebar está expandido, muestra el popover completo con métricas OCI (CPU, RAM, Swap, Uptime).
 
 ---
 
@@ -119,4 +119,4 @@ El servicio `frontend` se sirve vía **Nginx Alpine** en el puerto `80`.
 
 ---
 
-*Módulo mantenido por el equipo TechMind G9 LATAM Team 37. Última actualización: 2026-08-08.*
+*Módulo mantenido por el equipo TechMind G9 LATAM Team 37. Última actualización: 2026-08-19.*

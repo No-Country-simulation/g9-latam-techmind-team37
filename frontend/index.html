@@ -1,8 +1,28 @@
 <!DOCTYPE html>
-<html class="dark" lang="es">
+<html class="dark no-transition" lang="es">
 
 <head>
     <meta charset="utf-8" />
+    <!-- Suprimir flash de transiciones en la carga inicial.
+         Este script inline corre ANTES de que cualquier CSS o JS externo se evalúe,
+         asegurando que no haya animaciones visibles durante el primer pintado del DOM. -->
+    <script>
+        (function () {
+            // Remover la clase en el primer frame pintado (doble rAF = garantía cross-browser)
+            function enableTransitions() {
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        document.documentElement.classList.remove('no-transition');
+                    });
+                });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', enableTransitions);
+            } else {
+                enableTransitions();
+            }
+        })();
+    </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>TechMind - Clasificador Inteligente de Conocimiento Técnico</title>
     <!-- SEO: Meta description para motores de búsqueda (Sprint 5 QA Fix) -->
@@ -207,6 +227,17 @@
             --json-bg: var(--surface-container-lowest);
         }
 
+        /* Suprimir TODAS las transiciones durante la carga inicial (evita el flash animado
+           en móvil y desktop al pintar el primer frame). Se remueve con JS tras el primer rAF. */
+        .no-transition,
+        .no-transition *,
+        .no-transition *::before,
+        .no-transition *::after {
+            transition: none !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+        }
+
         /* Transición de iluminación (tema) selectiva, ergonómica y cinematográfica (350ms) */
         html,
         body,
@@ -264,6 +295,53 @@
         .theme-icon-spin {
             animation: themeIconSpin 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
         }
+
+        /* ── Animaciones del botón Clasificar (estado "listo") ─────────────────── */
+
+        /* 1. Glow pulsante exterior: sugiere energía y disposición */
+        @keyframes classifyGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(208, 188, 255, 0),
+                            0 10px 40px -10px rgba(109, 59, 215, 0.45);
+            }
+            50% {
+                box-shadow: 0 0 0 5px rgba(208, 188, 255, 0.18),
+                            0 10px 40px -10px rgba(109, 59, 215, 0.7);
+            }
+        }
+
+        /* 2. Shine sweep: destello diagonal que recorre el botón */
+        @keyframes classifyShine {
+            0%   { transform: translateX(-110%) skewX(-18deg); }
+            100% { transform: translateX(220%)  skewX(-18deg); }
+        }
+
+        /* Estado "listo para clasificar" */
+        #btn-classify.classify-ready {
+            animation: classifyGlow 2s ease-in-out infinite;
+        }
+
+        /* Pseudo-elemento de shine (se activa con JS añadiendo .classify-ready) */
+        #btn-classify.classify-ready .classify-shine {
+            animation: classifyShine 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* El ícono de rayo entra con fade+slide cuando los campos tienen contenido */
+        .classify-icon-enter {
+            animation: classifyIconIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .classify-icon-exit {
+            animation: classifyIconOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+        @keyframes classifyIconIn {
+            from { opacity: 0; transform: scale(0.4) translateX(-6px); }
+            to   { opacity: 1; transform: scale(1)   translateX(0px);  }
+        }
+        @keyframes classifyIconOut {
+            from { opacity: 1; transform: scale(1)   translateX(0px);  }
+            to   { opacity: 0; transform: scale(0.4) translateX(-6px); }
+        }
+
 
         /* Preservar la animación de ancho y transform del sidebar con curva ergonómica */
         #sidebar {
@@ -407,6 +485,15 @@
            sus esquinas redondeadas. Se restituye la separación. */
         #status-popover {
             margin-bottom: 0.75rem !important;
+        }
+        /* Mini popover lateral para el sidebar colapsado */
+        #status-mini-popover {
+            position: fixed;
+            left: calc(var(--sidebar-collapsed-width) + 8px);
+            width: 186px;
+            z-index: 9999;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         #main-content {
             transition: margin-left 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -859,6 +946,27 @@
                 <span class="sidebar-collapsed-tooltip" data-i18n="service_status">Estado de servicios</span>
             </button>
 
+            <!-- Mini Popover lateral (solo visible cuando el sidebar está colapsado) -->
+            <!-- Se posiciona con JS (top dinámico) y CSS (left: sidebar-collapsed-width + 8px) -->
+            <div id="status-mini-popover"
+                class="bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-3 flex flex-col gap-2 opacity-0 pointer-events-none -translate-x-2">
+                <!-- Header del mini popover -->
+                <div class="font-label-sm text-[10px] font-bold tracking-wider uppercase opacity-60 text-on-surface-variant" data-i18n="microservices">Microservicios</div>
+                <!-- LEDs espejo — se sincronizan por JS igual que los del popover principal -->
+                <div class="flex items-center gap-2">
+                    <div id="mini-led-springboot" class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium text-on-surface-variant">Spring Boot</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div id="mini-led-fastapi" class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: var(--led-error-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium text-on-surface-variant">FastAPI ML</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div id="mini-led-postgres" class="w-2.5 h-2.5 rounded-full led-pulse shrink-0" style="background-color: var(--led-ok-bg);"></div>
+                    <span class="font-label-sm text-[11px] font-medium text-on-surface-variant">PostgreSQL</span>
+                </div>
+            </div>
+
             <!-- Status Popover Dropdown -->
             <div id="status-popover"
                 class="absolute bottom-full left-0 right-0 mb-3 bg-surface-container-high backdrop-blur-xl border medium-border rounded-2xl shadow-2xl p-4 flex flex-col gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2 z-50">
@@ -1043,7 +1151,7 @@
 
                             <div class="flex flex-col items-start gap-2">
                                 <button id="btn-import-doc" type="button"
-                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-label-sm text-sm font-semibold border border-dashed border-purple-900/30 dark:border-outline-variant/70 bg-purple-900/5 dark:bg-transparent text-purple-950 dark:text-on-surface-variant hover:text-purple-900 dark:hover:text-on-surface hover:bg-purple-900/15 dark:hover:bg-surface-variant/40 hover:border-purple-800/60 dark:hover:border-purple-800/40 shadow-sm dark:shadow-none transition-all duration-200 active:scale-95 cursor-pointer">
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-label-sm text-sm font-semibold border border-dashed border-purple-900/30 dark:border-primary/25 bg-purple-900/5 dark:bg-transparent text-purple-950 dark:text-on-surface-variant hover:text-purple-900 dark:hover:text-on-surface hover:bg-purple-900/15 dark:hover:bg-surface-variant/40 hover:border-purple-800/60 dark:hover:border-primary/50 shadow-sm dark:shadow-none transition-all duration-200 active:scale-95 cursor-pointer">
                                     <span class="material-symbols-outlined text-base leading-none text-purple-700 dark:text-primary">upload_file</span>
                                     <span data-i18n="btn_import_doc">Importar PDF / DOCX</span>
                                 </button>
@@ -1062,12 +1170,18 @@
                                     <div
                                         class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300">
                                     </div>
-                                    <div class="relative flex items-center justify-center text-center w-full">
+                                    <!-- Shine sweep: destello diagonal animado, visible solo en estado .classify-ready -->
+                                    <div class="classify-shine absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none opacity-0 [.classify-ready_&]:opacity-100"></div>
+                                    <div class="relative flex items-center justify-center gap-2 text-center w-full">
+                                        <!-- Ícono de rayo: oculto por defecto, aparece al detectar contenido -->
+                                        <span id="classify-ready-icon"
+                                            class="material-symbols-outlined text-lg leading-none opacity-0 w-0 overflow-hidden pointer-events-none"
+                                            aria-hidden="true">bolt</span>
                                         <span data-i18n="btn_classify">Clasificar con TechMind</span>
                                     </div>
                                 </button>
                                 <button id="btn-clear-form" type="button"
-                                    class="w-full sm:w-auto min-w-[200px] px-8 sm:px-10 py-3.5 rounded-xl font-label-sm text-base font-bold border border-purple-900/25 dark:border-outline-variant/50 bg-white/70 dark:bg-surface-variant/10 text-purple-950 dark:text-on-surface-variant hover:text-purple-900 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/50 dark:hover:border-purple-800/30 shadow-sm transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center text-center">
+                                    class="w-full sm:w-auto min-w-[200px] px-8 sm:px-10 py-3.5 rounded-xl font-label-sm text-base font-bold border border-purple-900/25 dark:border-primary/20 bg-white/70 dark:bg-surface-variant/10 text-purple-950 dark:text-on-surface-variant hover:text-purple-900 dark:hover:text-on-surface hover:bg-purple-900/10 dark:hover:bg-surface-variant/40 hover:border-purple-800/50 dark:hover:border-primary/45 shadow-sm transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center text-center">
                                     <span data-i18n="btn_clear">Limpiar formulario</span>
                                 </button>
                             </div>

@@ -4,6 +4,48 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [2.5.0] — 2026-08-19 · Mini Popover Lateral de Servicios, Animación del Clasificador, Correcciones de UX Móvil y Modo Oscuro
+
+### Añadido
+
+- **Mini Popover Lateral de Estado de Servicios en Sidebar Colapsado (`frontend/index.html` + `frontend/app.js`):**
+  - **Problema previo:** Al tener el sidebar contraído y hacer clic en el botón *"Estado de servicios"*, no ocurría ninguna acción ya que el popover completo (`#status-popover`) quedaba oculto detrás del rail de 64px.
+  - **Solución:** Añadido nuevo `#status-mini-popover` que aparece hacia la **derecha del sidebar** cuando está colapsado, mostrando de forma compacta el estado de los 3 microservicios (Spring Boot, FastAPI ML, PostgreSQL) con sus LEDs de color sin necesidad de expandir el sidebar.
+  - **Posicionamiento dinámico:** El mini popover se posiciona con `position: fixed` y `left: calc(var(--sidebar-collapsed-width) + 8px)`. El eje `top` se calcula en tiempo de ejecución con `getBoundingClientRect()` para centrarlo verticalmente respecto al botón disparador, con protección de márgenes del viewport.
+  - **Sincronización automática de LEDs:** La función `setServiceStatus()` fue extendida para sincronizar en paralelo los LEDs del popover principal (`status-springboot`, `status-fastapi`, `status-postgres`) y los LEDs espejo del mini popover (`mini-led-springboot`, `mini-led-fastapi`, `mini-led-postgres`) sin duplicar ninguna lógica de negocio.
+  - **Comportamiento diferenciado por estado del sidebar:** El handler de `#btn-status-trigger` detecta `sidebarCollapsed` en tiempo de clic: si el sidebar está colapsado abre el mini popover lateral; si está expandido, abre el popover completo con métricas OCI. Ambos se cierran mutuamente al alternarse.
+  - **Cierre automático:** Al expandir el sidebar (`expandSidebar()`), el mini popover se cierra automáticamente. Ambos popovers se cierran al hacer clic en cualquier otra área del documento.
+
+### Corregido
+
+- **Flash de Animación del Sidebar en Carga Inicial (Móvil) (`frontend/app.js`):**
+  - **Síntoma:** Al recargar la página en dispositivos móviles, se percibía una micro-animación de contracción del sidebar (visible durante ~150ms), dado que el DOM inicia con el sidebar en estado expandido y JS lo colapsaba con las transiciones CSS ya activas.
+  - **Causa:** `collapseSidebar()` se invocaba durante `DOMContentLoaded` mientras la regla de transición cinematográfica de 350ms (`cubic-bezier(0.16, 1, 0.3, 1)`) sobre `#sidebar` ya estaba computada.
+  - **Solución (v2.5.0):** Resuelta de forma global por la supresión de transiciones en carga inicial (ver entrada siguiente). La lógica de inicialización del sidebar en móvil se simplificó eliminando el override manual de `sidebar.style.transition`.
+
+- **Flash Global de Transiciones en Carga Inicial (`frontend/index.html`):**
+  - **Síntoma:** Al cargar o refrescar la página (especialmente en móviles), múltiples elementos (`body`, `sidebar`, `main-content`, `button`, `input`, etc.) mostraban una breve animación de color/layout (flash) causada por las transiciones CSS de 350ms que se disparaban al aplicar el tema y el estado inicial.
+  - **Causa:** La regla CSS de transición cinematográfica global se aplica al parsear el stylesheet, antes de que el DOM esté completamente inicializado. Al ejecutar JS para establecer el tema (`dark`/`light`) y el estado del sidebar, los cambios de `background-color`, `color` y `border-color` eran interpolados visiblemente por el navegador.
+  - **Solución:** Implementada la técnica estándar *"No-transition on load"*:
+    1. El elemento `<html>` inicia con la clase `no-transition` en el HTML estático.
+    2. Una regla CSS `!important` anula todas las transiciones y reduce todas las animaciones a `0.01ms` mientras la clase esté presente.
+    3. Un script `<script>` **inline y síncrono** en el `<head>` (antes de cualquier recurso externo) programa la remoción de `no-transition` mediante **doble `requestAnimationFrame`**, garantizando que la clase se elimine solo después del primer frame pintado en pantalla.
+    - El resultado: cero transiciones visibles durante la carga inicial, con todas las micro-interacciones y animaciones funcionando normalmente a partir del primer pintado.
+
+- **Bordes Invisibles en Modo Oscuro en Botones Secundarios del Formulario (`frontend/index.html`):**
+  - **Síntoma:** Los botones *"Importar PDF / DOCX"* (`#btn-import-doc`) y *"Limpiar formulario"* (`#btn-clear-form`) no mostraban borde visible en Modo Oscuro, luciendo como elementos sin delimitación.
+  - **Causa:** Ambos botones usaban `dark:border-outline-variant` con opacidades bajas (`/70` y `/50`). La variable `--outline-variant` en dark mode vale `#494454`, un tono muy próximo al fondo del sistema (`#0b1326`), lo que hacía el borde prácticamente invisible independientemente de la opacidad aplicada.
+  - **Solución:** Reemplazada la referencia a `outline-variant` por `primary` (`#d0bcff`, el lila claro del sistema de diseño) con opacidades calibradas: `dark:border-primary/25` para el borde dashed de Importar y `dark:border-primary/20` para el borde sólido de Limpiar. Los estados hover se actualizaron a `dark:hover:border-primary/50` y `/45` respectivamente, manteniendo coherencia visual con el color primario del tema.
+
+- **Animación del Botón "Clasificar con TechMind" al Detectar Contenido (`frontend/index.html` + `frontend/app.js`):**
+  - Cuando **ambos campos** del formulario (*Título* y *Contenido*) tienen texto, el botón entra en estado *"listo"* activando tres capas de micro-feedback visual:
+    1. **Glow pulsante exterior (`@keyframes classifyGlow`):** Anillo de luz semitransparente con pulso sinusoidal cada 2 segundos que rodea el botón, comunicando energía y disposición.
+    2. **Shine sweep (`@keyframes classifyShine`):** Destello diagonal blanco translúcido (`via-white/20`) que recorre el botón de izquierda a derecha cada 2.2 segundos.
+    3. **Ícono de rayo (`⚡ bolt`):** Aparece a la izquierda del texto con animación de entrada `fade + slide` (`@keyframes classifyIconIn` en 0.35s). Al vaciar algún campo, sale con animación inversa (`classifyIconOut` en 0.25s) y el espacio se colapsa.
+  - La detección es reactiva: escucha el evento `input` en ambos campos y evalúa `value.trim()` en tiempo real.
+  - Al hacer clic en *"Limpiar formulario"*, se llama `updateClassifyReadyState()` para resetear el estado visual inmediatamente.
+  - Evalúa el estado inicial al cargar la página para cubrir el caso de campos pre-rellenados por autocompletado del navegador.
+
 ## [2.4.0] — 2026-08-15 · Transición Cinemática de Tema, Microanimaciones, UI/UX Pulida, Tooltips Dinámicos y Precisión Decimal
 
 ### Añadido
