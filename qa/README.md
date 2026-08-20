@@ -261,11 +261,11 @@ Durante los Sprints 1, 2, 3 y 4 se ejecutaron de manera exhaustiva las suites de
 
 ---
 
-### ⚡ Sprint 5: Auditoría de Performance & Web Vitals — Google Lighthouse Re-evaluación v2.4.0 (4 Casos)
-* `CP-LIGHTHOUSE-01` **(Performance Desktop & Core Web Vitals):** Re-evaluación de FCP (`1.1s`), LCP (`1.1s`) y TBT (`20ms`) en escritorio. Registró avance de 51 a 70/100. Reducción del payload total a `819 KiB`. Mantiene CLS parcial (`1.144`) atribuido a fuentes externas de Google Fonts.
-* `CP-LIGHTHOUSE-02` **(Performance Mobile & Redes 4G):** Simulación en Moto G Power bajo red Slow 4G. FCP y LCP acelerados de `9.9s` a `5.5s`. Registra TBT de `0ms`, CLS perfecto (`0`) y reducción del 51% de consumo de datos móviles (`817 KiB`). Puntaje incrementó de 56 a 66/100.
-* `CP-LIGHTHOUSE-03` **(Accessibility & WCAG 2.1 AA):** Evaluación semántica y lectores de pantalla. Confirmado arreglo al incorporar el atributo `aria-label="Estado de servicios"` en `button#btn-status-trigger`. Puntaje alcanzó un nivel sobresaliente de 95/100.  
-* `CP-LIGHTHOUSE-04` **(Best Practices & SEO):** Evaluación de transporte de red, metadatos e indexabilidad. SEO alcanzó 91/100 tras validar la etiqueta `<meta name="description">`. Best Practices se mantiene en 74/100 debido a la falta de HTTPS/TLS en el servidor.
+### ⚡ Sprint 5: Auditoría de Performance & Web Vitals — Google Lighthouse Re-evaluación v2.5.0 (4 Casos)
+* `CP-LIGHTHOUSE-01` **(Performance Desktop & Core Web Vitals):** Re-evaluación de FCP (`1.4s`), LCP (`1.4s`) y TBT (`0ms`) en escritorio. Mantiene tiempos de respuesta ágiles y reducción del payload total a `801 KiB`. Score: 66/100. Persiste CLS residual (`0.942`) atribuido a la descarga asíncrona de tipografías desde la CDN de Google Fonts.
+* `CP-LIGHTHOUSE-02` **(Performance Mobile & Redes 4G):** Simulación en Moto G Power bajo red Slow 4G. FCP y LCP acelerados de `9.9s` a `5.4s`. Registra TBT impecable (`0ms`), CLS perfecto (`0`) y una reducción del 52% en tráfico de datos móviles (`801 KiB`). Puntaje incrementó de 56 a 67/100.
+* `CP-LIGHTHOUSE-03` **(Accessibility & WCAG 2.1 AA):** Evaluación semántica, contraste y lectores de pantalla. Se confirmó el **cumplimiento perfecto (100/100)** en Desktop y Mobile tras corregir contrastes de color y mantener el atributo `aria-label="Estado de servicios"` en `button#btn-status-trigger`.
+* `CP-LIGHTHOUSE-04` **(Best Practices & SEO):** Evaluación de transporte de red, cabeceras e indexabilidad. SEO se consolidó en 91/100 tras validar la etiqueta `<meta name="description">`. En Best Practices se mantiene en 74/100 debido a la falta de cifrado HTTPS/TLS y cabeceras CSP/HSTS en la capa de servidor web.
 
 ---
 ## ⚡ 7. Informes de Rendimiento y Auditoría Técnica (Lighthouse Re-evaluación v2.4.0)
@@ -273,22 +273,25 @@ Durante los Sprints 1, 2, 3 y 4 se ejecutaron de manera exhaustiva las suites de
 Como parte de las pruebas no funcionales del Sprint 5, se ejecutó una re-evaluación sobre el entorno de despliegue mediante Google Lighthouse 13.4 (`v2.4.0`) tanto en modo Desktop como Mobile
 
 ### 📊 Tabla Comparativa de Auditoría Lighthouse
-| Categoría Auditada | Score Desktop `v1.6.0` | Score Desktop `v2.4.0` | Score Mobile `v1.6.0` | Score Mobile `v2.4.0` | Estado / Diagnóstico QA |
+Como parte de las pruebas no funcionales del Sprint 5, se ejecutó una re-evaluación final sobre el entorno de despliegue mediante Google Lighthouse 13.4 (`v3.0`) tanto en modo Desktop como Mobile.
+
+### 📊 Tabla Comparativa de Auditoría Lighthouse
+| Categoría Auditada | Score Desktop `v1.6.0` | **Score Desktop `v2.5.0`** | Score Mobile `v1.6.0` | **Score Mobile `v2.5.0`** | Estado / Diagnóstico QA |
 |---|---|---|---|---|---|
-| **Performance** | 51 / 100 |70 / 100 | 56 / 100 | 66 / 100 | 🟢 Reducción del 50% en tiempo de carga y tráfico de red (817 KiB). |
-| **Accessibility** | 87 / 100 | 95 / 100 | 87 / 100 | 95 / 100 | 🟢 Excelente. Agregado `aria-label` en `button#btn-status-trigger` |
-| **Best Practices** | 74 / 100 | 74 / 100 | 74 / 100 | 74 / 100 | ⚠️ Requiere habilitar cifrado HTTPS/TLS en servidor. |
-| **SEO** | 90 / 100 | 91 / 100 | 90 / 100 | 91 / 100 | 🟢 Excelente. Incorporada la etiqueta <meta name="description"> |
+| **Performance** | 51 / 100 | **66 / 100** | 56 / 100 | **67 / 100** | 🟢 Reducción del 52% en tiempo de carga y tráfico de red (801 KiB). |
+| **Accessibility** | 87 / 100 | **100 / 100** 🎯 | 87 / 100 | **100 / 100** 🎯 | 🟢 **Puntaje Perfecto.** 100% de cumplimiento en contraste y semántica ARIA. |
+| **Best Practices** | 74 / 100 | **74 / 100** | 74 / 100 | **74 / 100** | ⚠️ Requiere habilitar cifrado HTTPS/TLS en servidor. |
+| **SEO** | 90 / 100 | **91 / 100** | 90 / 100 | **91 / 100** | 🟢 Excelente. Incorporada la etiqueta `<meta name="description">`. |
 
 ### 📄 Acceso a los Informes Detallados y Reportes PDF:
 
 #### 💻 Informe de Rendimiento Escritorio:
-* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Desktop_v2.0.md](./reportes/Archivos/Rendimiento/REPORTE-QA_Lighthouse_Desktop_v2.0.md)
-* 📥 Descargar PDF Original: [Google Lighthouse (Desktop) - v2.0.pdf](https://drive.google.com/file/d/1JG5DfL7kTJzXwJiAg1gE8kbzWes1Hktg/view?usp=drive_link)
+* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Desktop_v3.0.md](./reportes/Archivos/Rendimiento/REPORTE-QA_Lighthouse_Desktop_v3.0.md)
+* 📥 Descargar PDF Original: [Google Lighthouse (Desktop) - v3.0.pdf](https://drive.google.com/file/d/1hGS3rMOx5SLFw85Rodx9WotzjusyNA8s/view?usp=drive_link)
 
 #### 📱 Informe de Rendimiento Mobile:
-* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Mobile_v2.0.md](./reportes/Archivos/Rendimiento/REPORTE-QA_Lighthouse_Mobile_v2.0.md)
-* 📥 Descargar PDF Original: [Google Lighthouse (Mobile) - v2.0.pdf](https://drive.google.com/file/d/1ONBKcit5ZvSoSF2PND6vIHDWaDPEZWwy/view?usp=drive_link)
+* 📄 Informe Markdown: [REPORTE-QA_Lighthouse_Mobile_v3.0.md](./reportes/Archivos/Rendimiento/REPORTE-QA_Lighthouse_Mobile_v3.0.md)
+* 📥 Descargar PDF Original: [Google Lighthouse (Mobile) - v3.0.pdf](https://drive.google.com/file/d/1mkeg9ObAJ2ZGO_4cXZqylQEVqS0KdZyF/view?usp=drive_link)
 
 ---
 
@@ -361,4 +364,4 @@ Todas las evidencias generadas durante las corridas de QA están ordenadas en el
 
 ---
 
-_QA Guía de pruebas e informe de ejecución — TechMind Project v4.1 — Hackathon G9 LATAM (Equipo 37)_
+_QA Guía de pruebas e informe de ejecución — TechMind Project v5.2 — Hackathon G9 LATAM (Equipo 37)_
