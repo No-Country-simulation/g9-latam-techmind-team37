@@ -21,12 +21,12 @@ Spring Boot lo llama internamente cada vez que recibe un contenido para clasific
 
 Si no querés hacer los pasos manualmente, el repositorio incluye un script que **hace todo por vos**:
 
-### Primera vez
+### Primera vez (Desarrollo Local)
 ```powershell
 python setup.py
 ```
 
-El script verifica Python, crea el entorno virtual, instala dependencias, levanta Docker, migra la base de datos e inicia la API. Si algo falla, te dice exactamente qué está mal.
+El script verifica Python, crea el entorno virtual, instala dependencias, te solicita interactivamente configurar las **credenciales del administrador** (`ADMIN_USER` y `ADMIN_PASSWORD`), levanta Docker, migra la base de datos e inicia la API. Si algo falla, te dice exactamente qué está mal.
 
 ---
 
@@ -39,9 +39,12 @@ Si querés levantar los **4 componentes del sistema** (PostgreSQL + FastAPI + Sp
 python setup.py --docker
 ```
 
+> 🔐 **Credenciales de Administrador en el primer deploy:**
+> Durante la primera ejecución, `setup.py` o `setup.py --docker` te solicitará en la terminal definir tu usuario y contraseña de administrador, guardándolos en el archivo `.env`. Si das *Enter* sin escribir nada, se configuran por defecto en `admin` / `admin123`.
+
 ### Vía Docker Compose directamente:
 ```powershell
-docker-compose --profile full up -d --build
+docker compose --profile full up -d --build
 ```
 
 Esto compilará las imágenes y dejará todo el stack activo en:
@@ -52,7 +55,7 @@ Esto compilará las imágenes y dejará todo el stack activo en:
 
 Para detener todos los contenedores:
 ```powershell
-docker-compose --profile full down
+docker compose --profile full down
 ```
 
 > ⚠️ Requiere tener **Python** y **Docker Desktop** instalados (ver requisitos abajo).

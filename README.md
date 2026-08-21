@@ -14,6 +14,8 @@
 
 **Hackathon TechMind · G9 LATAM · Equipo 37**
 
+[ 🇪🇸 Español ](README.md) · [ 🇬🇧 English ](README_EN.md)
+
 </div>
 
 ---
@@ -184,7 +186,8 @@ g9-latam-techmind-team37/
 ├── docker-compose.yml                     # Configuración de los 4 servicios en Docker
 ├── setup.py                               # Installer y orquestador multiplataforma (Windows/Mac/Linux)
 ├── how-to-run.md                          # Guía paso a paso de ejecución
-└── README.md                              # Documentación principal del proyecto
+├── README_EN.md                           # Documentación en inglés (English documentation)
+└── README.md                              # Documentación principal del proyecto (Español)
 ```
 
 ---
@@ -198,9 +201,12 @@ Para levantar la solución completa sin necesidad de instalar Java ni Python en 
 python setup.py --docker
 ```
 
+> 🔐 **Definición de Credenciales de Administrador (Primer Deploy):**
+> Al ejecutar `setup.py` o `setup.py --docker` por primera vez, el instalador solicitará de forma interactiva en la terminal ingresar el **usuario** (`ADMIN_USER`) y la **contraseña** (`ADMIN_PASSWORD`) que desees para la cuenta de administrador, guardándolos automáticamente en tu archivo `.env`. Si presionás *Enter* sin escribir nada, se asignarán los valores por defecto (`admin` / `admin123`). Estas credenciales te permitirán iniciar sesión en la Web UI para eliminar registros y gestionar el sistema sin restricciones.
+
 O directamente con Docker Compose:
 ```powershell
-docker-compose --profile full up -d --build
+docker compose --profile full up -d --build
 ```
 
 Esto desplegará los 4 componentes:
@@ -213,7 +219,7 @@ Esto desplegará los 4 componentes:
 ```powershell
 python setup.py
 ```
-El script creará el entorno virtual de Python, instalará requerimientos, levantará el contenedor de PostgreSQL y dejará los servicios activos.
+El script creará el entorno virtual de Python, solicitará tus credenciales de administrador si es la primera vez, instalará requerimientos, levantará el contenedor de PostgreSQL y dejará los servicios activos.
 
 > 📖 Para una guía detallada paso a paso en Windows/Mac, consultar [`how-to-run.md`](how-to-run.md).
 
@@ -250,11 +256,13 @@ El script creará el entorno virtual de Python, instalará requerimientos, levan
 
 ## 📚 Documentación Adicional
 
+- 📄 **Documentación en Inglés (English version)**: [`README_EN.md`](README_EN.md)
 - 📄 **Guía de Ejecución Rápida**: [`how-to-run.md`](how-to-run.md)
+- 📄 **Historial de Versiones & Changelog**: [`CHANGELOG.md`](CHANGELOG.md)
 - 📄 **Registro Técnico de Bugs Corregidos**: [`data-science/docs/BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md)
 - 📄 **Integración Backend / ML**: [`data-science/docs/BACKEND_INTEGRATION.md`](data-science/docs/BACKEND_INTEGRATION.md)
 - 📄 **Ingesta de Documentos PDF/DOCX**: [`data-science/docs/INGESTA_DOCUMENTOS.md`](data-science/docs/INGESTA_DOCUMENTOS.md)
-- 📄 **Reporte Ejecutivo de QA**: [`qa/reportes/Informes/RESULTADOS.md`](/qa/reportes/Informes/RESULTADOS.md)
+- 📄 **Reporte Ejecutivo de QA**: [`qa/reportes/Informes/RESULTADOS.md`](qa/reportes/Informes/RESULTADOS.md)
 
 ---
 
