@@ -14,7 +14,12 @@
   - **Posicionamiento dinámico:** El mini popover se posiciona con `position: fixed` y `left: calc(var(--sidebar-collapsed-width) + 8px)`. El eje `top` se calcula en tiempo de ejecución con `getBoundingClientRect()` para centrarlo verticalmente respecto al botón disparador, con protección de márgenes del viewport.
   - **Sincronización automática de LEDs:** La función `setServiceStatus()` fue extendida para sincronizar en paralelo los LEDs del popover principal (`status-springboot`, `status-fastapi`, `status-postgres`) y los LEDs espejo del mini popover (`mini-led-springboot`, `mini-led-fastapi`, `mini-led-postgres`) sin duplicar ninguna lógica de negocio.
   - **Comportamiento diferenciado por estado del sidebar:** El handler de `#btn-status-trigger` detecta `sidebarCollapsed` en tiempo de clic: si el sidebar está colapsado abre el mini popover lateral; si está expandido, abre el popover completo con métricas OCI. Ambos se cierran mutuamente al alternarse.
-  - **Cierre automático:** Al expandir el sidebar (`expandSidebar()`), el mini popover se cierra automáticamente. Ambos popovers se cierran al hacer clic en cualquier otra área del documento.
+- **Documentación Completa en Inglés y Selector Bilingüe (`README_EN.md` + `README.md`):**
+  - Creada la versión completa en inglés del archivo de documentación principal ([`README_EN.md`](README_EN.md)), cubriendo la arquitectura del sistema, stack tecnológico, roles del equipo, estructura del repositorio, comandos de orquestación y contratos de API REST.
+  - Añadido selector de idioma interactivo en la cabecera de ambos archivos (`[ 🇪🇸 Español ] · [ 🇬🇧 English ]`) para navegación inmediata entre idiomas.
+
+- **Guía de Configuración Interactiva de Credenciales en Primer Deploy (`README.md` + `how-to-run.md`):**
+  - Añadida aclaración explícita sobre la solicitud interactiva de credenciales (`ADMIN_USER` y `ADMIN_PASSWORD`) que ejecuta `setup.py` / `setup.py --docker` durante la primera instalación y su persistencia automática en el archivo `.env`.
 
 ### Corregido
 
