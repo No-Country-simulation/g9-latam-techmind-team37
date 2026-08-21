@@ -101,6 +101,7 @@ const TRANSLATIONS = {
         // ── Etiquetas de categorías del filtro ──────────────────────────────────────────
         cat_bases_de_datos: 'Bases de Datos',
         cat_seguridad: 'Seguridad',
+        no_category: 'Sin categoría',
     },
     en: {
         brand_subtitle: 'Intelligent organization', nav_classifier: 'Classifier',
@@ -177,6 +178,7 @@ const TRANSLATIONS = {
         // ── Category filter labels ────────────────────────────────────────────────────
         cat_bases_de_datos: 'Databases',
         cat_seguridad: 'Security',
+        no_category: 'Uncategorized',
     }
 };
 
@@ -1443,7 +1445,7 @@ function renderResult(data) {
     badgeContainer.innerHTML = `
         <div class="inline-flex max-w-full items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 rounded-full border text-lg sm:text-xl font-bold shadow-[0_0_25px_rgba(139,92,246,0.25)] ${config.colorClass} transition-all duration-300 transform scale-105">
             <span class="material-symbols-outlined text-xl sm:text-2xl shrink-0">${config.icon}</span>
-            <span class="min-w-0">${categoria}</span>
+            <span class="min-w-0">${escapeHtml(getCategoryLabel(categoria))}</span>
         </div>
     `;
 
@@ -1535,7 +1537,7 @@ async function loadHistory() {
                     <div class="glass-panel p-4 sm:p-5 rounded-xl border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all group hover:-translate-y-1 duration-300 min-w-0 flex flex-col justify-between h-full">
                         <div>
                             <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(entry.categoria || 'Sin categoría')}</span>
+                                <span class="px-2.5 py-1 rounded-md text-[11px] font-label-sm border font-medium ${config.colorClass}">${escapeHtml(getCategoryLabel(entry.categoria || 'Sin categoría'))}</span>
                                 <span class="text-on-surface-variant font-label-sm text-[11px] shrink-0">${timeLabel}</span>
                             </div>
                             <h4 class="font-body-md text-body-md text-on-surface font-medium group-hover:text-primary-fixed transition-colors line-clamp-1">${escapeHtml(entry.titulo || 'Sin título')}</h4>
@@ -1581,10 +1583,12 @@ async function loadHistory() {
 // y debe coincidir con los valores almacenados en la DB).
 // Solo el TEXTO visible se traduce.
 function getCategoryLabel(value) {
+    if (!value) return '';
     const overrides = {
         'all':            t('all_categories'),
         'Bases de Datos': t('cat_bases_de_datos'),
         'Seguridad':      t('cat_seguridad'),
+        'Sin categoría':  t('no_category'),
     };
     // Backend, Frontend, Data Science, DevOps, Mobile, Cloud son iguales en ambos idiomas
     return overrides[value] !== undefined ? overrides[value] : value;
@@ -1710,7 +1714,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
                                 <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 mb-1.5">
                                     <span class="px-3 py-1 rounded-full text-xs font-label-sm border font-semibold ${config.colorClass} flex items-center gap-1.5 shadow-sm">
                                         <span class="material-symbols-outlined text-sm">${config.icon}</span>
-                                        ${escapeHtml(entry.categoria || 'Sin categoría')}
+                                        ${escapeHtml(getCategoryLabel(entry.categoria || 'Sin categoría'))}
                                     </span>
                                     <span class="text-xs font-mono text-outline opacity-60">ID #${entry.id}</span>
                                     <span class="text-xs text-on-surface-variant font-medium flex items-center gap-1">
@@ -2187,7 +2191,7 @@ async function loadAnalyticsDashboard() {
         const kpiAvg = document.getElementById('kpi-avg-confidence');
 
         if (kpiTotal) kpiTotal.textContent = data.total_count || 0;
-        if (kpiTop) kpiTop.textContent = data.top_categoria || 'N/A';
+        if (kpiTop) kpiTop.textContent = (data.top_categoria && data.top_categoria !== 'N/A') ? getCategoryLabel(data.top_categoria) : (data.top_categoria || 'N/A');
         if (kpiAvg) kpiAvg.textContent = `${Number(data.avg_prob || 0).toFixed(1)}%`;
 
         if (typeof Chart === 'undefined') return;
@@ -2200,7 +2204,7 @@ async function loadAnalyticsDashboard() {
         // 2. Chart 1: Doughnut (Distribución por Categoría)
         const ctxCat = document.getElementById('chart-categories');
         if (ctxCat) {
-            const catLabels = Object.keys(data.categorias || {});
+            const catLabels = Object.keys(data.categorias || {}).map(cat => getCategoryLabel(cat));
             const catValues = Object.values(data.categorias || {});
             const colors = [
                 '#a078ff', '#4edea3', '#38bdf8', '#fbbf24',
@@ -2413,7 +2417,7 @@ function applyTranslations() {
     if (headerTitle) headerTitle.textContent = h.title;
     if (headerSubtitle) headerSubtitle.textContent = h.subtitle;
 
-    // Restaurar estado inicial de la tarjeta de resultados si no hay clasificación activa
+    // Restaurar estado inicial de la tarjeta de resultados si no hay clasificación activa, o re-renderizar la activa con el idioma actual
     if (!lastJsonResponse) {
         const categoryBadge = document.getElementById('category-badge-container');
         if (categoryBadge) {
@@ -2427,6 +2431,8 @@ function applyTranslations() {
         if (keywordsList) {
             keywordsList.innerHTML = `<span class="text-on-surface-variant text-sm sm:text-base italic opacity-60">${t('keywords_placeholder')}</span>`;
         }
+    } else {
+        renderResult(lastJsonResponse);
     }
 
     // Actualizar el texto del botón de copiar JSON

@@ -18,6 +18,11 @@
 
 ### Corregido
 
+- **Internacionalización (i18n) de Categorías en KPIs, Gráficos de Analytics y Tarjetas (`frontend/app.js`):**
+  - **Síntoma:** Al alternar el idioma al inglés (`EN`), el KPI de *"Categoría Líder"* (`#kpi-top-category`) en el panel de Análisis seguía mostrándose en español (ej. *"Bases de Datos"* o *"Seguridad"*). Del mismo modo, las etiquetas de la leyenda en el gráfico Doughnut y los badges de categoría en tarjetas de historial no traducían los nombres de categorías localizables.
+  - **Causa:** Los datos provenientes de la API en `loadAnalyticsDashboard()`, `loadHistory()` y `renderResult()` utilizaban directamente las cadenas crudas de la base de datos sin pasarlas por la función de mapeo de localización `getCategoryLabel()`.
+  - **Solución:** Se integró `getCategoryLabel()` de manera sistemática en el KPI de Categoría Líder, en las etiquetas del gráfico de distribución por categoría (Chart.js), en los badges del clasificador y en las tarjetas de historial reciente y detallado. Además, `applyTranslations()` ahora refresca dinámicamente el resultado activo en pantalla al conmutar entre idiomas.
+
 - **Tope Fijo de 100 Consultas en Contador y Filtro de Categorías del Historial (`frontend/app.js` + `app/main.py` + `app/database.py`):**
   - **Síntoma:** Al superar las 100 consultas en la base de datos, el contador junto al filtro de *"Todas las categorías (N)"* en la sección de Historial quedaba estancado en `(100)` y no reflejaba el número real de consultas acumuladas, omitiendo además registros históricos antiguos en el listado.
   - **Causa:** La petición a la API en `loadDetailedHistory()` tenía codificado `limit=100` en la URL y el endpoint `/predicciones` en FastAPI/PostgreSQL tenía un límite por defecto de 50 registros. Como el frontend calculaba los conteos por categoría y el total iterando sobre `allHistoryData.length`, el conteo total y por categoría quedaba truncado al número de elementos devueltos por la consulta paginada (100).
