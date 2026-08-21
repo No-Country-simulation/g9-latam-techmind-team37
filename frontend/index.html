@@ -238,7 +238,26 @@
             animation-iteration-count: 1 !important;
         }
 
-        /* Transición de iluminación (tema) selectiva, ergonómica y cinematográfica (350ms) */
+        /* ── Transición de iluminación uniforme para todo el DOM al cambiar de tema (300ms) ─────────── */
+        html.theme-transitioning,
+        html.theme-transitioning *,
+        html.theme-transitioning *::before,
+        html.theme-transitioning *::after {
+            transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important,
+                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important,
+                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important,
+                        fill 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important,
+                        stroke 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important,
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important,
+                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        /* Excluir el icono de giro para no interrumpir su animación keyframe 3D */
+        html.theme-transitioning #theme-toggle-icon {
+            transition: none !important;
+        }
+
+        /* Transición de iluminación base sincronizada (300ms) */
         html,
         body,
         #sidebar,
@@ -260,12 +279,12 @@
         select,
         .subtle-border,
         .medium-border {
-            transition: background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        fill 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        stroke 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        fill 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        stroke 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Micro-animación de giro 360°, escala y destello para el icono Sol ☀️ / Luna 🌙 */
@@ -349,12 +368,13 @@
             /* px-3 base (0.75rem) + corrimiento de los lados izquierdos */
             padding-left: calc(0.75rem + var(--sidebar-left-shift));
             padding-right: 0.75rem;
-            transition: width 0.15s cubic-bezier(0.16, 1, 0.3, 1),
-                        padding-left 0.15s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
-                        background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding-left 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #sidebar.sidebar-collapsed {
             width: var(--sidebar-collapsed-width);
@@ -496,7 +516,9 @@
                         transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         #main-content {
-            transition: margin-left 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: margin-left 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass-panel {
@@ -504,6 +526,10 @@
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             box-shadow: var(--glass-shadow);
+            transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass-panel:hover {
@@ -853,10 +879,10 @@
 </head>
 
 <body
-    class="bg-background text-on-background min-h-[100dvh] font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
+    class="bg-background text-on-background min-h-[100dvh] font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
 
     <!-- Ambient Glow Background -->
-    <div class="fixed inset-0 z-0 pointer-events-none opacity-20 dark:opacity-40 transition-opacity duration-500">
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-20 dark:opacity-40 transition-opacity duration-400">
         <div
             class="ambient-glow absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-inverse-primary/20 blur-[120px]">
         </div>
@@ -902,19 +928,19 @@
         </div>
         <nav class="flex-1 space-y-1.5 overflow-y-auto">
             <a id="nav-classifier"
-                class="sidebar-nav-item active-nav relative flex items-center gap-3 transition-all cursor-pointer">
+                class="sidebar-nav-item active-nav relative flex items-center gap-3 cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">category</span>
                 <span class="sidebar-label font-label-sm text-sm font-bold" data-i18n="nav_classifier">Clasificador</span>
                 <span class="sidebar-collapsed-tooltip" data-i18n="nav_classifier">Clasificador</span>
             </a>
             <a id="nav-history"
-                class="sidebar-nav-item relative flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
+                class="sidebar-nav-item relative flex items-center gap-3 text-on-surface-variant cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">history</span>
                 <span class="sidebar-label font-label-sm text-sm font-semibold" data-i18n="nav_history">Historial</span>
                 <span class="sidebar-collapsed-tooltip" data-i18n="nav_history">Historial</span>
             </a>
             <a id="nav-analytics"
-                class="sidebar-nav-item relative flex items-center gap-3 transition-all text-on-surface-variant cursor-pointer">
+                class="sidebar-nav-item relative flex items-center gap-3 text-on-surface-variant cursor-pointer">
                 <span class="material-symbols-outlined text-xl shrink-0">analytics</span>
                 <span class="sidebar-label font-label-sm text-sm font-semibold" data-i18n="nav_analytics">Análisis</span>
                 <span class="sidebar-collapsed-tooltip" data-i18n="nav_analytics">Análisis</span>
@@ -1113,9 +1139,9 @@
                 <!-- Left Column: Input Form -->
                 <section class="lg:col-span-7 xl:col-span-7 flex flex-col gap-6 min-w-0">
                     <div
-                        class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col transition-all duration-300 relative overflow-hidden group">
+                        class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col relative overflow-hidden group">
                         <div
-                            class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                            class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                         </div>
 
                         <h3 class="font-headline-md text-xl sm:text-2xl text-on-surface mb-6 font-bold" data-i18n="form_title">
@@ -1127,7 +1153,7 @@
                                 <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
                                     for="content-title" data-i18n="label_title">Título del documento o artículo</label>
                                 <input id="content-title" type="text"
-                                    class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all"
+                                    class="tech-input w-full rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none"
                                     placeholder="ej. Tratamiento y gestión de bases de datos"
                                     data-i18n-placeholder="placeholder_title" />
                             </div>
@@ -1136,7 +1162,7 @@
                                 <label class="font-label-sm text-sm text-on-surface-variant ml-1 font-semibold"
                                     for="content-body" data-i18n="label_body">Contenido del documento o artículo</label>
                                 <textarea id="content-body"
-                                    class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none transition-all resize-none leading-relaxed"
+                                    class="tech-input w-full flex-1 min-h-[220px] rounded-xl px-4 py-3.5 font-body-md text-base focus:outline-none resize-none leading-relaxed"
                                     placeholder="Pegá el texto aquí, o usá el botón «Importar PDF / DOCX» para extraerlo automáticamente. El modelo determinará la categoría y extraerá los conceptos clave..."
                                     data-i18n-placeholder="placeholder_body"></textarea>
                             </div>
@@ -1196,7 +1222,7 @@
                 <!-- Right Column: Results Card -->
                 <section class="lg:col-span-5 xl:col-span-5 flex flex-col gap-6 min-w-0">
                     <div id="results-card"
-                        class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col relative border-t-4 border-t-primary-fixed transition-all duration-500">
+                        class="glass-panel rounded-2xl p-5 sm:p-6 md:p-8 flex-1 flex flex-col relative border-t-4 border-t-primary-fixed">
 
                         <h3
                             class="font-headline-md text-xl sm:text-2xl text-on-surface font-bold text-center mt-2 mb-6" data-i18n="results_title">
@@ -1284,14 +1310,14 @@
                         class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg opacity-60">search</span>
                     <input id="search-history" type="text" placeholder="Buscar por título o palabra clave..."
                         data-i18n-placeholder="search_placeholder"
-                        class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all">
+                        class="tech-input w-full rounded-xl pl-10 pr-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none">
                 </div>
                 <!-- Category Filter -->
                 <div class="flex items-center gap-3 min-w-0">
                     <label for="filter-category"
                         class="font-label-sm text-sm text-on-surface-variant font-medium whitespace-nowrap shrink-0" data-i18n="filter_label">Filtrar:</label>
                     <select id="filter-category"
-                        class="tech-select flex-1 sm:flex-initial min-w-0 rounded-xl px-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none transition-all cursor-pointer">
+                        class="tech-select flex-1 sm:flex-initial min-w-0 rounded-xl px-4 py-2.5 min-h-[44px] font-body-md text-sm focus:outline-none cursor-pointer">
                         <option value="all">Todas las categorías</option>
                         <option value="Backend">Backend</option>
                         <option value="Frontend">Frontend</option>

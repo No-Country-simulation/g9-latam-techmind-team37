@@ -205,6 +205,7 @@ function triggerHaptic(pattern = 15) {
 let lastJsonResponse = null;
 let lastInput = null;
 let allHistoryData = [];
+let themeTransitionTimer = null;
 let healthStates = {
     springboot: false,
     fastapi: false,
@@ -1035,6 +1036,10 @@ function bindEvents() {
             e.preventDefault();
             triggerHaptic(15);
 
+            // Activar transición de iluminación uniforme para todos los elementos del DOM
+            const root = document.documentElement;
+            root.classList.add('theme-transitioning');
+
             // Disparar micro-animación fluida de giro 360°
             if (themeIcon) {
                 themeIcon.classList.remove('theme-icon-spin');
@@ -1042,13 +1047,19 @@ function bindEvents() {
                 themeIcon.classList.add('theme-icon-spin');
             }
 
-            document.documentElement.classList.toggle('dark');
-            const nowDark = document.documentElement.classList.contains('dark');
+            root.classList.toggle('dark');
+            const nowDark = root.classList.contains('dark');
             localStorage.setItem('theme', nowDark ? 'dark' : 'light');
             updateThemeToggleUI(true);
 
             // Sincronizar suavemente la paleta de Chart.js sin parpadeos
             updateChartsTheme();
+
+            // Limpiar la clase de transición una vez terminado el ciclo unificado (300ms)
+            if (themeTransitionTimer) clearTimeout(themeTransitionTimer);
+            themeTransitionTimer = setTimeout(() => {
+                root.classList.remove('theme-transitioning');
+            }, 320);
 
             // El hover del símbolo queda activado tras el click
             themeToggle.classList.add('theme-symbol-active');

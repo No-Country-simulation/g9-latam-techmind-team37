@@ -21,6 +21,10 @@
 - **Guía de Configuración Interactiva de Credenciales en Primer Deploy (`README.md` + `how-to-run.md`):**
   - Añadida aclaración explícita sobre la solicitud interactiva de credenciales (`ADMIN_USER` y `ADMIN_PASSWORD`) que ejecuta `setup.py` / `setup.py --docker` durante la primera instalación y su persistencia automática en el archivo `.env`.
 
+- **Transición de Iluminación Uniforme y Sincronizada de Tema (`frontend/index.html` + `frontend/app.js`):**
+  - **Problema previo:** Al alternar entre Modo Oscuro y Modo Claro, la interfaz se pintaba de forma desfasada o "por zonas" debido a la presencia de múltiples duraciones dispares en Tailwind (`duration-200`, `duration-300`, `duration-500`) y elementos de texto/tarjetas que cambiaban de color instantáneamente (0ms) mientras el fondo tardaba 500ms.
+  - **Solución:** Implementada la clase global `html.theme-transitioning` que se activa dinámicamente durante el toggle de tema, forzando a **todos los elementos, fondos, textos, bordes, sombras y opacidades del DOM** a interpolar con una duración idéntica de `400ms` y la misma curva cinemática `cubic-bezier(0.4, 0, 0.2, 1)`. La clase se remueve automáticamente al concluir el ciclo para preservar el rendimiento y velocidad de los hovers y microinteracciones estándar.
+
 ### Corregido
 
 - **Internacionalización (i18n) de Categorías en KPIs, Gráficos de Analytics y Tarjetas (`frontend/app.js`):**
