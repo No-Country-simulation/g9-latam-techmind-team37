@@ -43,7 +43,7 @@ const TRANSLATIONS = {
         placeholder_title: 'ej. Tratamiento y gestión de bases de datos',
         label_body: 'Contenido del documento o artículo',
         placeholder_body: 'Pegá el texto aquí, o usá el botón «Importar PDF / DOCX» para extraerlo automáticamente. El modelo determinará la categoría y extraerá los conceptos clave...',
-        btn_classify: 'Clasificar con TechMind', btn_clear: 'Limpiar formulario',
+        btn_classify: 'Clasificar con TechMind', btn_clear: 'Limpiar formulario', analyzing: 'Analizando...',
         results_title: 'Resultado del análisis', predicted_category: 'Categoría predicha',
         waiting: 'Esperando análisis...', confidence: 'Confianza del Modelo',
         keywords_title: 'Palabras clave extraídas',
@@ -119,7 +119,7 @@ const TRANSLATIONS = {
         placeholder_title: 'e.g. Database management & processing',
         label_body: 'Document or article content',
         placeholder_body: 'Paste the text here, or use the «Import PDF / DOCX» button to extract it automatically. The model will determine the category and extract key concepts...',
-        btn_classify: 'Classify with TechMind', btn_clear: 'Clear form',
+        btn_classify: 'Classify with TechMind', btn_clear: 'Clear form', analyzing: 'Analyzing...',
         results_title: 'Analysis result', predicted_category: 'Predicted category',
         waiting: 'Waiting for analysis...', confidence: 'Model Confidence',
         keywords_title: 'Extracted keywords',
@@ -662,41 +662,8 @@ function bindEvents() {
     // ── Animación del botón Clasificar según contenido de los campos ────────────
     const titleField = document.getElementById('content-title');
     const bodyField  = document.getElementById('content-body');
-    const classifyReadyIcon = document.getElementById('classify-ready-icon');
-
-    const updateClassifyReadyState = () => {
-        if (!classifyBtn) return;
-        const hasContent = !!(titleField && titleField.value.trim()) &&
-                           !!(bodyField  && bodyField.value.trim());
-
-        if (hasContent && !classifyBtn.classList.contains('classify-ready')) {
-            // Activar: glow + shine en el botón
-            classifyBtn.classList.add('classify-ready');
-            // Animar entrada del icóno de rayo
-            if (classifyReadyIcon) {
-                classifyReadyIcon.classList.remove('classify-icon-exit', 'w-0', 'opacity-0');
-                classifyReadyIcon.classList.add('classify-icon-enter', 'w-auto');
-                classifyReadyIcon.style.pointerEvents = 'none';
-            }
-        } else if (!hasContent && classifyBtn.classList.contains('classify-ready')) {
-            // Desactivar: remover glow + shine
-            classifyBtn.classList.remove('classify-ready');
-            // Animar salida del icóno de rayo
-            if (classifyReadyIcon) {
-                classifyReadyIcon.classList.remove('classify-icon-enter', 'w-auto');
-                classifyReadyIcon.classList.add('classify-icon-exit');
-                // Ocultar el espacio luego de que termina la anim de salida
-                setTimeout(() => {
-                    classifyReadyIcon.classList.remove('classify-icon-exit');
-                    classifyReadyIcon.classList.add('w-0', 'opacity-0');
-                }, 260);
-            }
-        }
-    };
-
     if (titleField) titleField.addEventListener('input', updateClassifyReadyState);
     if (bodyField)  bodyField.addEventListener('input', updateClassifyReadyState);
-    // Evaluar el estado inicial por si los campos tienen contenido al cargar (ej. autocompletado)
     updateClassifyReadyState();
 
     // Sidebar selectors
@@ -1439,8 +1406,11 @@ async function handleClassification() {
         triggerHaptic([18, 40, 22]);
 
         // Limpiar los campos de entrada para nuevas búsquedas
-        document.getElementById('content-title').value = '';
-        document.getElementById('content-body').value = '';
+        const titleInputEl = document.getElementById('content-title');
+        const bodyInputEl = document.getElementById('content-body');
+        if (titleInputEl) titleInputEl.value = '';
+        if (bodyInputEl) bodyInputEl.value = '';
+        updateClassifyReadyState();
 
         // Recargar vistas activas solo si están visibles para proteger recursos del servidor
         setTimeout(() => {
@@ -2063,26 +2033,73 @@ function formatTimeString(isoStr) {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+function updateClassifyReadyState() {
+    const classifyBtn = document.getElementById('btn-classify');
+    const titleField = document.getElementById('content-title');
+    const bodyField = document.getElementById('content-body');
+    const classifyReadyIcon = document.getElementById('classify-ready-icon');
+
+    if (!classifyBtn) return;
+    if (classifyBtn.disabled) return;
+
+    const hasContent = !!(titleField && titleField.value.trim()) &&
+                       !!(bodyField && bodyField.value.trim());
+
+    if (hasContent) {
+        if (!classifyBtn.classList.contains('classify-ready')) {
+            classifyBtn.classList.add('classify-ready');
+            if (classifyReadyIcon) {
+                classifyReadyIcon.classList.remove('classify-icon-exit', 'w-0', 'opacity-0');
+                classifyReadyIcon.classList.add('classify-icon-enter', 'w-auto');
+                classifyReadyIcon.style.pointerEvents = 'none';
+            }
+        }
+    } else {
+        if (classifyBtn.classList.contains('classify-ready')) {
+            classifyBtn.classList.remove('classify-ready');
+            if (classifyReadyIcon) {
+                classifyReadyIcon.classList.remove('classify-icon-enter', 'w-auto');
+                classifyReadyIcon.classList.add('classify-icon-exit');
+                setTimeout(() => {
+                    if (!classifyBtn.classList.contains('classify-ready')) {
+                        classifyReadyIcon.classList.remove('classify-icon-exit');
+                        classifyReadyIcon.classList.add('w-0', 'opacity-0');
+                    }
+                }, 260);
+            }
+        }
+    }
+}
+
 function setLoadingState(isLoading) {
     const btn = document.getElementById('btn-classify');
+    const readyIcon = document.getElementById('classify-ready-icon');
+    const spinner = document.getElementById('classify-loading-spinner');
+    const btnText = document.getElementById('btn-classify-text');
     if (!btn) return;
 
     if (isLoading) {
         btn.disabled = true;
-        btn.innerHTML = `
-            <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container opacity-80"></div>
-            <div class="relative flex items-center justify-center text-center w-full">
-                <span>Analizando...</span>
-            </div>
-        `;
+        btn.classList.remove('classify-ready');
+        if (readyIcon) {
+            readyIcon.classList.remove('classify-icon-enter', 'w-auto');
+            readyIcon.classList.add('w-0', 'opacity-0');
+        }
+        if (spinner) {
+            spinner.classList.remove('hidden');
+        }
+        if (btnText) {
+            btnText.textContent = t('analyzing');
+        }
     } else {
         btn.disabled = false;
-        btn.innerHTML = `
-            <div class="absolute inset-0 bg-gradient-to-r from-inverse-primary to-primary-container group-hover:scale-105 transition-transform duration-300"></div>
-            <div class="relative flex items-center justify-center text-center w-full">
-                <span data-i18n="btn_classify">${t('btn_classify')}</span>
-            </div>
-        `;
+        if (spinner) {
+            spinner.classList.add('hidden');
+        }
+        if (btnText) {
+            btnText.textContent = t('btn_classify');
+        }
+        updateClassifyReadyState();
     }
 }
 

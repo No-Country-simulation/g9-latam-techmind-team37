@@ -32,6 +32,11 @@
     3. Un script `<script>` **inline y síncrono** en el `<head>` (antes de cualquier recurso externo) programa la remoción de `no-transition` mediante **doble `requestAnimationFrame`**, garantizando que la clase se elimine solo después del primer frame pintado en pantalla.
     - El resultado: cero transiciones visibles durante la carga inicial, con todas las micro-interacciones y animaciones funcionando normalmente a partir del primer pintado.
 
+- **Persistencia de Animación del Botón "Clasificar con TechMind" tras Inferencia (`frontend/index.html` + `frontend/app.js`):**
+  - **Síntoma:** Tras clasificar un texto exitosamente, si el usuario volvía a llenar los campos para una nueva consulta, la animación del botón (glow, shine e ícono de rayo ⚡) no volvía a activarse.
+  - **Causa:** La función `setLoadingState()` sobreescribía de manera destructiva el `innerHTML` del botón con una plantilla HTML estática simple que no contenía los nodos de soporte (`#classify-ready-icon`, `.classify-shine`, `#btn-classify-text`). Esto desvinculaba los elementos del DOM y dejaba referencias huérfanas en memoria.
+  - **Solución:** Se preservó la estructura fija del DOM dentro del botón, manipulando únicamente clases de visibilidad, spinners y texto reactivo sin sobreescribir el `innerHTML`. Se re-ejecuta `updateClassifyReadyState()` al finalizar el ciclo de análisis para evaluar reactivamente los nuevos ingresos de texto.
+
 - **Bordes Invisibles en Modo Oscuro en Botones Secundarios del Formulario (`frontend/index.html`):**
   - **Síntoma:** Los botones *"Importar PDF / DOCX"* (`#btn-import-doc`) y *"Limpiar formulario"* (`#btn-clear-form`) no mostraban borde visible en Modo Oscuro, luciendo como elementos sin delimitación.
   - **Causa:** Ambos botones usaban `dark:border-outline-variant` con opacidades bajas (`/70` y `/50`). La variable `--outline-variant` en dark mode vale `#494454`, un tono muy próximo al fondo del sistema (`#0b1326`), lo que hacía el borde prácticamente invisible independientemente de la opacidad aplicada.
