@@ -241,7 +241,7 @@ def health():
     summary="Historial de predicciones",
     description="Devuelve el historial de predicciones registradas en la base de datos PostgreSQL.",
 )
-def listar_predicciones(limit: int = 50):
+def listar_predicciones(limit: int = 500):
     return get_predicciones(limit=limit)
 
 

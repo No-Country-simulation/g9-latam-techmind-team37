@@ -1484,7 +1484,7 @@ async function loadHistory() {
     if (!historyGrid) return;
 
     try {
-        const res = await fetch(`${DS_API_URL}/predicciones?limit=50`);
+        const res = await fetch(`${DS_API_URL}/predicciones?limit=500`);
         if (!res.ok) throw new Error('No se pudo consultar el historial');
 
         allHistoryData = await res.json();
@@ -1630,7 +1630,7 @@ async function loadDetailedHistory(categoryFilter = 'all', searchQuery = '') {
             </div>
         `;
 
-        const res = await fetch(`${DS_API_URL}/predicciones?limit=100`);
+        const res = await fetch(`${DS_API_URL}/predicciones?limit=1000`);
         if (!res.ok) throw new Error('No se pudo consultar el historial');
         
         allHistoryData = await res.json();

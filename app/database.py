@@ -43,7 +43,7 @@ def init_db():
     print("✅  Conexión a PostgreSQL verificada correctamente")
 
 
-def get_predicciones(limit: int = 50):
+def get_predicciones(limit: int = 500):
     """
     Obtiene el historial de predicciones guardadas en PostgreSQL
     uniendo la tabla predicciones con contenidos por contenido_id.

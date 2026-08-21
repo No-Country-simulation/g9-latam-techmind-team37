@@ -18,6 +18,11 @@
 
 ### Corregido
 
+- **Tope Fijo de 100 Consultas en Contador y Filtro de Categorías del Historial (`frontend/app.js` + `app/main.py` + `app/database.py`):**
+  - **Síntoma:** Al superar las 100 consultas en la base de datos, el contador junto al filtro de *"Todas las categorías (N)"* en la sección de Historial quedaba estancado en `(100)` y no reflejaba el número real de consultas acumuladas, omitiendo además registros históricos antiguos en el listado.
+  - **Causa:** La petición a la API en `loadDetailedHistory()` tenía codificado `limit=100` en la URL y el endpoint `/predicciones` en FastAPI/PostgreSQL tenía un límite por defecto de 50 registros. Como el frontend calculaba los conteos por categoría y el total iterando sobre `allHistoryData.length`, el conteo total y por categoría quedaba truncado al número de elementos devueltos por la consulta paginada (100).
+  - **Solución:** Se incrementó el límite de recuperación de predicciones históricas a `1000` en `loadDetailedHistory()` y a `500` en `loadHistory()` / backend (`app/main.py` y `app/database.py`), permitiendo que el contador general de *"Todas las categorías"*, el desglose por categorías individuales y el listado de historial escalen y reflejen de manera precisa todas las consultas de la base de datos sin quedar truncados.
+
 - **Flash de Animación del Sidebar en Carga Inicial (Móvil) (`frontend/app.js`):**
   - **Síntoma:** Al recargar la página en dispositivos móviles, se percibía una micro-animación de contracción del sidebar (visible durante ~150ms), dado que el DOM inicia con el sidebar en estado expandido y JS lo colapsaba con las transiciones CSS ya activas.
   - **Causa:** `collapseSidebar()` se invocaba durante `DOMContentLoaded` mientras la regla de transición cinematográfica de 350ms (`cubic-bezier(0.16, 1, 0.3, 1)`) sobre `#sidebar` ya estaba computada.
