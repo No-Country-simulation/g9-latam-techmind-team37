@@ -4,6 +4,26 @@
 > Se sigue el formato [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 > Para el detalle técnico (causa, síntoma y código) de cada bug, ver [`BUGFIX_REGISTRO.md`](data-science/docs/BUGFIX_REGISTRO.md).
 
+## [2.6.0] — 2026-08-21 · Transición de Iluminación 100% Sincronizada, Documentación Bilingüe (README_EN) y Guía Interactiva de Credenciales
+
+### Añadido
+
+- **Documentación Completa en Inglés y Selector Bilingüe (`README_EN.md` + `README.md`):**
+  - Creada la versión completa en inglés del archivo de documentación principal ([`README_EN.md`](README_EN.md)), cubriendo la arquitectura del sistema, stack tecnológico, roles del equipo, estructura del repositorio, comandos de orquestación y contratos de API REST.
+  - Añadido selector de idioma interactivo en la cabecera de ambos archivos (`[ 🇪🇸 Español ] · [ 🇬🇧 English ]`) para navegación inmediata entre idiomas.
+
+- **Guía de Configuración Interactiva de Credenciales en Primer Deploy (`README.md` + `how-to-run.md`):**
+  - Añadida aclaración explícita sobre la solicitud interactiva de credenciales (`ADMIN_USER` y `ADMIN_PASSWORD`) que ejecuta `setup.py` / `setup.py --docker` durante la primera instalación y su persistencia automática en el archivo `.env`.
+
+### Corregido
+
+- **Transición de Iluminación 100% Sincronizada y Uniforme (Dark ⇄ Light mode) (`frontend/index.html` + `frontend/app.js`):**
+  - **Problema previo:** Al alternar entre Modo Oscuro y Modo Claro, la interfaz se pintaba de forma desfasada o "por zonas" (primero el sidebar y campos de texto debido a curvas de aceleración dispares y clases `transition-all` / `duration-150`, y recién después las tarjetas `glass-panel` y el fondo).
+  - **Solución:**
+    1. Se unificaron `#sidebar`, `#main-content`, `.glass-panel`, `.tech-input`, inputs y botones a una duración exacta de **`0.3s` con la misma curva cinematográfica `cubic-bezier(0.4, 0, 0.2, 1)`**.
+    2. Se removieron las clases Tailwind `transition-all` y `duration-*` dispersas en formularios, búsqueda, filtros y tarjetas que sobreescribían los tiempos de transición.
+    3. Implementada la clase global `html.theme-transitioning` que se activa dinámicamente en `app.js` durante el toggle de tema, forzando **a todos los elementos del árbol DOM** a interpolar con un reloj idéntico de 300ms de forma simultánea, retirándose automáticamente a los 320ms para preservar la respuesta instantánea de las microinteracciones estándar.
+
 ## [2.5.0] — 2026-08-19 · Mini Popover Lateral de Servicios, Animación del Clasificador, Correcciones de UX Móvil y Modo Oscuro
 
 ### Añadido
@@ -14,16 +34,7 @@
   - **Posicionamiento dinámico:** El mini popover se posiciona con `position: fixed` y `left: calc(var(--sidebar-collapsed-width) + 8px)`. El eje `top` se calcula en tiempo de ejecución con `getBoundingClientRect()` para centrarlo verticalmente respecto al botón disparador, con protección de márgenes del viewport.
   - **Sincronización automática de LEDs:** La función `setServiceStatus()` fue extendida para sincronizar en paralelo los LEDs del popover principal (`status-springboot`, `status-fastapi`, `status-postgres`) y los LEDs espejo del mini popover (`mini-led-springboot`, `mini-led-fastapi`, `mini-led-postgres`) sin duplicar ninguna lógica de negocio.
   - **Comportamiento diferenciado por estado del sidebar:** El handler de `#btn-status-trigger` detecta `sidebarCollapsed` en tiempo de clic: si el sidebar está colapsado abre el mini popover lateral; si está expandido, abre el popover completo con métricas OCI. Ambos se cierran mutuamente al alternarse.
-- **Documentación Completa en Inglés y Selector Bilingüe (`README_EN.md` + `README.md`):**
-  - Creada la versión completa en inglés del archivo de documentación principal ([`README_EN.md`](README_EN.md)), cubriendo la arquitectura del sistema, stack tecnológico, roles del equipo, estructura del repositorio, comandos de orquestación y contratos de API REST.
-  - Añadido selector de idioma interactivo en la cabecera de ambos archivos (`[ 🇪🇸 Español ] · [ 🇬🇧 English ]`) para navegación inmediata entre idiomas.
-
-- **Guía de Configuración Interactiva de Credenciales en Primer Deploy (`README.md` + `how-to-run.md`):**
-  - Añadida aclaración explícita sobre la solicitud interactiva de credenciales (`ADMIN_USER` y `ADMIN_PASSWORD`) que ejecuta `setup.py` / `setup.py --docker` durante la primera instalación y su persistencia automática en el archivo `.env`.
-
-- **Transición de Iluminación Uniforme y Sincronizada de Tema (`frontend/index.html` + `frontend/app.js`):**
-  - **Problema previo:** Al alternar entre Modo Oscuro y Modo Claro, la interfaz se pintaba de forma desfasada o "por zonas" debido a la presencia de múltiples duraciones dispares en Tailwind (`duration-200`, `duration-300`, `duration-500`) y elementos de texto/tarjetas que cambiaban de color instantáneamente (0ms) mientras el fondo tardaba 500ms.
-  - **Solución:** Implementada la clase global `html.theme-transitioning` que se activa dinámicamente durante el toggle de tema, forzando a **todos los elementos, fondos, textos, bordes, sombras y opacidades del DOM** a interpolar con una duración idéntica de `400ms` y la misma curva cinemática `cubic-bezier(0.4, 0, 0.2, 1)`. La clase se remueve automáticamente al concluir el ciclo para preservar el rendimiento y velocidad de los hovers y microinteracciones estándar.
+  - **Cierre automático:** Al expandir el sidebar (`expandSidebar()`), el mini popover se cierra automáticamente. Ambos popovers se cierran al hacer clic en cualquier otra área del documento.
 
 ### Corregido
 
