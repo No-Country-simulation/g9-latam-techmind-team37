@@ -24,6 +24,17 @@
     2. Se removieron las clases Tailwind `transition-all` y `duration-*` dispersas en formularios, búsqueda, filtros y tarjetas que sobreescribían los tiempos de transición.
     3. Implementada la clase global `html.theme-transitioning` que se activa dinámicamente en `app.js` durante el toggle de tema, forzando **a todos los elementos del árbol DOM** a interpolar con un reloj idéntico de 300ms de forma simultánea, retirándose automáticamente a los 320ms para preservar la respuesta instantánea de las microinteracciones estándar.
 
+- **Eliminación del Flash de Tema (Oscuro ⇄ Claro) en Carga Inicial (`frontend/index.html`):**
+  - **Problema:** Al recargar la página estando en Modo Claro, el sistema pintaba primero un frame en Modo Oscuro (debido a la clase `dark` estática en `<html>`) y luego aclaraba la pantalla mediante JavaScript, provocando un parpadeo molesto (FOUC).
+  - **Solución:** Se implementó la lectura y aplicación síncrona inmediata de `localStorage.getItem('theme')` en el `<head>` antes de evaluar cualquier hoja de estilos o recurso externo, garantizando que el primer fotograma se renderice directamente en el tema activo sin transición ni parpadeo visual.
+
+- **Supresión de la Animación de Contracción Inicial del Sidebar en Móvil y Escritorio (`frontend/index.html` + `frontend/app.js`):**
+  - **Problema:** Al cargar la página en dispositivos móviles o en pantallas de escritorio con sidebar colapsado guardado, el sidebar se renderizaba brevemente expandido y se contraía animadamente hacia el rail de 64px a la vista del usuario.
+  - **Solución:**
+    1. El script síncrono en `<head>` detecta si el cliente es móvil o tiene la preferencia guardada y añade la clase `init-sidebar-collapsed` en `<html>` de forma instantánea.
+    2. El CSS aplica estáticamente el ancho colapsado de `64px` y el `margin-left` correspondiente a `#main-content` desde el primer frame de renderizado.
+    3. `app.js` restaura el estado asignando `.sidebar-collapsed` directamente y retirando `init-sidebar-collapsed` sin disparar ninguna transición de ancho durante el arranque.
+
 ## [2.5.0] — 2026-08-19 · Mini Popover Lateral de Servicios, Animación del Clasificador, Correcciones de UX Móvil y Modo Oscuro
 
 ### Añadido

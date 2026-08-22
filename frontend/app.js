@@ -798,16 +798,21 @@ function bindEvents() {
     const savedCollapsed = localStorage.getItem('sidebarCollapsed');
     sidebar.classList.remove('-translate-x-full');
     sidebar.classList.add('translate-x-0', 'md:translate-x-0');
-    if (isMobileView()) {
-        // Móvil: colapsado por defecto.
-        // Las transiciones ya están suprimidas globalmente por .no-transition en <html>
-        // (el script inline del head lo remueve tras el primer rAF, evitando el flash).
-        collapseSidebar();
-    } else if (savedCollapsed === 'true') {
-        collapseSidebar();
+    if (isMobileView() || savedCollapsed === 'true') {
+        sidebarCollapsed = true;
+        sidebar.classList.add('sidebar-collapsed');
+        if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-collapsed-width)';
+        updateSidebarToggleIcons(true);
+        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+        setStatusPopoverOpen(false);
     } else {
-        expandSidebar();
+        sidebarCollapsed = false;
+        sidebar.classList.remove('sidebar-collapsed');
+        if (mainContent) mainContent.style.marginLeft = 'var(--sidebar-width)';
+        updateSidebarToggleIcons(false);
+        if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
     }
+    document.documentElement.classList.remove('init-sidebar-collapsed');
 
     // Sync sidebar state when crossing breakpoints
     let wasDesktop = window.innerWidth >= 768;
