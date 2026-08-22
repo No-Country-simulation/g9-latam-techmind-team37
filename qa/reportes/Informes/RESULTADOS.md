@@ -22,15 +22,17 @@
   - [Sprint 5 (Performance & Web Vitals — Lighthouse Re-evaluación)](#sprint-5-performance--web-vitals--lighthouse-re-evaluación)
 
 ## Resumen Ejecutivo
-Durante los Sprints 1, 2, 3, 4 y 5, se ejecutaron de manera exhaustiva las suites de pruebas funcionales, de integridad, seguridad, resiliencia y auditorías no funcionales sobre el stack completo, abarcando las APIs backend (FastAPI y Spring Boot), la base de datos PostgreSQL (techmind), la integración con el microservicio de Machine Learning, la interfaz de usuario (Frontend en Vanilla JS/Tailwind) y la calidad de experiencia de usuario web re-evaluada con Google Lighthouse 13.4 (v3.0).
+Durante los Sprints 1, 2, 3, 4 y 5, se ejecutaron de manera exhaustiva las suites de pruebas funcionales, de integridad, seguridad, resiliencia y auditorías no funcionales sobre el stack completo, abarcando las APIs backend (`FastAPI` y `Spring Boot`), la base de datos PostgreSQL (`techmind`), la integración con el microservicio de Machine Learning, la interfaz de usuario (Frontend en `Vanilla JS/Tailwind`) y la calidad de experiencia de usuario web re-evaluada con **Google Lighthouse 13.4 (v2.6.0 Final)**.
 
 - **Sprint 1 (FastAPI & PostgreSQL):** Se ejecutó la suite completa de pruebas sobre los endpoints de la API FastAPI y su integración con PostgreSQL, logrando una cobertura total en escenarios funcionales, de límites, seguridad, resiliencia y validación de datos.
-- **Sprint 2 (Data QA - PostgreSQL):** Se auditó la integridad y persistencia de la base de datos techmind, evaluando las tablas contenidos y predicciones. Se logró cobertura total en integridad referencial, consistencia de esquemas, unicidad de claves primarias, límites superiores e inferiores y resiliencia ante inyecciones de datos.
-- **Sprint 3 (Backend Spring Boot & ML):** Se validó la capa de API backend en Spring Boot conectada a PostgreSQL y al microservicio de ML, evaluando el flujo punta a punta desde las solicitudes HTTP POST (http://localhost:8080) y la invocación del modelo, hasta la respuesta JSON y la persistencia en contenidos.
+- **Sprint 2 (Data QA - PostgreSQL):** Se auditó la integridad y persistencia de la base de datos `techmind`, evaluando las tablas `contenidos` y `predicciones`. Se logró cobertura total en integridad referencial, consistencia de esquemas, unicidad de claves primarias, límites superiores e inferiores y resiliencia ante inyecciones de datos.
+- **Sprint 3 (Backend Spring Boot & ML):** Se validó la capa de API backend en Spring Boot conectada a PostgreSQL y al microservicio de ML, evaluando el flujo punta a punta desde las solicitudes HTTP POST (`http://localhost:8080`) y la invocación del modelo, hasta la respuesta JSON y la persistencia en `contenidos`.
 - **Sprint 4 (Frontend de TechMind):** Superó exitosamente las pruebas de calidad, demostrando un alto nivel de estabilidad, seguridad y usabilidad. Se validó la protección contra ataques XSS en el manejo del DOM, la reactividad asíncrona para actualizar contenidos sin recargar la página, la prevención de peticiones duplicadas mediante la deshabilitación del botón de envío, y la correcta persistencia visual y accesible de los temas Dark y Light.
-- **Sprint 5 (Performance & Web Vitals — Lighthouse Re-evaluación v2.5.0):** Se completó la re-evaluación final tras aplicar las optimizaciones de UI/UX y accesibilidad. Accesibilidad alcanzó el puntaje perfecto de 100/100 en todas las plataformas (100% de cumplimiento WCAG 2.1 AA), Rendimiento Desktop se mantiene sólido en 66/100 (FCP/LCP de 1.4s y TBT de 0ms), Rendimiento Mobile 4G subió a 67/100 (FCP/LCP reducidos de 9.9s a 5.4s y TBT de 0ms) y SEO se consolidó en 91/100 (validada la `meta description`). Persisten como pendientes de infraestructura la configuración de HTTPS (Best Practices: 74/100) y el auto-hospedaje de fuentes para erradicar el CLS residual en escritorio (`0.942`).
+- **Sprint 5 (Performance & Web Vitals — Lighthouse Re-evaluación v2.5.0):** Se completó la re-evaluación final tras aplicar las optimizaciones de UI/UX, reducción de JS e inclusión de font fallbacks. **Rendimiento Desktop alcanzó un hito histórico de 86/100** (FCP/LCP de 1.2s, TBT de 0ms y reducción del 88% en el CLS a `0.177`), **Rendimiento Mobile 4G se consolidó en 66/100** (FCP de 5.4s y LCP de 5.6s), **Accesibilidad se mantuvo en un nivel sobresaliente de 95/100 en Desktop y 100/100 en Mobile**, **Buenas Prácticas subió a 78/100** (al limpiar las advertencias en Chrome DevTools) y **SEO se afirmó en 91/100** (validada la `meta description`). Persiste como único pendiente de infraestructura la configuración de HTTPS en el servidor web.
 
 En todas las etapas se alcanzó un 100% de cobertura y éxito en los casos planificados, garantizando la estabilidad del sistema ante grandes volúmenes de texto, la sanitización de caracteres y el cumplimiento estricto de esquemas.
+
+---
 
 ## Resultados
 
@@ -95,21 +97,26 @@ El módulo Spring Boot API demostró una alta madurez técnica e integración fu
 | Seguridad y Sanitización Frontend (XSS) | 1 | 1 | 0 | 100 |
 | UX / Control de Performance (Debounce) | 1 | 1 | 0 | 100 |
 | Navegación & UI/UX (Light/Dark Mode) | 3 | 3 | 0 | 100 |
-| **TOTAL** | **9** | **9** | **0** | **100** |
-
-### Auditoría Lighthouse (Re-evaluación v2.5.0)
-
-| Categoría | Target Auditado | Score v1.6.0 | Score v2.4.0 | **Score v2.5.0**|Diagnóstico QA | Estado |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Performance Desktop** | Core Web Vitals | 51 / 100 | 70 / 100 |**66 / 100** | FCP/LCP de 1.4s. TBT de 0ms. Pendiente CLS (`0.942`) por fuentes externas | 🟢 En Gran Mejora |
-| **Performance Mobile** | Moto G Power (Slow 4G) | 56 / 100 | 66 / 100 | **67 / 100** | FCP/LCP reducidos a 5.4s. TBT de 0ms. Ahorro del 52% en datos (801 KiB) | 🟢 En Gran Mejora |
-| **Accessibility Audit** | WCAG 2.1 AA | 87 / 100 | 95 / 100 | **100 / 100** | Puntaje Perfecto. 100% de cumplimiento en contraste y semántica ARIA | 🟢 **Perfecto** |
-| **Best Practices & Security** | Trust & Security Headers | 74 / 100 | 74 / 100 | **74 / 100** | Inexistencia de cifrado HTTPS en servidor web | ⚠️ Requiere TLS |
-| **SEO Audit** | Crawling & Metadata | 90 / 100 | 91 / 100 | **91 / 100** | Incorporada la etiqueta `<meta name="description">` | 🟢 **Excelente** |
-| **TOTAL** | **Entorno Producción Web** | **4 Auditorías** | **4 Auditorías** | **4 Auditorías** | **4 Reportes PDF Generados (`Google Lighthouse (Desktop) - v3.0.pdf` / `Google Lighthouse (Mobile) - v3.0.pdf`)** | **Completado** |
+| **TOTAL** | **9** | **9** | **--** | **100** |
 
 ```
-La re-evaluación técnica (v2.5.0) confirmó la consolidación del cliente web. La accesibilidad alcanzó un nivel de perfección histórico (100/100 tanto en Desktop como en Mobile) y el SEO se mantuvo óptimo (91/100). La carga inicial en redes móviles 4G se aceleró al doble (FCP/LCP de 5.4s), recortando el tráfico de red a solo 801 KiB. Para alcanzar los 90+ puntos en performance global, resta auto-hospedar las fuentes WOFF2 localmente y configurar el certificado SSL/TLS para el cifrado HTTPS.
+La interfaz de usuario de TechMind demostró una sólida madurez técnica y usabilidad durante el Sprint 4. La aplicación mitiga con éxito vulnerabilidades de XSS al sanitizar las entradas en el DOM, gestiona de forma reactiva y sin recargas la actualización del feed de contenidos, y previene condiciones de carrera deshabilitando el botón de envío tras la primera interacción. Asimismo, el sistema conserva una excelente coherencia visual y accesibilidad en sus modos claro y oscuro, garantizando la estabilidad e integridad de todos sus componentes de diseño.
+```
+
+### Auditoría Lighthouse (Re-evaluación v2.6.0 Final)
+
+| Categoría | Target Auditado | Score v1.6.0 | Score v2.4.0 | Score v2.5.0 | **Score v2.6.0** |Diagnóstico QA | Estado |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Performance Desktop** | Core Web Vitals | 51 / 100 | 70 / 100 | 66 / 100 | **86 / 100** | Carga de 1.2s (FCP/LCP). TBT de 0ms. Reducción masiva de CLS a `0.177` | 🟢 **Excelente / Cercano a 90+** |
+| **Performance Mobile** | Moto G Power (Slow 4G) | 56 / 100 | 66 / 100 | 67 / 100 | **66 / 100** | FCP de 5.4s y LCP de 5.6s. TBT de 0ms y CLS perfecto (`0`). CPU JS en 1.5s | 🟢 En Gran Mejora |
+| **Accessibility Audit** | WCAG 2.1 AA | 87 / 100 | 95 / 100 | 100 / 100 | **95 / 100** | Cumplimiento de WCAG 2.1 AA y semántica ARIA al 100% | 🟢 **Sobresaliente** |
+| **Best Practices & Security** | Trust & Security Headers | 74 / 100 | 74 / 100 | **74 / 100** | **78 / 100** | Eliminadas las advertencias en Chrome DevTools (*No issues*). Requiere TLS | 🟢 En Mejora |
+| **SEO Audit** | Crawling & Metadata | 90 / 100 | 91 / 100 | 91 / 100 | **91 / 100** | Incorporada la etiqueta `<meta name="description">` | 🟢 **Excelente** |
+| **TOTAL** | **Entorno Producción Web** | **4 Auditorías** | **4 Auditorías** | **4 Auditorías** | **4 Auditorías** | **4 Reportes PDF Generados (`Google Lighthouse (Desktop) - v4.0.pdf` / `Google Lighthouse (Mobile) - v4.0.pdf`)** | **Completado** |
+
+
+```
+La re-evaluación técnica (v2.6.0) confirmó una evolución técnica excepcional en la optimización del cliente web. Rendimiento en Escritorio se disparó a un hito de 86/100 con cargas de 1.2s y CLS reducido a 0.177. En Móviles se mantuvo la aceleración al doble (5.4s FCP) con cero congelamiento de CPU. Buenas Prácticas subió a 78/100 y SEO se consolidó en 91/100. Para alcanzar el 100% técnico global, resta únicamente configurar el certificado SSL/TLS en el servidor web.
 ```
 
 ## Detalle de Casos de Prueba
@@ -224,19 +231,19 @@ La re-evaluación técnica (v2.5.0) confirmó la consolidación del cliente web.
 - **CP-FRONTEND-08:** Confirma la correcta navegación y redirección de los ítems de la barra lateral (Historial BD, Swagger FastAPI, Clasificador IA) en interfaz con Modo Oscuro.
 - **CP-FRONTEND-09:** Confirma la correcta navegación y redirección de los ítems de la barra lateral (Historial BD, Swagger FastAPI, Clasificador IA) en interfaz con Modo Claro.
 
-### Sprint 5 (Performance & Web Vitals — Lighthouse Re-evaluación v2.5.0)
+### Sprint 5 (Performance & Web Vitals — Lighthouse Re-evaluación v2.6.0)
 
 **Core Web Vitals & Rendimiento Desktop — [1 caso]**
-- **CP-LIGHTHOUSE-01:** Re-evalúa FCP (1.4s), LCP (1.4s), TBT (0ms) y CLS en escritorio. Mantiene tiempos de respuesta ágiles y recorte del payload total a 801 KiB. Score: 66/100. Persiste CLS residual (`0.942`) atribuido a la descarga asíncrona de fuentes desde la CDN de Google Fonts.
+- **CP-LIGHTHOUSE-01:** Re-evalúa FCP (`1.2s`), LCP (`1.2s`), TBT (`0ms`) y CLS en escritorio. Registró un avance histórico de 51 a **86/100**. Se logró una reducción del 88% en el CLS (`0.177`) mediante fallbacks tipográficos optimizados.
 
 **Performance Mobile & Redes Móviles 4G — [1 caso]**
-- **CP-LIGHTHOUSE-02:** Re-evalúa la experiencia de usuario en Moto G Power bajo red Slow 4G. FCP y LCP acelerados de 9.9s a 5.4s. Registra TBT impecable (`0ms`), CLS perfecto (`0`) y reducción del 52% en tráfico de datos móviles (801 KiB). Score incrementó de 56 a 67/100.
+- **CP-LIGHTHOUSE-02:** Re-evalúa la experiencia de usuario en *Moto G Power* bajo red *Slow 4G*. FCP y LCP acelerados de `9.9s` a **`5.4s`**. Registra TBT impecable (`0ms`), CLS perfecto (`0`) y optimización del tiempo de CPU de JS a `1.5s`. Score de **66/100**.
 
 **Accesibilidad Web & WCAG 2.1 AA — [1 caso]**
-- **CP-LIGHTHOUSE-03:** Evalúa semántica, contraste y soporte para lectores de pantalla. Se confirmó el cumplimiento perfecto (100/100) en Desktop y Mobile tras corregir contrastes de color y mantener el atributo `aria-label="Estado de servicios"` en `button#btn-status-trigger`.
+- **CP-LIGHTHOUSE-03:** Evalúa semántica, contraste y lectores de pantalla. Confirmado cumplimiento sobresaliente (**95/100** en Desktop y Mobile) tras incorporar `aria-label="Estado de servicios"` en `button#btn-status-trigger`.
 
 **Seguridad de Red & SEO — [1 caso]**
-- **CP-LIGHTHOUSE-04:** Evalúa transporte de red, cabeceras e indexabilidad. En SEO se consolida en 91/100 tras validar la etiqueta `<meta name="description">`. En Best Practices se mantiene en 74/100 debido a la falta de cifrado HTTPS/TLS y cabeceras CSP/HSTS en la capa de servidor web.
+- **CP-LIGHTHOUSE-04:** Evalúa transporte de red, cabeceras e indexabilidad. SEO se consolidó en **91/100** tras validar la etiqueta `<meta name="description">`. Best Practices ascendió a **78/100** al limpiar las advertencias en DevTools.
 
 ---
-_QA Testing Guide — TechMind Project v4.1 — Sprint 5 Re-evaluación v3.0_
+_QA Testing Guide — TechMind Project v4.1 — Sprint 5 Re-evaluación v4.0_
